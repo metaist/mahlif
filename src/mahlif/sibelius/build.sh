@@ -4,7 +4,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC_DIR="$SCRIPT_DIR"
 # Build to repo root dist/
-BUILD_DIR="$SRC_DIR/../../../../dist"
+BUILD_DIR="$SRC_DIR/../../../dist"
 
 mkdir -p "$BUILD_DIR"
 
