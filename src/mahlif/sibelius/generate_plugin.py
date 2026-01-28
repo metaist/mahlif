@@ -189,234 +189,251 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
             # Page/system breaks are handled at system staff level
 
             for elem in bar.elements:
-                if isinstance(elem, NoteRest) and not elem.is_rest:
-                    if elem.is_chord:
-                        # First note
-                        note = elem.notes[0]
-                        tied = "True" if note.tied else "False"
-                        lines.append(
-                            f"nr = b.AddNote({elem.pos}, {note.pitch}, "
-                            f"{elem.dur}, {tied}, {elem.voice});"
-                        )
-                        # Additional notes (only if nr is valid)
-                        lines.append("if (nr != null) {")
-                        for note in elem.notes[1:]:
-                            lines.append(f"\tnr.AddNote({note.pitch});")
-                        # Articulations
-                        for artic in elem.articulations:
-                            if artic in ARTICULATION_MAP:
-                                lines.append(
-                                    f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
-                                )
-                        # dx/dy offsets
-                        if elem.offset.dx != 0:
-                            lines.append(f"\tnr.Dx = {int(elem.offset.dx)};")
-                        if elem.offset.dy != 0:
-                            lines.append(f"\tnr.Dy = {int(elem.offset.dy)};")
-                        # Stem direction
-                        if elem.stem == "up":
-                            lines.append("\tnr.StemDirection = 1;")
-                        elif elem.stem == "down":
-                            lines.append("\tnr.StemDirection = -1;")
-                        lines.append("}")
-                    else:
-                        # Single note
-                        note = elem.notes[0]
-                        tied = "True" if note.tied else "False"
-                        lines.append(
-                            f"nr = b.AddNote({elem.pos}, {note.pitch}, "
-                            f"{elem.dur}, {tied}, {elem.voice});"
-                        )
-                        # Articulations, offsets, stem
-                        has_extras = (
-                            elem.articulations
-                            or elem.offset.dx != 0
-                            or elem.offset.dy != 0
-                            or elem.stem in ("up", "down")
-                        )
-                        if has_extras:
+                match elem:
+                    case NoteRest() if not elem.is_rest:
+                        if elem.is_chord:
+                            # First note
+                            note = elem.notes[0]
+                            tied = "True" if note.tied else "False"
+                            lines.append(
+                                f"nr = b.AddNote({elem.pos}, {note.pitch}, "
+                                f"{elem.dur}, {tied}, {elem.voice});"
+                            )
+                            # Additional notes (only if nr is valid)
                             lines.append("if (nr != null) {")
+                            for note in elem.notes[1:]:
+                                lines.append(f"\tnr.AddNote({note.pitch});")
+                            # Articulations
                             for artic in elem.articulations:
                                 if artic in ARTICULATION_MAP:
                                     lines.append(
                                         f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
                                     )
+                            # dx/dy offsets
                             if elem.offset.dx != 0:
                                 lines.append(f"\tnr.Dx = {int(elem.offset.dx)};")
                             if elem.offset.dy != 0:
                                 lines.append(f"\tnr.Dy = {int(elem.offset.dy)};")
+                            # Stem direction
                             if elem.stem == "up":
                                 lines.append("\tnr.StemDirection = 1;")
                             elif elem.stem == "down":
                                 lines.append("\tnr.StemDirection = -1;")
                             lines.append("}")
+                        else:
+                            # Single note
+                            note = elem.notes[0]
+                            tied = "True" if note.tied else "False"
+                            lines.append(
+                                f"nr = b.AddNote({elem.pos}, {note.pitch}, "
+                                f"{elem.dur}, {tied}, {elem.voice});"
+                            )
+                            # Articulations, offsets, stem
+                            has_extras = (
+                                elem.articulations
+                                or elem.offset.dx != 0
+                                or elem.offset.dy != 0
+                                or elem.stem in ("up", "down")
+                            )
+                            if has_extras:
+                                lines.append("if (nr != null) {")
+                                for artic in elem.articulations:
+                                    if artic in ARTICULATION_MAP:
+                                        lines.append(
+                                            f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
+                                        )
+                                if elem.offset.dx != 0:
+                                    lines.append(f"\tnr.Dx = {int(elem.offset.dx)};")
+                                if elem.offset.dy != 0:
+                                    lines.append(f"\tnr.Dy = {int(elem.offset.dy)};")
+                                if elem.stem == "up":
+                                    lines.append("\tnr.StemDirection = 1;")
+                                elif elem.stem == "down":
+                                    lines.append("\tnr.StemDirection = -1;")
+                                lines.append("}")
 
-                elif isinstance(elem, Dynamic):
-                    # Dynamics use expression text style
-                    lines.append(
-                        f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
-                        f"'text.staff.expression');"
-                    )
-
-                elif isinstance(elem, Text):
-                    # Generic text - try to map style
-                    style = "text.staff.plain"
-                    if "technique" in (elem.style or ""):
-                        style = "text.staff.technique"
-                    elif "expression" in (elem.style or ""):
-                        style = "text.staff.expression"
-                    lines.append(
-                        f"b.AddText({elem.pos}, '{escape_str(elem.text)}', '{style}');"
-                    )
-
-                elif isinstance(elem, Clef):
-                    # Map clef type to style ID
-                    clef_map = {
-                        "treble": "clef.treble",
-                        "bass": "clef.bass",
-                        "alto": "clef.alto",
-                        "tenor": "clef.tenor",
-                        "percussion": "clef.percussion",
-                    }
-                    clef_style = clef_map.get(elem.type, "clef.treble")
-                    lines.append(f"b.AddClef({elem.pos}, '{clef_style}');")
-
-                elif isinstance(elem, Slur):
-                    # Slurs span from start to end position
-                    # AddLine(pos, duration, style)
-                    duration = _calc_spanner_duration(
-                        elem.start_bar,
-                        elem.start_pos,
-                        elem.end_bar,
-                        elem.end_pos,
-                        bar.length,
-                    )
-                    if duration > 0:
+                    case Dynamic():
+                        # Dynamics use expression text style
                         lines.append(
-                            f"b.AddLine({elem.start_pos}, {duration}, "
-                            f"'line.staff.slur.up', 0, 0, {elem.voice});"
+                            f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
+                            f"'text.staff.expression');"
                         )
 
-                elif isinstance(elem, Hairpin):
-                    # Hairpins: crescendo or diminuendo
-                    duration = _calc_spanner_duration(
-                        elem.start_bar,
-                        elem.start_pos,
-                        elem.end_bar,
-                        elem.end_pos,
-                        bar.length,
-                    )
-                    if duration > 0:
-                        style = (
-                            "line.staff.hairpin.crescendo"
-                            if elem.type == "cresc"
-                            else "line.staff.hairpin.diminuendo"
-                        )
+                    case Text():
+                        # Generic text - try to map style
+                        style = "text.staff.plain"
+                        if "technique" in (elem.style or ""):
+                            style = "text.staff.technique"
+                        elif "expression" in (elem.style or ""):
+                            style = "text.staff.expression"
                         lines.append(
-                            f"b.AddLine({elem.start_pos}, {duration}, "
-                            f"'{style}', 0, 0, {elem.voice});"
+                            f"b.AddText({elem.pos}, '{escape_str(elem.text)}', '{style}');"
                         )
 
-                elif isinstance(elem, Tuplet):
-                    # AddTuplet(pos, voice, left, right, unit)
-                    # left/right = ratio (e.g., 3:2 triplet)
-                    # unit = duration of each note in the tuplet
-                    lines.append(
-                        f"b.AddTuplet({elem.start_pos}, 1, {elem.num}, {elem.den}, 256);"
-                    )
+                    case Clef():
+                        # Map clef type to style ID
+                        clef_map = {
+                            "treble": "clef.treble",
+                            "bass": "clef.bass",
+                            "alto": "clef.alto",
+                            "tenor": "clef.tenor",
+                            "percussion": "clef.percussion",
+                        }
+                        clef_style = clef_map.get(elem.type, "clef.treble")
+                        lines.append(f"b.AddClef({elem.pos}, '{clef_style}');")
 
-                elif isinstance(elem, Barline):
-                    # Special barlines (repeat, double, final)
-                    barline_map = {
-                        "double": "DoubleBarline",
-                        "final": "FinalBarline",
-                        "repeat-start": "StartRepeatBarline",
-                        "repeat-end": "EndRepeatBarline",
-                        "dashed": "DashedBarline",
-                    }
-                    if elem.type in barline_map:
-                        lines.append(f"b.AddSpecialBarline({barline_map[elem.type]});")
+                    case Slur():
+                        # Slurs span from start to end position
+                        # AddLine(pos, duration, style)
+                        duration = _calc_spanner_duration(
+                            elem.start_bar,
+                            elem.start_pos,
+                            elem.end_bar,
+                            elem.end_pos,
+                            bar.length,
+                        )
+                        if duration > 0:
+                            lines.append(
+                                f"b.AddLine({elem.start_pos}, {duration}, "
+                                f"'line.staff.slur.up', 0, 0, {elem.voice});"
+                            )
 
-                elif isinstance(elem, Octava):
-                    # 8va/8vb lines
-                    octava_map = {
-                        "8va": "line.staff.octava.plus8",
-                        "8vb": "line.staff.octava.minus8",
-                        "15va": "line.staff.octava.plus15",
-                        "15vb": "line.staff.octava.minus15",
-                    }
-                    style = octava_map.get(elem.type, "line.staff.octava.plus8")
-                    duration = _calc_spanner_duration(
-                        elem.start_bar,
-                        elem.start_pos,
-                        elem.end_bar,
-                        elem.end_pos,
-                        bar.length,
-                    )
-                    if duration > 0:
+                    case Hairpin():
+                        # Hairpins: crescendo or diminuendo
+                        duration = _calc_spanner_duration(
+                            elem.start_bar,
+                            elem.start_pos,
+                            elem.end_bar,
+                            elem.end_pos,
+                            bar.length,
+                        )
+                        if duration > 0:
+                            style = (
+                                "line.staff.hairpin.crescendo"
+                                if elem.type == "cresc"
+                                else "line.staff.hairpin.diminuendo"
+                            )
+                            lines.append(
+                                f"b.AddLine({elem.start_pos}, {duration}, "
+                                f"'{style}', 0, 0, {elem.voice});"
+                            )
+
+                    case Tuplet():
+                        # AddTuplet(pos, voice, left, right, unit)
+                        # left/right = ratio (e.g., 3:2 triplet)
+                        # unit = duration of each note in the tuplet
                         lines.append(
-                            f"b.AddLine({elem.start_pos}, {duration}, "
-                            f"'{style}', 0, 0, {elem.voice});"
+                            f"b.AddTuplet({elem.start_pos}, 1, {elem.num}, {elem.den}, 256);"
                         )
 
-                elif isinstance(elem, Pedal):
-                    # Piano pedal lines
-                    duration = _calc_spanner_duration(
-                        elem.start_bar,
-                        elem.start_pos,
-                        elem.end_bar,
-                        elem.end_pos,
-                        bar.length,
-                    )
-                    if duration > 0:
-                        lines.append(
-                            f"b.AddLine({elem.start_pos}, {duration}, "
-                            f"'line.staff.pedal', 0, 0, 1);"
-                        )
+                    case Barline():
+                        # Special barlines (repeat, double, final)
+                        barline_map = {
+                            "double": "DoubleBarline",
+                            "final": "FinalBarline",
+                            "repeat-start": "StartRepeatBarline",
+                            "repeat-end": "EndRepeatBarline",
+                            "dashed": "DashedBarline",
+                        }
+                        if elem.type in barline_map:
+                            lines.append(
+                                f"b.AddSpecialBarline({barline_map[elem.type]});"
+                            )
 
-                elif isinstance(elem, Trill):
-                    # Trill lines
-                    duration = _calc_spanner_duration(
-                        elem.start_bar,
-                        elem.start_pos,
-                        elem.end_bar,
-                        elem.end_pos,
-                        bar.length,
-                    )
-                    if duration > 0:
-                        lines.append(
-                            f"b.AddLine({elem.start_pos}, {duration}, "
-                            f"'line.staff.trill', 0, 0, {elem.voice});"
+                    case Octava():
+                        # 8va/8vb lines
+                        octava_map = {
+                            "8va": "line.staff.octava.plus8",
+                            "8vb": "line.staff.octava.minus8",
+                            "15va": "line.staff.octava.plus15",
+                            "15vb": "line.staff.octava.minus15",
+                        }
+                        style = octava_map.get(elem.type, "line.staff.octava.plus8")
+                        duration = _calc_spanner_duration(
+                            elem.start_bar,
+                            elem.start_pos,
+                            elem.end_bar,
+                            elem.end_pos,
+                            bar.length,
                         )
+                        if duration > 0:
+                            lines.append(
+                                f"b.AddLine({elem.start_pos}, {duration}, "
+                                f"'{style}', 0, 0, {elem.voice});"
+                            )
 
-                elif isinstance(elem, Grace):
-                    # Grace notes - add before the main note
-                    if elem.type == "acciaccatura":
-                        # Need to find the NoteRest at this position first
-                        lines.append(
-                            f"// Grace note at {elem.pos} (acciaccatura) - "
-                            f"requires AddAcciaccaturaBefore on NoteRest"
+                    case Pedal():
+                        # Piano pedal lines
+                        duration = _calc_spanner_duration(
+                            elem.start_bar,
+                            elem.start_pos,
+                            elem.end_bar,
+                            elem.end_pos,
+                            bar.length,
                         )
-                    elif elem.type == "appoggiatura":
-                        lines.append(
-                            f"// Grace note at {elem.pos} (appoggiatura) - "
-                            f"requires AddAppoggiaturaBefore on NoteRest"
-                        )
+                        if duration > 0:
+                            lines.append(
+                                f"b.AddLine({elem.start_pos}, {duration}, "
+                                f"'line.staff.pedal', 0, 0, 1);"
+                            )
 
-                elif isinstance(elem, Tempo):
-                    # Tempo markings with metronome
-                    if elem.text:
+                    case Trill():
+                        # Trill lines
+                        duration = _calc_spanner_duration(
+                            elem.start_bar,
+                            elem.start_pos,
+                            elem.end_bar,
+                            elem.end_pos,
+                            bar.length,
+                        )
+                        if duration > 0:
+                            lines.append(
+                                f"b.AddLine({elem.start_pos}, {duration}, "
+                                f"'line.staff.trill', 0, 0, {elem.voice});"
+                            )
+
+                    case Grace():
+                        # Grace notes - add before the main note
+                        if elem.type == "acciaccatura":
+                            # Need to find the NoteRest at this position first
+                            lines.append(
+                                f"// Grace note at {elem.pos} (acciaccatura) - "
+                                f"requires AddAcciaccaturaBefore on NoteRest"
+                            )
+                        elif elem.type == "appoggiatura":
+                            lines.append(
+                                f"// Grace note at {elem.pos} (appoggiatura) - "
+                                f"requires AddAppoggiaturaBefore on NoteRest"
+                            )
+
+                    case Tempo() if elem.text:
+                        # Tempo markings with metronome
                         lines.append(
                             f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
                             f"'text.system.tempo');"
                         )
 
-                elif isinstance(elem, Rehearsal):
-                    # Rehearsal marks
-                    lines.append(
-                        f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
-                        f"'text.system.rehearsalmark');"
-                    )
+                    case Rehearsal():
+                        # Rehearsal marks
+                        lines.append(
+                            f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
+                            f"'text.system.rehearsalmark');"
+                        )
+
+                    case NoteRest():
+                        # Rest - skip (handled by Sibelius automatically)
+                        pass
+
+                    case Tempo():
+                        # Tempo without text - skip
+                        pass
+
+                    case KeySignature() | TimeSignature():
+                        # Handled at system staff level
+                        pass
+
+                    case _:  # pragma: no cover
+                        raise TypeError(f"Unknown bar element type: {type(elem)}")
 
         # Add lyrics for this staff (lyrics are at staff level, not bar level)
         for lyrics in staff.lyrics:
@@ -471,15 +488,18 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
             for bar in score.system_staff.bars:
                 if bar.n == bar_n:
                     for elem in bar.elements:
-                        if isinstance(elem, TimeSignature):
-                            lines.append(
-                                f"sysBar.AddTimeSignature({elem.num}, {elem.den}, False, False);"
-                            )
-                        elif isinstance(elem, KeySignature):
-                            is_major = "True" if elem.mode == "major" else "False"
-                            lines.append(
-                                f"sysBar.AddKeySignature({elem.pos}, {elem.fifths}, {is_major});"
-                            )
+                        match elem:
+                            case TimeSignature():
+                                lines.append(
+                                    f"sysBar.AddTimeSignature({elem.num}, {elem.den}, False, False);"
+                                )
+                            case KeySignature():
+                                is_major = "True" if elem.mode == "major" else "False"
+                                lines.append(
+                                    f"sysBar.AddKeySignature({elem.pos}, {elem.fifths}, {is_major});"
+                                )
+                            case _:
+                                pass  # Other elements handled at staff level
                     break
     lines.append("")
 

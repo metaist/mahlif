@@ -61,14 +61,18 @@ def _pitch_to_lily(pitch: int, accidental: str = "") -> str:
     if accidental:
         base_names = ["c", "c", "d", "d", "e", "f", "f", "g", "g", "a", "a", "b"]
         base_name = base_names[note_index]
-        if accidental == "#":
-            name = base_name + "is"
-        elif accidental == "b":
-            name = base_name + "es"
-        elif accidental == "x":
-            name = base_name + "isis"
-        elif accidental == "bb":
-            name = base_name + "eses"
+        match accidental:
+            case "#":
+                name = base_name + "is"
+            case "b":
+                name = base_name + "es"
+            case "x":
+                name = base_name + "isis"
+            case "bb":
+                name = base_name + "eses"
+            case _:
+                # Unknown accidental - keep chromatic pitch name
+                pass
 
     # Add octave marks
     if octave > 0:

@@ -2162,3 +2162,95 @@ class TestFinalCoverageGaps:
         result = generate_plugin(score, "Test")
         # All pedal types use same style
         assert "line.staff.pedal" in result
+
+    def test_generate_plugin_rest_element(self) -> None:
+        """Test that rest elements are skipped."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        rest = NoteRest(pos=256, dur=256, notes=[], voice=1)  # Rest
+        bar = Bar(n=1, length=1024, elements=[noterest, rest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Rest should be skipped, only one AddNote call
+        assert result.count("AddNote") == 1
+
+    def test_generate_plugin_tempo_without_text(self) -> None:
+        """Test that tempo without text is skipped."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        tempo = Tempo(pos=0, text="", bpm=120)
+        bar = Bar(n=1, length=1024, elements=[noterest, tempo])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Tempo without text should not add text.system.tempo
+        assert "text.system.tempo" not in result
+
+    def test_generate_plugin_key_time_sig_in_bar(self) -> None:
+        """Test that key/time signatures in staff bars are skipped."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        ks = KeySignature(pos=0, fifths=2, mode="major")
+        ts = TimeSignature(pos=0, num=4, den=4)
+        bar = Bar(n=1, length=1024, elements=[noterest, ks, ts])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Key/time sigs in staff bars should be handled at system level only
+        # Check that we don't crash and the note is still added
+        assert "AddNote" in result
+
+    def test_generate_plugin_system_staff_other_element(self) -> None:
+        """Test that non-key/time elements in system staff are skipped."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        # Put a text element in system staff (should be skipped)
+        text = Text(pos=0, text="test", style="tempo")
+        sys_bar = Bar(n=1, length=1024, elements=[text])
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[sys_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        # Text in system staff should not generate anything
+        assert "AddNote" in result
+
+    def test_generate_plugin_system_staff_mixed_elements(self) -> None:
+        """Test system staff bar with both key sig and other elements."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        # Put both key signature and text in same system staff bar
+        ks = KeySignature(pos=0, fifths=2, mode="major")
+        text = Text(pos=0, text="test", style="tempo")
+        sys_bar = Bar(n=1, length=1024, elements=[ks, text])
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[sys_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        # Key sig should be added, text should be skipped
+        assert "AddKeySignature" in result

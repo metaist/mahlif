@@ -92,21 +92,27 @@ def _parse_noterest(elem: etree._Element) -> NoteRest:
     notes: list[Note] = []
     articulations: list[str] = []
 
-    if tag == "chord":
-        # Parse child notes
-        for n_elem in elem.findall("n"):
-            notes.append(_parse_note(n_elem))
-    elif tag == "note":
-        # Single note
-        notes.append(
-            Note(
-                pitch=_get_int(elem, "pitch"),
-                written_pitch=_get_int(elem, "written-pitch") or None,
-                diatonic=_get_int(elem, "diatonic"),
-                accidental=_get_attr(elem, "accidental"),
-                tied=_get_bool(elem, "tied"),
+    match tag:
+        case "chord":
+            # Parse child notes
+            for n_elem in elem.findall("n"):
+                notes.append(_parse_note(n_elem))
+        case "note":
+            # Single note
+            notes.append(
+                Note(
+                    pitch=_get_int(elem, "pitch"),
+                    written_pitch=_get_int(elem, "written-pitch") or None,
+                    diatonic=_get_int(elem, "diatonic"),
+                    accidental=_get_attr(elem, "accidental"),
+                    tied=_get_bool(elem, "tied"),
+                )
             )
-        )
+        case "rest":
+            # Rest - no notes
+            pass
+        case _:  # pragma: no cover
+            raise ValueError(f"Unknown noterest type: {tag!r}")
 
     # Parse articulations
     art_str = _get_attr(elem, "articulations")
