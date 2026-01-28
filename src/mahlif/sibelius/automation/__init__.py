@@ -174,6 +174,26 @@ def new_blank_score() -> None:
     """)
 
 
+def dismiss_modal(count: int = 1) -> None:
+    """Dismiss modal dialog(s) by pressing Enter.
+
+    Sibelius message boxes don't expose accessibility elements,
+    but Enter dismisses the default (OK) button.
+
+    Args:
+        count: Number of modals to dismiss (for error sequences)
+    """
+    for _ in range(count):
+        run_applescript("""
+            tell application "System Events"
+                tell process "Sibelius"
+                    keystroke return
+                    delay 0.5
+                end tell
+            end tell
+        """)
+
+
 def close_without_saving() -> None:
     """Close current score without saving."""
     run_applescript("""

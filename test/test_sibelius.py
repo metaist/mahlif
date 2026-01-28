@@ -2527,3 +2527,25 @@ class TestFinalBranchCoverage:
         parser = Parser(tokens)
         result = parser._extract_params("no parens here")
         assert result == []
+
+
+def test_dismiss_modal_single() -> None:
+    """Test dismissing single modal."""
+    from mahlif.sibelius.automation import dismiss_modal
+
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        dismiss_modal()
+        assert mock_run.call_count == 1
+        script = mock_run.call_args[0][0][2]
+        assert "keystroke return" in script
+
+
+def test_dismiss_modal_multiple() -> None:
+    """Test dismissing multiple modals."""
+    from mahlif.sibelius.automation import dismiss_modal
+
+    with patch("subprocess.run") as mock_run:
+        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+        dismiss_modal(count=3)
+        assert mock_run.call_count == 3
