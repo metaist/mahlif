@@ -1,0 +1,2598 @@
+{
+  "methods": {
+    "AbbreviateUsingApostrophe": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "AbbreviateUsingApostrophe",
+      "params": [
+        "useApostrophe"
+      ]
+    },
+    "AddAcciaccaturaBefore": {
+      "max_params": 7,
+      "min_params": 6,
+      "name": "AddAcciaccaturaBefore",
+      "params": [
+        "sounding pitch",
+        "duration",
+        "tied",
+        "voice",
+        "diatonic pitch",
+        "string number",
+        "force stem dir?"
+      ]
+    },
+    "AddAppoggiaturaBefore": {
+      "max_params": 7,
+      "min_params": 6,
+      "name": "AddAppoggiaturaBefore",
+      "params": [
+        "sounding pitch",
+        "duration",
+        "tied",
+        "voice",
+        "diatonic pitch",
+        "string number",
+        "force stem dir?"
+      ]
+    },
+    "AddBarNumber": {
+      "max_params": 5,
+      "min_params": 1,
+      "name": "AddBarNumber",
+      "params": [
+        "new bar number",
+        "format",
+        "extra_text",
+        "prepend",
+        "skip this bar?"
+      ]
+    },
+    "AddBarline": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "AddBarline",
+      "params": [
+        "top staff number",
+        "bottom staff number"
+      ]
+    },
+    "AddBars": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "AddBars",
+      "params": [
+        "n"
+      ]
+    },
+    "AddBracket": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "AddBracket",
+      "params": [
+        "type",
+        "top staff number",
+        "bottom staff number"
+      ]
+    },
+    "AddChordSymbolFromPitches": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "AddChordSymbolFromPitches",
+      "params": [
+        "position",
+        "pitches",
+        "instrument style?"
+      ]
+    },
+    "AddClef": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "AddClef",
+      "params": [
+        "pos",
+        "concert pitch clef",
+        "transposed pitch clef?"
+      ]
+    },
+    "AddComment": {
+      "max_params": 4,
+      "min_params": 2,
+      "name": "AddComment",
+      "params": [
+        "sr",
+        "text",
+        "color",
+        "maximized?"
+      ]
+    },
+    "AddCommentWithName": {
+      "max_params": 5,
+      "min_params": 3,
+      "name": "AddCommentWithName",
+      "params": [
+        "sr",
+        "text",
+        "username",
+        "color",
+        "maximized?"
+      ]
+    },
+    "AddGraphic": {
+      "max_params": 6,
+      "min_params": 2,
+      "name": "AddGraphic",
+      "params": [
+        "file name",
+        "pos",
+        "below staff",
+        "x displacement",
+        "y displacement",
+        "size ratio?"
+      ]
+    },
+    "AddGraphicToBlankPage": {
+      "max_params": 5,
+      "min_params": 4,
+      "name": "AddGraphicToBlankPage",
+      "params": [
+        "file name",
+        "nth page",
+        "x offset",
+        "y offset",
+        "size ratio?"
+      ]
+    },
+    "AddGuitarFrame": {
+      "max_params": 4,
+      "min_params": 2,
+      "name": "AddGuitarFrame",
+      "params": [
+        "position",
+        "chord name",
+        "instrument style",
+        "fingerings?"
+      ]
+    },
+    "AddInstrumentChange": {
+      "max_params": 9,
+      "min_params": 2,
+      "name": "AddInstrumentChange",
+      "params": [
+        "pos",
+        "styleID",
+        "add_clef",
+        "show_text",
+        "text_label",
+        "show_\nwarning",
+        "warning_label?",
+        "full_instrument_name",
+        "short_instrument_name?"
+      ]
+    },
+    "AddKeySignature": {
+      "max_params": 6,
+      "min_params": 3,
+      "name": "AddKeySignature",
+      "params": [
+        "pos",
+        "num sharps",
+        "major key",
+        "add double barline",
+        "hidden",
+        "one staff only?"
+      ]
+    },
+    "AddKeySignatureFromText": {
+      "max_params": 6,
+      "min_params": 3,
+      "name": "AddKeySignatureFromText",
+      "params": [
+        "pos",
+        "key name",
+        "major key",
+        "add double barline",
+        "hidden",
+        "one staff\nonly?"
+      ]
+    },
+    "AddLine": {
+      "max_params": 7,
+      "min_params": 3,
+      "name": "AddLine",
+      "params": [
+        "pos",
+        "duration",
+        "line style",
+        "dx",
+        "dy",
+        "voicenumber",
+        "hidden?"
+      ]
+    },
+    "AddLiveTempoTapPoint": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "AddLiveTempoTapPoint",
+      "params": [
+        "position"
+      ]
+    },
+    "AddLyric": {
+      "max_params": 6,
+      "min_params": 3,
+      "name": "AddLyric",
+      "params": [
+        "position",
+        "duration",
+        "text",
+        "syllable type",
+        "number of notes?",
+        "voicenum?"
+      ]
+    },
+    "AddNestedTuplet": {
+      "max_params": 7,
+      "min_params": 4,
+      "name": "AddNestedTuplet",
+      "params": [
+        "posInTuplet",
+        "left",
+        "right",
+        "unit",
+        "style",
+        "bracket",
+        "fullDuration?"
+      ]
+    },
+    "AddNote": {
+      "max_params": 7,
+      "min_params": 6,
+      "name": "AddNote",
+      "params": [
+        "pos",
+        "sounding pitch",
+        "duration",
+        "tied",
+        "voice",
+        "diatonic pitch",
+        "string number?"
+      ]
+    },
+    "AddPageNumber": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "AddPageNumber",
+      "params": [
+        "blank page offset?"
+      ]
+    },
+    "AddPageNumberAtStartOfBar": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "AddPageNumberAtStartOfBar",
+      "params": []
+    },
+    "AddRehearsalMark": {
+      "max_params": 6,
+      "min_params": 5,
+      "name": "AddRehearsalMark",
+      "params": [
+        "consecutive",
+        "mark",
+        "new prefix and suffix",
+        "prefix",
+        "suffx",
+        "override\ndefaults?"
+      ]
+    },
+    "AddSpecialBarline": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "AddSpecialBarline",
+      "params": [
+        "barline type",
+        "pos?"
+      ]
+    },
+    "AddStaffAbove": {
+      "max_params": 5,
+      "min_params": 4,
+      "name": "AddStaffAbove",
+      "params": [
+        "ossia",
+        "start bar number",
+        "end bar number",
+        "start pos",
+        "end pos?"
+      ]
+    },
+    "AddStaffBelow": {
+      "max_params": 5,
+      "min_params": 4,
+      "name": "AddStaffBelow",
+      "params": [
+        "ossia",
+        "start bar number",
+        "end bar number",
+        "start pos",
+        "end pos?"
+      ]
+    },
+    "AddStaffToPart": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "AddStaffToPart",
+      "params": [
+        "staff"
+      ]
+    },
+    "AddSymbol": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "AddSymbol",
+      "params": [
+        "pos",
+        "symbol index or name"
+      ]
+    },
+    "AddText": {
+      "max_params": 4,
+      "min_params": 3,
+      "name": "AddText",
+      "params": [
+        "pos",
+        "text",
+        "style",
+        "voicenum?"
+      ]
+    },
+    "AddTextToBlankPage": {
+      "max_params": 5,
+      "min_params": 5,
+      "name": "AddTextToBlankPage",
+      "params": [
+        "xPos",
+        "yPos",
+        "text",
+        "style",
+        "pageOffset"
+      ]
+    },
+    "AddTimeSignature": {
+      "max_params": 5,
+      "min_params": 4,
+      "name": "AddTimeSignature",
+      "params": [
+        "top",
+        "bottom",
+        "allow cautionary",
+        "rewrite music",
+        "use symbol?"
+      ]
+    },
+    "AddTimeSignatureReturnObject": {
+      "max_params": 5,
+      "min_params": 4,
+      "name": "AddTimeSignatureReturnObject",
+      "params": [
+        "top",
+        "bottom",
+        "allow cautionary",
+        "rewrite music",
+        "use symbol?"
+      ]
+    },
+    "AddToPluginsMenu": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "AddToPluginsMenu",
+      "params": [
+        "\"menu text\"",
+        "\"function name\""
+      ]
+    },
+    "AddTuplet": {
+      "max_params": 8,
+      "min_params": 5,
+      "name": "AddTuplet",
+      "params": [
+        "pos",
+        "voice",
+        "left",
+        "right",
+        "unit",
+        "style",
+        "bracket",
+        "fullDuration?"
+      ]
+    },
+    "AddVersion": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "AddVersion",
+      "params": [
+        "name",
+        "comment?"
+      ]
+    },
+    "AppendLineToFile": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "AppendLineToFile",
+      "params": [
+        "filename",
+        "text",
+        "use_unicode?"
+      ]
+    },
+    "AppendLineToRTFFile": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "AppendLineToRTFFile",
+      "params": [
+        "filename",
+        "text"
+      ]
+    },
+    "AppendTextFile": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "AppendTextFile",
+      "params": [
+        "filename",
+        "text",
+        "use_unicode?"
+      ]
+    },
+    "ApplyStyle": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "ApplyStyle",
+      "params": [
+        "style file",
+        "\"style\"",
+        "\"style\"?"
+      ]
+    },
+    "Asc": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Asc",
+      "params": [
+        "expression"
+      ]
+    },
+    "BarNumberFrequency": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "BarNumberFrequency",
+      "params": [
+        "BarNumberFrequencyCategory",
+        "customFrequency?"
+      ]
+    },
+    "CalculateDegree": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "CalculateDegree",
+      "params": [
+        "source pitch",
+        "dest pitch",
+        "upward interval"
+      ]
+    },
+    "CalculateInterval": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "CalculateInterval",
+      "params": [
+        "source pitch",
+        "dest pitch",
+        "upward interval"
+      ]
+    },
+    "CallMethod": {
+      "max_params": 4,
+      "min_params": 4,
+      "name": "CallMethod",
+      "params": [
+        "methodname",
+        "param1",
+        "param2",
+        "...paramN"
+      ]
+    },
+    "CharAt": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "CharAt",
+      "params": [
+        "expression",
+        "position"
+      ]
+    },
+    "Chr": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Chr",
+      "params": [
+        "expression"
+      ]
+    },
+    "Clear": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "Clear",
+      "params": [
+        "voice number?"
+      ]
+    },
+    "ClearAll": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ClearAll",
+      "params": []
+    },
+    "ClearNotesAndModifiers": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "ClearNotesAndModifiers",
+      "params": [
+        "voice number?"
+      ]
+    },
+    "ClefStyleId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ClefStyleId",
+      "params": [
+        "clef style name"
+      ]
+    },
+    "ClipboardContainsData": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "ClipboardContainsData",
+      "params": [
+        "clipboard Id?"
+      ]
+    },
+    "Clone": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Clone",
+      "params": []
+    },
+    "Close": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Close",
+      "params": [
+        "show dialogs"
+      ]
+    },
+    "CloseAllWindows": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CloseAllWindows",
+      "params": [
+        "show dialogs"
+      ]
+    },
+    "CloseAllWindowsForScore": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "CloseAllWindowsForScore",
+      "params": [
+        "score",
+        "showDialogs"
+      ]
+    },
+    "CloseDialog": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "CloseDialog",
+      "params": [
+        "dialogName",
+        "pluginName",
+        "returnValue"
+      ]
+    },
+    "CloseWindow": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CloseWindow",
+      "params": [
+        "show dialogs"
+      ]
+    },
+    "Cmd": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Cmd",
+      "params": [
+        "command name"
+      ]
+    },
+    "CommandExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CommandExists",
+      "params": [
+        "CommandID"
+      ]
+    },
+    "Concat": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "Concat",
+      "params": [
+        "array1",
+        "array2 ... arrayN"
+      ]
+    },
+    "Contains": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Contains",
+      "params": [
+        "pluginName"
+      ]
+    },
+    "Copy": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "Copy",
+      "params": [
+        "clipboard Id?"
+      ]
+    },
+    "CopyOutSuffixes": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "CopyOutSuffixes",
+      "params": []
+    },
+    "CreateArray": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "CreateArray",
+      "params": []
+    },
+    "CreateAt": {
+      "max_params": 3,
+      "min_params": 0,
+      "name": "CreateAt",
+      "params": [
+        "barNumber?",
+        "position?",
+        "nthRepeat?"
+      ]
+    },
+    "CreateDefaultParts": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "CreateDefaultParts",
+      "params": []
+    },
+    "CreateFolder": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CreateFolder",
+      "params": [
+        "foldername"
+      ]
+    },
+    "CreateHash": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "CreateHash",
+      "params": []
+    },
+    "CreateHitPoint": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "CreateHitPoint",
+      "params": [
+        "timeMs",
+        "label"
+      ]
+    },
+    "CreateInstrument": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrument",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short name\"?"
+      ]
+    },
+    "CreateInstrumentAtBottom": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrumentAtBottom",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short name\"?"
+      ]
+    },
+    "CreateInstrumentAtBottomReturnStave": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrumentAtBottomReturnStave",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short\nname\"?"
+      ]
+    },
+    "CreateInstrumentAtTop": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrumentAtTop",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short name\"?"
+      ]
+    },
+    "CreateInstrumentAtTopReturnStave": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrumentAtTopReturnStave",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short\nname\"?"
+      ]
+    },
+    "CreateInstrumentReturnStave": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "CreateInstrumentReturnStave",
+      "params": [
+        "style ID",
+        "change names?",
+        "\"full name\"?",
+        "\"short name\"?"
+      ]
+    },
+    "CreatePartFromStaff": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CreatePartFromStaff",
+      "params": [
+        "staff"
+      ]
+    },
+    "CreateProgressDialog": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "CreateProgressDialog",
+      "params": [
+        "caption",
+        "min value",
+        "max value"
+      ]
+    },
+    "CreateRTFFile": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CreateRTFFile",
+      "params": [
+        "filename"
+      ]
+    },
+    "CreateTextFile": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CreateTextFile",
+      "params": [
+        "filename"
+      ]
+    },
+    "CurrentKeySignature": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CurrentKeySignature",
+      "params": [
+        "bar number"
+      ]
+    },
+    "CurrentTimeSignature": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "CurrentTimeSignature",
+      "params": [
+        "bar number"
+      ]
+    },
+    "DataExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DataExists",
+      "params": [
+        "data"
+      ]
+    },
+    "Delete": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "Delete",
+      "params": [
+        "remove staves?"
+      ]
+    },
+    "DeleteNthBarline": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeleteNthBarline",
+      "params": [
+        "index"
+      ]
+    },
+    "DeleteNthBracket": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeleteNthBracket",
+      "params": [
+        "n"
+      ]
+    },
+    "DeleteNthComment": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeleteNthComment",
+      "params": [
+        "n"
+      ]
+    },
+    "DeleteNthVersion": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeleteNthVersion",
+      "params": [
+        "n"
+      ]
+    },
+    "DeletePageNumber": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "DeletePageNumber",
+      "params": [
+        "blank page offset?"
+      ]
+    },
+    "DeletePart": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeletePart",
+      "params": [
+        "dynamic part"
+      ]
+    },
+    "DeleteStaffFromPart": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DeleteStaffFromPart",
+      "params": [
+        "staff"
+      ]
+    },
+    "Deselect": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Deselect",
+      "params": []
+    },
+    "DestroyProgressDialog": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "DestroyProgressDialog",
+      "params": []
+    },
+    "DialogExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "DialogExists",
+      "params": [
+        "dialog"
+      ]
+    },
+    "EarlierVersionIdFromName": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "EarlierVersionIdFromName",
+      "params": [
+        "versionName"
+      ]
+    },
+    "EnableControlById": {
+      "max_params": 4,
+      "min_params": 4,
+      "name": "EnableControlById",
+      "params": [
+        "plugin",
+        "dialog",
+        "controlID",
+        "enable"
+      ]
+    },
+    "EnableNthControl": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "EnableNthControl",
+      "params": [
+        "nth control",
+        "enable"
+      ]
+    },
+    "ExcludeStaff": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ExcludeStaff",
+      "params": [
+        "staff number"
+      ]
+    },
+    "Execute": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Execute",
+      "params": [
+        "CommandID"
+      ]
+    },
+    "ExitPlugin": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ExitPlugin",
+      "params": []
+    },
+    "ExportHouseStyle": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ExportHouseStyle",
+      "params": [
+        "filename"
+      ]
+    },
+    "ExportPartsAsPDF": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "ExportPartsAsPDF",
+      "params": [
+        "filename",
+        "single file",
+        "part IDs",
+        "include score?"
+      ]
+    },
+    "ExportScoreAsPDF": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ExportScoreAsPDF",
+      "params": [
+        "filename"
+      ]
+    },
+    "ExtractParts": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "ExtractParts",
+      "params": [
+        "show_dialogs",
+        "parts path",
+        "open parts?"
+      ]
+    },
+    "FileCount": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FileCount",
+      "params": [
+        "Type"
+      ]
+    },
+    "FileExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FileExists",
+      "params": [
+        "filename"
+      ]
+    },
+    "FindCommandId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FindCommandId",
+      "params": [
+        "Command Name"
+      ]
+    },
+    "FindCommandName": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FindCommandName",
+      "params": [
+        "Id"
+      ]
+    },
+    "FindStyleId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FindStyleId",
+      "params": [
+        "Style Name"
+      ]
+    },
+    "FlipStem": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "FlipStem",
+      "params": []
+    },
+    "FolderExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "FolderExists",
+      "params": [
+        "foldername"
+      ]
+    },
+    "FreezeMagneticLayoutPositions": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "FreezeMagneticLayoutPositions",
+      "params": []
+    },
+    "GetArticulation": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetArticulation",
+      "params": [
+        "articulation number"
+      ]
+    },
+    "GetChromaticPitchesOfChordInClosePosition": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetChromaticPitchesOfChordInClosePosition",
+      "params": [
+        "consider root"
+      ]
+    },
+    "GetClefAt": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetClefAt",
+      "params": [
+        "pos"
+      ]
+    },
+    "GetDocumentsFolder": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetDocumentsFolder",
+      "params": []
+    },
+    "GetDotFingeringsOnNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetDotFingeringsOnNthString",
+      "params": [
+        "nth string"
+      ]
+    },
+    "GetDotSymbolsOnNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetDotSymbolsOnNthString",
+      "params": [
+        "nth string"
+      ]
+    },
+    "GetElapsedCentiSeconds": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetElapsedCentiSeconds",
+      "params": [
+        "timer number"
+      ]
+    },
+    "GetElapsedMilliSeconds": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetElapsedMilliSeconds",
+      "params": [
+        "timer number"
+      ]
+    },
+    "GetElapsedSeconds": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetElapsedSeconds",
+      "params": [
+        "timer number"
+      ]
+    },
+    "GetEndStringForNthBarre": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetEndStringForNthBarre",
+      "params": [
+        "barreNum"
+      ]
+    },
+    "GetFile": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetFile",
+      "params": [
+        "file path"
+      ]
+    },
+    "GetFolder": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetFolder",
+      "params": [
+        "file path"
+      ]
+    },
+    "GetInstrumentTypeAt": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetInstrumentTypeAt",
+      "params": [
+        "pos"
+      ]
+    },
+    "GetInterpreterOption": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetInterpreterOption",
+      "params": [
+        "optionName"
+      ]
+    },
+    "GetIsInVoice": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetIsInVoice",
+      "params": [
+        "voicenum"
+      ]
+    },
+    "GetKeySignatureAt": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetKeySignatureAt",
+      "params": [
+        "pos"
+      ]
+    },
+    "GetListOfCommandNamesInCategory": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetListOfCommandNamesInCategory",
+      "params": [
+        "Localized Command Category Name"
+      ]
+    },
+    "GetLocationTime": {
+      "max_params": 3,
+      "min_params": 1,
+      "name": "GetLocationTime",
+      "params": [
+        "bar number",
+        "position",
+        "pass?"
+      ]
+    },
+    "GetMethodNames": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetMethodNames",
+      "params": []
+    },
+    "GetNotesForChord": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNotesForChord",
+      "params": [
+        "chord name"
+      ]
+    },
+    "GetNotesForGuitarChord": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNotesForGuitarChord",
+      "params": [
+        "chord name"
+      ]
+    },
+    "GetNthComment": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNthComment",
+      "params": [
+        "n"
+      ]
+    },
+    "GetNthStaffShowsSystemObjects": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNthStaffShowsSystemObjects",
+      "params": [
+        "staffNum"
+      ]
+    },
+    "GetNthSyllable": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNthSyllable",
+      "params": [
+        "n"
+      ]
+    },
+    "GetNthVersion": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetNthVersion",
+      "params": [
+        "n"
+      ]
+    },
+    "GetPageNumber": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "GetPageNumber",
+      "params": [
+        "blank page offset?"
+      ]
+    },
+    "GetPitchOfNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetPitchOfNthString",
+      "params": [
+        "stringNum"
+      ]
+    },
+    "GetPitchesOfDotsOnNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetPitchesOfDotsOnNthString",
+      "params": [
+        "nth string"
+      ]
+    },
+    "GetPlayedOnNthPass": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetPlayedOnNthPass",
+      "params": [
+        "n"
+      ]
+    },
+    "GetPositionOfFingerForNthBarre": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetPositionOfFingerForNthBarre",
+      "params": [
+        "barreNum"
+      ]
+    },
+    "GetPositionOfFingerOnNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetPositionOfFingerOnNthString",
+      "params": [
+        "stringNum"
+      ]
+    },
+    "GetPropertyNames": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetPropertyNames",
+      "params": []
+    },
+    "GetScoresFolder": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetScoresFolder",
+      "params": []
+    },
+    "GetStartStringForNthBarre": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetStartStringForNthBarre",
+      "params": [
+        "barreNum"
+      ]
+    },
+    "GetSyllabifier": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetSyllabifier",
+      "params": []
+    },
+    "GetUserApplicationDataFolder": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetUserApplicationDataFolder",
+      "params": []
+    },
+    "GetUserSibeliusFolder": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetUserSibeliusFolder",
+      "params": []
+    },
+    "GetValidationError": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "GetValidationError",
+      "params": [
+        "object"
+      ]
+    },
+    "GetVersions": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GetVersions",
+      "params": []
+    },
+    "GoToEnd": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GoToEnd",
+      "params": []
+    },
+    "GoToStart": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "GoToStart",
+      "params": []
+    },
+    "HideEmptyStaves": {
+      "max_params": 4,
+      "min_params": 4,
+      "name": "HideEmptyStaves",
+      "params": [
+        "startStaveNum",
+        "endStaveNum",
+        "startBarNum",
+        "endBarNum"
+      ]
+    },
+    "HideSelectedEmptyStaves": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "HideSelectedEmptyStaves",
+      "params": []
+    },
+    "IncludeStaff": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IncludeStaff",
+      "params": [
+        "staff number"
+      ]
+    },
+    "IncludesStaff": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IncludesStaff",
+      "params": [
+        "staff"
+      ]
+    },
+    "InsertBarRest": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "InsertBarRest",
+      "params": [
+        "voice number",
+        "rest type?"
+      ]
+    },
+    "InsertBars": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "InsertBars",
+      "params": [
+        "n",
+        "barNum",
+        "length?"
+      ]
+    },
+    "InternalPageNumToExternalPageNum": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "InternalPageNumToExternalPageNum",
+      "params": [
+        "pagenum"
+      ]
+    },
+    "InterpreterOptionExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "InterpreterOptionExists",
+      "params": [
+        "optionName"
+      ]
+    },
+    "IsDynamicPartOpen": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IsDynamicPartOpen",
+      "params": [
+        "dynamic part"
+      ]
+    },
+    "IsFontFamilyInstalled": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IsFontFamilyInstalled",
+      "params": [
+        "font name"
+      ]
+    },
+    "IsNthStringPartOfBarre": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IsNthStringPartOfBarre",
+      "params": [
+        "stringNum"
+      ]
+    },
+    "IsObject": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IsObject",
+      "params": [
+        "expression"
+      ]
+    },
+    "IsScoreSubset": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "IsScoreSubset",
+      "params": []
+    },
+    "IsValid": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "IsValid",
+      "params": [
+        "object"
+      ]
+    },
+    "Join": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "Join",
+      "params": [
+        "separator?"
+      ]
+    },
+    "JoinStrings": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "JoinStrings",
+      "params": [
+        "expression",
+        "delimiter"
+      ]
+    },
+    "LaunchApplication": {
+      "max_params": 3,
+      "min_params": 1,
+      "name": "LaunchApplication",
+      "params": [
+        "path",
+        "parameters",
+        "hide?"
+      ]
+    },
+    "Length": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Length",
+      "params": [
+        "expression"
+      ]
+    },
+    "LineStyleId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "LineStyleId",
+      "params": [
+        "line style name"
+      ]
+    },
+    "LiveTempoTap": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "LiveTempoTap",
+      "params": []
+    },
+    "MakeSafeFileName": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "MakeSafeFileName",
+      "params": [
+        "filename"
+      ]
+    },
+    "MessageBox": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "MessageBox",
+      "params": [
+        "string"
+      ]
+    },
+    "MethodExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "MethodExists",
+      "params": [
+        "methodname"
+      ]
+    },
+    "MoveActiveViewToBar": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "MoveActiveViewToBar",
+      "params": [
+        "bar number",
+        "position?"
+      ]
+    },
+    "MoveActiveViewToSelection": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "MoveActiveViewToSelection",
+      "params": [
+        "start of selection?"
+      ]
+    },
+    "MoveTo": {
+      "max_params": 3,
+      "min_params": 0,
+      "name": "MoveTo",
+      "params": [
+        "barNumber?",
+        "position?",
+        "nthRepeat?"
+      ]
+    },
+    "MoveToNext": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "MoveToNext",
+      "params": []
+    },
+    "MoveToPrevious": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "MoveToPrevious",
+      "params": []
+    },
+    "New": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "New",
+      "params": [
+        "manuscript paper?"
+      ]
+    },
+    "NextItem": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "NextItem",
+      "params": [
+        "voice",
+        "item type?"
+      ]
+    },
+    "NoteStyleIndex": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NoteStyleIndex",
+      "params": [
+        "notehead style name"
+      ]
+    },
+    "NthBar": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthBar",
+      "params": [
+        "n"
+      ]
+    },
+    "NthBarObject": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthBarObject",
+      "params": [
+        "n"
+      ]
+    },
+    "NthScore": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthScore",
+      "params": [
+        "score index from 0"
+      ]
+    },
+    "NthStaff": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthStaff",
+      "params": [
+        "staff index from 1"
+      ]
+    },
+    "NthStringHasClosedMarkingAtNut": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthStringHasClosedMarkingAtNut",
+      "params": [
+        "nth string"
+      ]
+    },
+    "NthStringHasOpenMarkingAtNut": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthStringHasOpenMarkingAtNut",
+      "params": [
+        "nth string"
+      ]
+    },
+    "NthSyllableEndsWord": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "NthSyllableEndsWord",
+      "params": [
+        "n"
+      ]
+    },
+    "Open": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "Open",
+      "params": [
+        "filename",
+        "quiet?"
+      ]
+    },
+    "OpenAndReturnScore": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "OpenAndReturnScore",
+      "params": []
+    },
+    "Paste": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "Paste",
+      "params": [
+        "clipboard Id",
+        "reset positions?"
+      ]
+    },
+    "PasteToPosition": {
+      "max_params": 5,
+      "min_params": 3,
+      "name": "PasteToPosition",
+      "params": [
+        "stave num",
+        "bar num",
+        "position",
+        "clipboard Id",
+        "reset positions?"
+      ]
+    },
+    "PitchOfNthString": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "PitchOfNthString",
+      "params": [
+        "string num"
+      ]
+    },
+    "Play": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Play",
+      "params": []
+    },
+    "PlayFromSelection": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "PlayFromSelection",
+      "params": []
+    },
+    "PlayFromStart": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "PlayFromStart",
+      "params": []
+    },
+    "PlayLiveTempo": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "PlayLiveTempo",
+      "params": [
+        "play"
+      ]
+    },
+    "Pop": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Pop",
+      "params": []
+    },
+    "PrependScreenreaderText": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "PrependScreenreaderText",
+      "params": [
+        "string"
+      ]
+    },
+    "PreviousItem": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "PreviousItem",
+      "params": [
+        "voice",
+        "item type?"
+      ]
+    },
+    "Print": {
+      "max_params": 3,
+      "min_params": 1,
+      "name": "Print",
+      "params": [
+        "number of copies",
+        "dynamic part",
+        "showdialog?"
+      ]
+    },
+    "PrintAllDynamicParts": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "PrintAllDynamicParts",
+      "params": [
+        "score?"
+      ]
+    },
+    "PropertyExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "PropertyExists",
+      "params": [
+        "propertyname"
+      ]
+    },
+    "Push": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "Push",
+      "params": [
+        "value1",
+        "value2",
+        "value3 ... valueN"
+      ]
+    },
+    "RandomNumber": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RandomNumber",
+      "params": []
+    },
+    "RandomSeed": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RandomSeed",
+      "params": [
+        "start number"
+      ]
+    },
+    "RandomSeedTime": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RandomSeedTime",
+      "params": []
+    },
+    "ReadTextFile": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ReadTextFile",
+      "params": [
+        "filename"
+      ]
+    },
+    "RefreshDialog": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RefreshDialog",
+      "params": []
+    },
+    "Remove": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Remove",
+      "params": [
+        "index"
+      ]
+    },
+    "RemoveAllHighlights": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RemoveAllHighlights",
+      "params": []
+    },
+    "RemoveLiveTempoTapPoint": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RemoveLiveTempoTapPoint",
+      "params": [
+        "position"
+      ]
+    },
+    "RemoveNote": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RemoveNote",
+      "params": [
+        "note"
+      ]
+    },
+    "RemoveVideo": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RemoveVideo",
+      "params": []
+    },
+    "RemoveVoice": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RemoveVoice",
+      "params": [
+        "voicenum"
+      ]
+    },
+    "Rename": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Rename",
+      "params": [
+        "newFileName"
+      ]
+    },
+    "RenameTextStyle": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "RenameTextStyle",
+      "params": [
+        "\"old name\"",
+        "\"new name\""
+      ]
+    },
+    "ResetDesign": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ResetDesign",
+      "params": []
+    },
+    "ResetPosition": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "ResetPosition",
+      "params": [
+        "horizontal",
+        "vertical?"
+      ]
+    },
+    "ResetSpaceAroundBar": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "ResetSpaceAroundBar",
+      "params": [
+        "above",
+        "below"
+      ]
+    },
+    "ResetSpaceAroundStaff": {
+      "max_params": 4,
+      "min_params": 2,
+      "name": "ResetSpaceAroundStaff",
+      "params": [
+        "above",
+        "below",
+        "from bar",
+        "to bar?"
+      ]
+    },
+    "ResetStopWatch": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ResetStopWatch",
+      "params": [
+        "timer number"
+      ]
+    },
+    "Respace": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Respace",
+      "params": []
+    },
+    "RestoreSelection": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "RestoreSelection",
+      "params": []
+    },
+    "Reverse": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Reverse",
+      "params": []
+    },
+    "Round": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Round",
+      "params": [
+        "expression"
+      ]
+    },
+    "RoundDown": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RoundDown",
+      "params": [
+        "expression"
+      ]
+    },
+    "RoundUp": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "RoundUp",
+      "params": [
+        "expression"
+      ]
+    },
+    "Save": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Save",
+      "params": [
+        "filename"
+      ]
+    },
+    "SaveAs": {
+      "max_params": 4,
+      "min_params": 2,
+      "name": "SaveAs",
+      "params": [
+        "filename",
+        "type",
+        "use_defaults?",
+        "foldername?"
+      ]
+    },
+    "SaveAsAudio": {
+      "max_params": 5,
+      "min_params": 1,
+      "name": "SaveAsAudio",
+      "params": [
+        "filename",
+        "include all staves",
+        "play from start",
+        "bit depth",
+        "sample rate?"
+      ]
+    },
+    "SaveAsCompressedAudio": {
+      "max_params": 5,
+      "min_params": 1,
+      "name": "SaveAsCompressedAudio",
+      "params": [
+        "filename",
+        "include all staves",
+        "play from start",
+        "bit rate",
+        "sample rate?"
+      ]
+    },
+    "SaveAsEarlierVersion": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "SaveAsEarlierVersion",
+      "params": [
+        "versionIdentifier",
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius2": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius2",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius2020_1": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius2020_1",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius3": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius3",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius4": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius4",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius5": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius5",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius6": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius6",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius7": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius7",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius7_5": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius7_5",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius8": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius8",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius8_5": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius8_5",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveAsSibelius8_6": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveAsSibelius8_6",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "SaveCopyAs": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SaveCopyAs",
+      "params": [
+        "filename",
+        "foldername?"
+      ]
+    },
+    "ScaleFactorChange": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "ScaleFactorChange",
+      "params": [
+        "StaveScaleFactor",
+        "startBarNum",
+        "endBarNum"
+      ]
+    },
+    "ScreenreaderText": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ScreenreaderText",
+      "params": [
+        "string"
+      ]
+    },
+    "Select": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Select",
+      "params": []
+    },
+    "SelectFileToOpen": {
+      "max_params": 6,
+      "min_params": 6,
+      "name": "SelectFileToOpen",
+      "params": [
+        "caption",
+        "file",
+        "initial_dir",
+        "default extension",
+        "default type",
+        "default type\ndescription"
+      ]
+    },
+    "SelectFolder": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "SelectFolder",
+      "params": [
+        "caption?"
+      ]
+    },
+    "SelectPassage": {
+      "max_params": 6,
+      "min_params": 1,
+      "name": "SelectPassage",
+      "params": [
+        "start barNum",
+        "end barNum",
+        "top staveNum",
+        "bottom staveNum",
+        "start pos",
+        "end\npos?"
+      ]
+    },
+    "SelectSystemPassage": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "SelectSystemPassage",
+      "params": [
+        "start barNum",
+        "end barNum",
+        "start pos",
+        "end pos?"
+      ]
+    },
+    "SetAllVoices": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "SetAllVoices",
+      "params": []
+    },
+    "SetArticulation": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "SetArticulation",
+      "params": [
+        "articulation number",
+        "set"
+      ]
+    },
+    "SetCurrentScoreViewType": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetCurrentScoreViewType",
+      "params": [
+        "view type"
+      ]
+    },
+    "SetFocusToControl": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "SetFocusToControl",
+      "params": [
+        "pluginName",
+        "dialogName",
+        "controlID"
+      ]
+    },
+    "SetFormatChangeOnly": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetFormatChangeOnly",
+      "params": [
+        "format change only"
+      ]
+    },
+    "SetHideOrShow": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetHideOrShow",
+      "params": [
+        "page number visibility"
+      ]
+    },
+    "SetInterpreterOption": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SetInterpreterOption",
+      "params": [
+        "optionName",
+        "optionValue?"
+      ]
+    },
+    "SetMethod": {
+      "max_params": 3,
+      "min_params": 3,
+      "name": "SetMethod",
+      "params": [
+        "methodname",
+        "Self",
+        "method"
+      ]
+    },
+    "SetNthStaffShowsSystemObjects": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "SetNthStaffShowsSystemObjects",
+      "params": [
+        "staffNum",
+        "show"
+      ]
+    },
+    "SetPageNumber": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetPageNumber",
+      "params": [
+        "page number"
+      ]
+    },
+    "SetPageNumberFormat": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetPageNumberFormat",
+      "params": [
+        "format"
+      ]
+    },
+    "SetPlaybackPos": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "SetPlaybackPos",
+      "params": [
+        "bar number",
+        "sr"
+      ]
+    },
+    "SetPlayedOnNthPass": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "SetPlayedOnNthPass",
+      "params": [
+        "n",
+        "do play"
+      ]
+    },
+    "SetSound": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SetSound",
+      "params": [
+        "styleID",
+        "set SoundStage?"
+      ]
+    },
+    "SetSoundID": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SetSoundID",
+      "params": [
+        "soundID"
+      ]
+    },
+    "SetVoice": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "SetVoice",
+      "params": [
+        "voicenum",
+        "clear other voices?"
+      ]
+    },
+    "ShiftTimes": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ShiftTimes",
+      "params": [
+        "timeMs"
+      ]
+    },
+    "ShowDialog": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "ShowDialog",
+      "params": [
+        "dialogName",
+        "pluginName"
+      ]
+    },
+    "ShowDynamicPart": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "ShowDynamicPart",
+      "params": [
+        "dynamic part",
+        "newWindow?"
+      ]
+    },
+    "ShowEmptyStaves": {
+      "max_params": 4,
+      "min_params": 4,
+      "name": "ShowEmptyStaves",
+      "params": [
+        "startStaveNum",
+        "endStaveNum",
+        "startBarNum",
+        "endBarNum"
+      ]
+    },
+    "ShowInAll": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ShowInAll",
+      "params": []
+    },
+    "ShowInParts": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ShowInParts",
+      "params": []
+    },
+    "ShowInScore": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ShowInScore",
+      "params": []
+    },
+    "ShowTraceWindow": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "ShowTraceWindow",
+      "params": []
+    },
+    "Slice": {
+      "max_params": 2,
+      "min_params": 1,
+      "name": "Slice",
+      "params": [
+        "start",
+        "end?"
+      ]
+    },
+    "SoundIDAtPosition": {
+      "max_params": 3,
+      "min_params": 0,
+      "name": "SoundIDAtPosition",
+      "params": [
+        "bar number?",
+        "position?",
+        "nth repeat?"
+      ]
+    },
+    "SplitString": {
+      "max_params": 3,
+      "min_params": 1,
+      "name": "SplitString",
+      "params": [
+        "expression",
+        "delimiter?",
+        "trimEmpty?"
+      ]
+    },
+    "StartLiveTempoRecording": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "StartLiveTempoRecording",
+      "params": []
+    },
+    "StaveTypeId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "StaveTypeId",
+      "params": [
+        "stave type name"
+      ]
+    },
+    "Stop": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "Stop",
+      "params": []
+    },
+    "StopLiveTempoRecording": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "StopLiveTempoRecording",
+      "params": []
+    },
+    "StopPlugin": {
+      "max_params": 1,
+      "min_params": 0,
+      "name": "StopPlugin",
+      "params": [
+        "message?"
+      ]
+    },
+    "StoreCurrentSelection": {
+      "max_params": 0,
+      "min_params": 0,
+      "name": "StoreCurrentSelection",
+      "params": []
+    },
+    "Substring": {
+      "max_params": 3,
+      "min_params": 2,
+      "name": "Substring",
+      "params": [
+        "expression",
+        "start",
+        "length?"
+      ]
+    },
+    "Syllabify": {
+      "max_params": 3,
+      "min_params": 1,
+      "name": "Syllabify",
+      "params": [
+        "textToSyllabify",
+        "language",
+        "abbreviate = False?"
+      ]
+    },
+    "SymbolExists": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SymbolExists",
+      "params": [
+        "symbol"
+      ]
+    },
+    "SymbolIndex": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SymbolIndex",
+      "params": [
+        "symbol name"
+      ]
+    },
+    "SystemCount": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "SystemCount",
+      "params": [
+        "page num"
+      ]
+    },
+    "TextStyleId": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "TextStyleId",
+      "params": [
+        "text style name"
+      ]
+    },
+    "TimeOnNthPass": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "TimeOnNthPass",
+      "params": [
+        "n"
+      ]
+    },
+    "Trace": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "Trace",
+      "params": [
+        "expression"
+      ]
+    },
+    "Transpose": {
+      "max_params": 4,
+      "min_params": 2,
+      "name": "Transpose",
+      "params": [
+        "degree",
+        "interval type",
+        "keep double accs",
+        "transpose keys?"
+      ]
+    },
+    "UpdateProgressDialog": {
+      "max_params": 2,
+      "min_params": 2,
+      "name": "UpdateProgressDialog",
+      "params": [
+        "progress pos",
+        "status message"
+      ]
+    },
+    "ValidationChecking": {
+      "max_params": 4,
+      "min_params": 1,
+      "name": "ValidationChecking",
+      "params": [
+        "enable",
+        "object1",
+        "object2?",
+        "...?"
+      ]
+    },
+    "ViewLiveTempo": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "ViewLiveTempo",
+      "params": [
+        "view"
+      ]
+    },
+    "YesNoMessageBox": {
+      "max_params": 1,
+      "min_params": 1,
+      "name": "YesNoMessageBox",
+      "params": [
+        "string"
+      ]
+    }
+  },
+  "source": "ManuScript Language.pdf",
+  "version": "1.0"
+}

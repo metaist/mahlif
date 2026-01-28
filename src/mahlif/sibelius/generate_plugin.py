@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from mahlif import parse
+from mahlif.models import Barline
 from mahlif.models import Clef
 from mahlif.models import Dynamic
 from mahlif.models import Hairpin
@@ -23,6 +24,29 @@ from mahlif.models import Score
 from mahlif.models import Slur
 from mahlif.models import Text
 from mahlif.models import TimeSignature
+from mahlif.models import Tuplet
+
+# Articulation name -> ManuScript constant
+ARTICULATION_MAP = {
+    "staccato": "StaccatoArtic",
+    "accent": "AccentArtic",
+    "tenuto": "TenutoArtic",
+    "marcato": "MarcatoArtic",
+    "staccatissimo": "StaccatissimoArtic",
+    "fermata": "FermataArtic",
+    "sforzando": "SforzandoArtic",
+    "sforzato": "SforzatoArtic",
+    "trill": "TrillArtic",
+    "turn": "TurnArtic",
+    "mordent": "MordentArtic",
+    "up-bow": "UpBowArtic",
+    "down-bow": "DownBowArtic",
+    "harmonic": "HarmonicArtic",
+    "open": "OpenArtic",
+    "stopped": "StoppedArtic",
+    "snap": "SnapArtic",
+    "plus": "PlusArtic",
+}
 
 
 def escape_str(text: str) -> str:
@@ -123,6 +147,15 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
 
             lines.append(f"b = st.NthBar({bar.n});")
 
+            # Handle page/system breaks
+            if bar.break_type:
+                break_map = {
+                    "page": "EndOfPage",
+                    "system": "EndOfSystem",
+                }
+                if bar.break_type in break_map:
+                    lines.append(f"b.BreakType = {break_map[bar.break_type]};")
+
             for elem in bar.elements:
                 if isinstance(elem, NoteRest) and not elem.is_rest:
                     if elem.is_chord:
@@ -137,15 +170,30 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                         lines.append("if (nr != null) {")
                         for note in elem.notes[1:]:
                             lines.append(f"\tnr.AddNote({note.pitch});")
+                        # Articulations
+                        for artic in elem.articulations:
+                            if artic in ARTICULATION_MAP:
+                                lines.append(
+                                    f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
+                                )
                         lines.append("}")
                     else:
                         # Single note
                         note = elem.notes[0]
                         tied = "True" if note.tied else "False"
                         lines.append(
-                            f"b.AddNote({elem.pos}, {note.pitch}, "
+                            f"nr = b.AddNote({elem.pos}, {note.pitch}, "
                             f"{elem.dur}, {tied}, {elem.voice});"
                         )
+                        # Articulations
+                        if elem.articulations:
+                            lines.append("if (nr != null) {")
+                            for artic in elem.articulations:
+                                if artic in ARTICULATION_MAP:
+                                    lines.append(
+                                        f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
+                                    )
+                            lines.append("}")
 
                 elif isinstance(elem, Dynamic):
                     # Dynamics use expression text style
@@ -205,6 +253,26 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                                 f"b.AddLine({elem.start_pos}, {duration}, "
                                 f"'{style}', 0, 0, {elem.voice});"
                             )
+
+                elif isinstance(elem, Tuplet):
+                    # AddTuplet(pos, voice, left, right, unit)
+                    # left/right = ratio (e.g., 3:2 triplet)
+                    # unit = duration of each note in the tuplet
+                    lines.append(
+                        f"b.AddTuplet({elem.start_pos}, 1, {elem.num}, {elem.den}, 256);"
+                    )
+
+                elif isinstance(elem, Barline):
+                    # Special barlines (repeat, double, final)
+                    barline_map = {
+                        "double": "DoubleBarline",
+                        "final": "FinalBarline",
+                        "repeat-start": "StartRepeatBarline",
+                        "repeat-end": "EndRepeatBarline",
+                        "dashed": "DashedBarline",
+                    }
+                    if elem.type in barline_map:
+                        lines.append(f"b.AddSpecialBarline({barline_map[elem.type]});")
 
         lines.append("")
 
