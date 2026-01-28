@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import tempfile
+from pathlib import Path
 
-from mahlif import parse, to_lilypond
+from mahlif import convert_to_utf8, detect_encoding, parse, read_xml, to_lilypond
 from mahlif.models import Note, NoteRest, Position, Score
 
 
@@ -223,3 +225,115 @@ class TestLilypond:
         score = parse(xml)
         lily = to_lilypond(score)
         assert "s4" in lily
+
+
+class TestEncoding:
+    """Test encoding detection and conversion."""
+
+    def test_detect_utf8(self) -> None:
+        """Detect UTF-8 encoding."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            f.write(b'<?xml version="1.0" encoding="UTF-8"?>\n<mahlif/>')
+            path = f.name
+        try:
+            enc = detect_encoding(path)
+            assert enc == "utf-8"
+        finally:
+            Path(path).unlink()
+
+    def test_detect_utf16_be_bom(self) -> None:
+        """Detect UTF-16 BE from BOM."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            # UTF-16 BE BOM + content
+            f.write(b"\xfe\xff")
+            f.write('<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-be"))
+            path = f.name
+        try:
+            enc = detect_encoding(path)
+            assert enc == "utf-16-be"
+        finally:
+            Path(path).unlink()
+
+    def test_detect_utf16_le_bom(self) -> None:
+        """Detect UTF-16 LE from BOM."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            # UTF-16 LE BOM + content
+            f.write(b"\xff\xfe")
+            f.write('<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-le"))
+            path = f.name
+        try:
+            enc = detect_encoding(path)
+            assert enc == "utf-16-le"
+        finally:
+            Path(path).unlink()
+
+    def test_read_utf8(self) -> None:
+        """Read UTF-8 file."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False, encoding="utf-8") as f:
+            f.write('<?xml version="1.0" encoding="UTF-8"?>\n<mahlif><text>Привет</text></mahlif>')
+            path = f.name
+        try:
+            content = read_xml(path)
+            assert "Привет" in content
+        finally:
+            Path(path).unlink()
+
+    def test_read_utf16_be(self) -> None:
+        """Read UTF-16 BE file with BOM."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            content = '<?xml version="1.0" encoding="UTF-16"?>\n<mahlif><text>Привет</text></mahlif>'
+            f.write(b"\xfe\xff")
+            f.write(content.encode("utf-16-be"))
+            path = f.name
+        try:
+            result = read_xml(path)
+            assert "Привет" in result
+        finally:
+            Path(path).unlink()
+
+    def test_convert_utf16_to_utf8(self) -> None:
+        """Convert UTF-16 file to UTF-8."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            content = '<?xml version="1.0" encoding="UTF-16"?>\n<mahlif><text>Привет мир</text></mahlif>'
+            f.write(b"\xfe\xff")
+            f.write(content.encode("utf-16-be"))
+            input_path = f.name
+
+        output_path = input_path + ".utf8.xml"
+        try:
+            convert_to_utf8(input_path, output_path)
+
+            # Verify output is UTF-8
+            with open(output_path, "rb") as f:
+                raw = f.read()
+            assert b"\xfe\xff" not in raw  # No BOM
+            assert b'encoding="UTF-8"' in raw
+
+            # Verify content preserved
+            with open(output_path, encoding="utf-8") as f:
+                result = f.read()
+            assert "Привет мир" in result
+        finally:
+            Path(input_path).unlink()
+            if Path(output_path).exists():
+                Path(output_path).unlink()
+
+    def test_parse_utf16_file(self) -> None:
+        """Parse UTF-16 encoded Mahlif file."""
+        with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
+            content = '''<?xml version="1.0" encoding="UTF-16"?>
+<mahlif version="1.0">
+    <meta>
+        <work-title>Тестовая партитура</work-title>
+        <composer>Чайковский</composer>
+    </meta>
+</mahlif>'''
+            f.write(b"\xfe\xff")
+            f.write(content.encode("utf-16-be"))
+            path = f.name
+        try:
+            score = parse(path)
+            assert score.meta.work_title == "Тестовая партитура"
+            assert score.meta.composer == "Чайковский"
+        finally:
+            Path(path).unlink()

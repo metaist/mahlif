@@ -398,23 +398,30 @@ def _parse_movement(mov_elem: etree._Element) -> Movement:
     )
 
 
-def parse(source: str | Path) -> Score:
+def parse(source: str | Path | bytes) -> Score:
     """Parse a Mahlif XML file into a Score object.
 
+    Handles UTF-8 and UTF-16 encoded files automatically.
+
     Args:
-        source: Path to XML file or XML string
+        source: Path to XML file, XML string, or XML bytes
 
     Returns:
         Parsed Score object
     """
-    if isinstance(source, Path) or (
+    if isinstance(source, bytes):
+        # Raw bytes - lxml auto-detects encoding from BOM/declaration
+        root = etree.fromstring(source)
+    elif isinstance(source, Path) or (
         isinstance(source, str) and not source.strip().startswith("<")
     ):
-        # It's a file path
-        tree = etree.parse(str(source))
-        root = tree.getroot()
+        # It's a file path - read as bytes to let lxml handle encoding
+        path = Path(source)
+        with open(path, "rb") as f:
+            content = f.read()
+        root = etree.fromstring(content)
     else:
-        # It's an XML string
+        # It's an XML string (assumed UTF-8)
         root = etree.fromstring(source.encode("utf-8"))
 
     # Meta

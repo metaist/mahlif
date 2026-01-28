@@ -27,15 +27,16 @@
 		
 		result = exportScore(score);
 		
+		// Write as Unicode (UTF-16) to preserve Cyrillic and other non-ASCII text
 		Sibelius.CreateTextFile(file);
-		Sibelius.AppendTextFile(file, result, False);
+		Sibelius.AppendTextFile(file, result, True);
 		
 		Sibelius.MessageBox('Export complete: ' & file);
 		return True;
 	}"
 
 	exportScore "(score) {
-		xml = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n';
+		xml = '<?xml version=\"1.0\" encoding=\"UTF-16\"?>\n';
 		xml = xml & '<mahlif version=\"1.0\" generator=\"SibeliusPlugin/1.0\">\n';
 		
 		// Meta

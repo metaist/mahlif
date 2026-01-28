@@ -5,5 +5,6 @@ __pubdate__ = "unpublished"
 
 from mahlif.parser import parse
 from mahlif.lilypond import to_lilypond
+from mahlif.encoding import convert_to_utf8, detect_encoding, read_xml
 
-__all__ = ["parse", "to_lilypond"]
+__all__ = ["parse", "to_lilypond", "convert_to_utf8", "detect_encoding", "read_xml"]
