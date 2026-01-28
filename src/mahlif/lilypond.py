@@ -300,47 +300,50 @@ def _convert_bar(
     has_notes = False
 
     for elem in bar.elements:
-        if isinstance(elem, TimeSignature):
-            result.append(_time_to_lily(elem.num, elem.den))
+        match elem:
+            case TimeSignature():
+                result.append(_time_to_lily(elem.num, elem.den))
 
-        elif isinstance(elem, KeySignature):
-            result.append(f"\\key {_key_to_lily(elem.fifths, elem.mode)}")
+            case KeySignature():
+                result.append(f"\\key {_key_to_lily(elem.fifths, elem.mode)}")
 
-        elif isinstance(elem, Clef):
-            result.append(f"\\clef {_clef_to_lily(elem.type)}")
+            case Clef():
+                result.append(f"\\clef {_clef_to_lily(elem.type)}")
 
-        elif isinstance(elem, NoteRest):
-            lily = _noterest_to_lily(elem)
-            has_notes = True
+            case NoteRest():
+                lily = _noterest_to_lily(elem)
+                has_notes = True
 
-            # Check for slur start/end
-            # (This is simplified - real implementation would track by position)
+                # Check for slur start/end
+                # (This is simplified - real implementation would track by position)
 
-            result.append(lily)
+                result.append(lily)
 
-        elif isinstance(elem, Dynamic):
-            result.append(f"\\{elem.text}")
+            case Dynamic():
+                result.append(f"\\{elem.text}")
 
-        elif isinstance(elem, Slur):
-            # Slurs are handled with ( and ) around notes
-            # This is a simplified approach
-            pass
+            case Slur():
+                # Slurs are handled with ( and ) around notes
+                # This is a simplified approach
+                pass
 
-        elif isinstance(elem, Hairpin):
-            if elem.type == "cresc":
-                result.append("\\<")
-            else:
-                result.append("\\>")
+            case Hairpin():
+                if elem.type == "cresc":
+                    result.append("\\<")
+                else:
+                    result.append("\\>")
 
-        elif isinstance(elem, Tuplet):
-            # Tuplets wrap notes: \tuplet 3/2 { ... }
-            # This would need more context to implement properly
-            pass
+            case Tuplet():
+                # Tuplets wrap notes: \tuplet 3/2 { ... }
+                # This would need more context to implement properly
+                pass
 
-        elif isinstance(elem, Barline):
-            lily_bar = _barline_to_lily(elem.type)
-            if lily_bar:
-                result.append(lily_bar)
+            case Barline():
+                if lily_bar := _barline_to_lily(elem.type):
+                    result.append(lily_bar)
+
+            case _:  # pragma: no cover
+                raise TypeError(f"Unknown bar element type: {type(elem).__name__}")
 
     # If bar has no notes/rests, output a full-bar rest
     if not has_notes:

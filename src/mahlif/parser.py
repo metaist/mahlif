@@ -158,111 +158,113 @@ def _parse_bar_elements(
     ] = []
 
     for child in bar_elem:
-        tag = child.tag
+        match child.tag:
+            case "note" | "chord" | "rest":
+                elements.append(_parse_noterest(child))
 
-        if tag in ("note", "chord", "rest"):
-            elements.append(_parse_noterest(child))
-
-        elif tag == "clef":
-            elements.append(
-                Clef(
-                    pos=_get_int(child, "pos"),
-                    type=_get_attr(child, "type", "treble"),
-                    offset=_parse_position(child),
+            case "clef":
+                elements.append(
+                    Clef(
+                        pos=_get_int(child, "pos"),
+                        type=_get_attr(child, "type", "treble"),
+                        offset=_parse_position(child),
+                    )
                 )
-            )
 
-        elif tag == "key":
-            mode = _get_attr(child, "mode", "major")
-            mode_val: str = mode if mode in ("major", "minor") else "major"
-            elements.append(
-                KeySignature(
-                    pos=_get_int(child, "pos"),
-                    fifths=_get_int(child, "fifths"),
-                    mode=mode_val,  # type: ignore[arg-type]
+            case "key":
+                mode = _get_attr(child, "mode", "major")
+                mode_val: str = mode if mode in ("major", "minor") else "major"
+                elements.append(
+                    KeySignature(
+                        pos=_get_int(child, "pos"),
+                        fifths=_get_int(child, "fifths"),
+                        mode=mode_val,  # type: ignore[arg-type]
+                    )
                 )
-            )
 
-        elif tag == "time":
-            elements.append(
-                TimeSignature(
-                    pos=_get_int(child, "pos"),
-                    num=_get_int(child, "num"),
-                    den=_get_int(child, "den"),
+            case "time":
+                elements.append(
+                    TimeSignature(
+                        pos=_get_int(child, "pos"),
+                        num=_get_int(child, "num"),
+                        den=_get_int(child, "den"),
+                    )
                 )
-            )
 
-        elif tag == "dynamic":
-            elements.append(
-                Dynamic(
-                    pos=_get_int(child, "pos"),
-                    text=_get_attr(child, "text"),
-                    voice=_get_int(child, "voice", 1),
-                    offset=_parse_position(child),
+            case "dynamic":
+                elements.append(
+                    Dynamic(
+                        pos=_get_int(child, "pos"),
+                        text=_get_attr(child, "text"),
+                        voice=_get_int(child, "voice", 1),
+                        offset=_parse_position(child),
+                    )
                 )
-            )
 
-        elif tag == "text":
-            elements.append(
-                Text(
-                    pos=_get_int(child, "pos"),
-                    text=child.text or "",
-                    style=_get_attr(child, "style"),
-                    voice=_get_int(child, "voice", 1),
-                    offset=_parse_position(child),
+            case "text":
+                elements.append(
+                    Text(
+                        pos=_get_int(child, "pos"),
+                        text=child.text or "",
+                        style=_get_attr(child, "style"),
+                        voice=_get_int(child, "voice", 1),
+                        offset=_parse_position(child),
+                    )
                 )
-            )
 
-        elif tag == "tempo":
-            # Tempo goes in system staff but may appear in bars
-            pass  # Handled at system-staff level
+            case "tempo":
+                # Tempo goes in system staff but may appear in bars
+                pass  # Handled at system-staff level
 
-        elif tag == "rehearsal":
-            # Rehearsal goes in system staff
-            pass
+            case "rehearsal":
+                # Rehearsal goes in system staff
+                pass
 
-        elif tag == "slur":
-            elements.append(
-                Slur(
-                    start_bar=_get_int(child, "start-bar"),
-                    start_pos=_get_int(child, "start-pos"),
-                    end_bar=_get_int(child, "end-bar"),
-                    end_pos=_get_int(child, "end-pos"),
-                    voice=_get_int(child, "voice", 1),
+            case "slur":
+                elements.append(
+                    Slur(
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        end_bar=_get_int(child, "end-bar"),
+                        end_pos=_get_int(child, "end-pos"),
+                        voice=_get_int(child, "voice", 1),
+                    )
                 )
-            )
 
-        elif tag == "hairpin":
-            hp_type = _get_attr(child, "type", "cresc")
-            hp_type_val: str = hp_type if hp_type in ("cresc", "dim") else "cresc"
-            elements.append(
-                Hairpin(
-                    type=hp_type_val,  # type: ignore[arg-type]
-                    start_bar=_get_int(child, "start-bar"),
-                    start_pos=_get_int(child, "start-pos"),
-                    end_bar=_get_int(child, "end-bar"),
-                    end_pos=_get_int(child, "end-pos"),
-                    voice=_get_int(child, "voice", 1),
+            case "hairpin":
+                hp_type = _get_attr(child, "type", "cresc")
+                hp_type_val: str = hp_type if hp_type in ("cresc", "dim") else "cresc"
+                elements.append(
+                    Hairpin(
+                        type=hp_type_val,  # type: ignore[arg-type]
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        end_bar=_get_int(child, "end-bar"),
+                        end_pos=_get_int(child, "end-pos"),
+                        voice=_get_int(child, "voice", 1),
+                    )
                 )
-            )
 
-        elif tag == "tuplet":
-            elements.append(
-                Tuplet(
-                    start_bar=_get_int(child, "start-bar"),
-                    start_pos=_get_int(child, "start-pos"),
-                    num=_get_int(child, "num"),
-                    den=_get_int(child, "den"),
+            case "tuplet":
+                elements.append(
+                    Tuplet(
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        num=_get_int(child, "num"),
+                        den=_get_int(child, "den"),
+                    )
                 )
-            )
 
-        elif tag == "barline":
-            elements.append(
-                Barline(
-                    pos=_get_int(child, "pos"),
-                    type=_get_attr(child, "type", "single"),
+            case "barline":
+                elements.append(
+                    Barline(
+                        pos=_get_int(child, "pos"),
+                        type=_get_attr(child, "type", "single"),
+                    )
                 )
-            )
+
+            case _:  # pragma: no cover
+                raise ValueError(f"Unknown bar element tag: {child.tag!r}")
 
     return elements
 
