@@ -8,11 +8,9 @@ from pathlib import Path
 
 from mahlif.sibelius.automation import (
     activate,
-    compare_windows,
     list_windows,
     screenshot,
     switch_to_window,
-    go_to_page,
     scroll_to_start,
 )
 
@@ -36,7 +34,7 @@ def main() -> int:
             original = w
 
     if not original or not imported:
-        print(f"Need both original and imported windows open")
+        print("Need both original and imported windows open")
         print(f"  Original: {original}")
         print(f"  Imported: {imported}")
         return 1

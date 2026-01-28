@@ -146,14 +146,29 @@ def go_to_page(page_num: int) -> None:
 
 
 def new_blank_score() -> None:
-    """Create new blank score."""
+    """Create new blank score via Quick Start dialog."""
+    print("→ Creating new blank score")
     run_applescript("""
         tell application "System Events"
             tell process "Sibelius"
+                -- Cmd+N to open Quick Start
                 keystroke "n" using command down
+                delay 1.5
+                
+                -- Focus search text field and type Blank
+                tell window "Quick Start"
+                    set focused of text field 1 of group 2 to true
+                    delay 0.3
+                end tell
+                
+                keystroke "Blank"
                 delay 0.5
+                
+                -- Tab out of text field, then Enter to select
+                keystroke tab
+                delay 0.3
                 keystroke return
-                delay 1
+                delay 2
             end tell
         end tell
     """)
@@ -188,12 +203,63 @@ def scroll_to_start() -> None:
 
 
 def run_plugin(plugin_name: str) -> None:
-    """Run a plugin from the Other menu."""
+    """Run a plugin via command search (Ctrl+0)."""
+    print(f"→ Running plugin: {plugin_name}")
     run_applescript(f"""
         tell application "System Events"
             tell process "Sibelius"
-                click menu item "{plugin_name}" of menu "Other" of menu item "Other" of menu "Plug-ins" of menu bar 1
+                -- Use command search (Ctrl+0)
+                keystroke "0" using control down
                 delay 0.5
+                keystroke "{plugin_name}"
+                delay 0.3
+                keystroke return
+                delay 1
+            end tell
+        end tell
+    """)
+
+
+def reload_plugin(plugin_name: str) -> None:
+    """Reload a specific plugin via Edit Plug-ins dialog.
+
+    Steps: Edit Plug-ins > type name > Find > Unload > Reload > Close
+    Button names have & prefixes (e.g., "&Unload").
+    """
+    print(f"→ Reloading plugin: {plugin_name}")
+    run_applescript(f"""
+        tell application "System Events"
+            tell process "Sibelius"
+                -- Open Edit Plug-ins via command search
+                keystroke "0" using control down
+                delay 0.5
+                keystroke "Edit Plug-ins"
+                delay 0.3
+                keystroke return
+                delay 1.5
+
+                -- Now in Edit Plugins dialog, type plugin name and find
+                keystroke "{plugin_name}"
+                delay 0.3
+                keystroke return
+                delay 0.5
+
+                -- Click Unload button
+                click button "&Unload" of front window
+                delay 0.5
+
+                -- Click Reload button
+                click button "&Reload" of front window
+                delay 1
+
+                -- Close dialog via Close button (inside a group)
+                repeat with g in groups of front window
+                    try
+                        click button "Close" of g
+                        exit repeat
+                    end try
+                end repeat
+                delay 0.3
             end tell
         end tell
     """)

@@ -450,6 +450,10 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
             if any(isinstance(e, (TimeSignature, KeySignature)) for e in bar.elements):
                 all_bar_nums.add(bar.n)
 
+    # Filter to only bars that exist in the score
+    max_bars_in_score = max((len(s.bars) for s in score.staves), default=0)
+    all_bar_nums = {n for n in all_bar_nums if n <= max_bars_in_score}
+
     for bar_n in sorted(all_bar_nums):
         lines.append(f"sysBar = score.SystemStaff.NthBar({bar_n});")
 
