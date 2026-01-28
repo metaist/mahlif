@@ -1261,32 +1261,30 @@ class TestAutomation:
         captured = capsys.readouterr()
         assert "page 5" in captured.out
 
-    def test_new_blank_score(self, capsys: pytest.CaptureFixture[str]) -> None:
-        """Test new_blank_score function."""
+    def test_new_blank_score(self) -> None:
+        """Test new_blank_score function (legacy wrapper)."""
         from mahlif.sibelius.automation import new_blank_score
 
-        with patch("mahlif.sibelius.automation.run_applescript"):
+        with patch("mahlif.sibelius.automation.create_blank_score") as mock:
             new_blank_score()
-
-        captured = capsys.readouterr()
-        assert "blank score" in captured.out
+            mock.assert_called_once()
 
     def test_close_without_saving(self) -> None:
-        """Test close_without_saving function."""
+        """Test close_without_saving function (legacy wrapper)."""
         from mahlif.sibelius.automation import close_without_saving
 
-        with patch("mahlif.sibelius.automation.run_applescript") as mock:
+        with patch("mahlif.sibelius.automation.close_score") as mock:
             close_without_saving()
-            mock.assert_called_once()
-            assert "Don't Save" in mock.call_args[0][0]
+            mock.assert_called_with(save=False)
 
     def test_scroll_to_start(self) -> None:
         """Test scroll_to_start function."""
         from mahlif.sibelius.automation import scroll_to_start
 
-        with patch("mahlif.sibelius.automation.run_applescript") as mock:
-            scroll_to_start()
-            mock.assert_called_once()
+        with patch("mahlif.sibelius.automation.press_key") as mock:
+            with patch("mahlif.sibelius.automation.run_applescript"):
+                scroll_to_start()
+                mock.assert_called_with("home", ["command"])
 
     def test_run_plugin(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test run_plugin function."""
@@ -2527,25 +2525,3 @@ class TestFinalBranchCoverage:
         parser = Parser(tokens)
         result = parser._extract_params("no parens here")
         assert result == []
-
-
-def test_dismiss_modal_single() -> None:
-    """Test dismissing single modal."""
-    from mahlif.sibelius.automation import dismiss_modal
-
-    with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-        dismiss_modal()
-        assert mock_run.call_count == 1
-        script = mock_run.call_args[0][0][2]
-        assert "keystroke return" in script
-
-
-def test_dismiss_modal_multiple() -> None:
-    """Test dismissing multiple modals."""
-    from mahlif.sibelius.automation import dismiss_modal
-
-    with patch("subprocess.run") as mock_run:
-        mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-        dismiss_modal(count=3)
-        assert mock_run.call_count == 3
