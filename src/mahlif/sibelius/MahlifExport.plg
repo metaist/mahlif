@@ -85,6 +85,8 @@ nl = Chr(10);
 xml = '    <staff n=' & q & staff.StaffNum & q;
 xml = xml & ' instrument=' & q & XmlEsc(staff.InstrumentName) & q;
 xml = xml & ' instrument-short=' & q & XmlEsc(staff.ShortInstrumentName) & q;
+xml = xml & ' full-name=' & q & XmlEsc(staff.FullInstrumentName) & q;
+xml = xml & ' short-name=' & q & XmlEsc(staff.ShortInstrumentName) & q;
 xml = xml & ' clef=' & q & GetClefName(staff.InitialClefStyleId) & q;
 // InitialKeySignature returns a KeySignature object, get Sharps from it
 initKey = staff.InitialKeySignature;
@@ -93,6 +95,10 @@ if (initKey != null) {
 	keySharps = initKey.Sharps;
 }
 xml = xml & ' key-sig=' & q & keySharps & q;
+// Staff size (percentage, 100 = normal)
+xml = xml & ' size=' & q & staff.SmallStaffSize & q;
+// Number of lines
+xml = xml & ' lines=' & q & staff.NumStaveLines & q;
 xml = xml & '>' & nl;
 
 barCount = score.SystemStaff.BarCount;
@@ -162,6 +168,18 @@ if (type = 'Tuplet') {
 if (type = 'SpecialBarline') {
 	return DoExportBarline(obj);
 }
+if (type = 'OctavaLine') {
+	return DoExportOctava(obj, barNum);
+}
+if (type = 'PedalLine') {
+	return DoExportPedal(obj, barNum);
+}
+if (type = 'Trill') {
+	return DoExportTrill(obj, barNum);
+}
+if (type = 'GraceNote') {
+	return DoExportGraceNote(obj);
+}
 if (type = 'GuitarFrame') {
 	return '';
 }
@@ -169,6 +187,45 @@ if (type = 'LyricItem') {
 	return '';
 }
 if (type = 'BarRest') {
+	return '';
+}
+if (type = 'RehearsalMark') {
+	return '';
+}
+if (type = 'SystemTextItem') {
+	return '';
+}
+if (type = 'InstrumentChange') {
+	return '';
+}
+if (type = 'Line') {
+	return '';
+}
+if (type = 'ArpeggioLine') {
+	return '';
+}
+if (type = 'GlissandoLine') {
+	return '';
+}
+if (type = 'BeamLine') {
+	return '';
+}
+if (type = 'Box') {
+	return '';
+}
+if (type = 'SymbolItem') {
+	return '';
+}
+if (type = 'Graphic') {
+	return '';
+}
+if (type = 'Comment') {
+	return '';
+}
+if (type = 'RepeatTimeLine') {
+	return '';
+}
+if (type = 'Highlight') {
 	return '';
 }
 
@@ -367,6 +424,77 @@ nl = Chr(10);
 xml = '        <barline';
 xml = xml & ' pos=' & q & obj.Position & q;
 xml = xml & ' type=' & q & GetBarlineType(obj.BarlineInternalType) & q;
+xml = xml & '/>' & nl;
+return xml;
+}"
+	DoExportOctava "(obj, barNum) {
+q = Chr(34);
+nl = Chr(10);
+
+// Determine octave type from StyleId
+styleId = obj.StyleId;
+octType = '8va';
+if (Substring(styleId, 0, 25) = 'line.staff.octava.minus8') {
+	octType = '8vb';
+}
+if (Substring(styleId, 0, 26) = 'line.staff.octava.minus15') {
+	octType = '15vb';
+}
+if (Substring(styleId, 0, 25) = 'line.staff.octava.plus15') {
+	octType = '15va';
+}
+
+xml = '        <octava';
+xml = xml & ' type=' & q & octType & q;
+xml = xml & ' start-bar=' & q & barNum & q;
+xml = xml & ' start-pos=' & q & obj.Position & q;
+xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-pos=' & q & obj.EndPosition & q;
+xml = xml & '/>' & nl;
+return xml;
+}"
+	DoExportPedal "(obj, barNum) {
+q = Chr(34);
+nl = Chr(10);
+
+xml = '        <pedal';
+xml = xml & ' type=' & q & 'sustain' & q;
+xml = xml & ' start-bar=' & q & barNum & q;
+xml = xml & ' start-pos=' & q & obj.Position & q;
+xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-pos=' & q & obj.EndPosition & q;
+xml = xml & '/>' & nl;
+return xml;
+}"
+	DoExportTrill "(obj, barNum) {
+q = Chr(34);
+nl = Chr(10);
+
+xml = '        <trill';
+xml = xml & ' start-bar=' & q & barNum & q;
+xml = xml & ' start-pos=' & q & obj.Position & q;
+xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-pos=' & q & obj.EndPosition & q;
+xml = xml & '/>' & nl;
+return xml;
+}"
+	DoExportGraceNote "(obj) {
+q = Chr(34);
+nl = Chr(10);
+
+gType = 'grace';
+if (obj.IsAcciaccatura) {
+	gType = 'acciaccatura';
+}
+if (obj.IsAppoggiatura) {
+	gType = 'appoggiatura';
+}
+
+xml = '        <grace';
+xml = xml & ' pos=' & q & obj.Position & q;
+xml = xml & ' type=' & q & gType & q;
+xml = xml & ' pitch=' & q & obj.Pitch & q;
+xml = xml & ' dur=' & q & obj.Duration & q;
 xml = xml & '/>' & nl;
 return xml;
 }"

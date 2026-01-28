@@ -17,15 +17,19 @@ from mahlif import parse
 from mahlif.models import Barline
 from mahlif.models import Clef
 from mahlif.models import Dynamic
+from mahlif.models import Grace
 from mahlif.models import Hairpin
 from mahlif.models import KeySignature
 from mahlif.models import NoteRest
+from mahlif.models import Octava
+from mahlif.models import Pedal
 from mahlif.models import Rehearsal
 from mahlif.models import Score
 from mahlif.models import Slur
 from mahlif.models import Tempo
 from mahlif.models import Text
 from mahlif.models import TimeSignature
+from mahlif.models import Trill
 from mahlif.models import Tuplet
 
 
@@ -123,6 +127,23 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
     lines.append("\t}")
     lines.append("\tstaffNum = staffNum + 1;")
     lines.append("}")
+    lines.append("")
+
+    # Set staff names
+    lines.append("// Set staff instrument names")
+    for staff_idx, staff in enumerate(score.staves):
+        if staff.full_name:
+            lines.append(
+                f"staves[{staff_idx}].FullInstrumentName = "
+                f"'{escape_str(staff.full_name)}';"
+            )
+        if staff.short_name:
+            lines.append(
+                f"staves[{staff_idx}].ShortInstrumentName = "
+                f"'{escape_str(staff.short_name)}';"
+            )
+        if staff.size != 100:
+            lines.append(f"staves[{staff_idx}].SmallStaffSize = {staff.size};")
     lines.append("")
 
     # Page layout
@@ -322,6 +343,72 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                     }
                     if elem.type in barline_map:
                         lines.append(f"b.AddSpecialBarline({barline_map[elem.type]});")
+
+                elif isinstance(elem, Octava):
+                    # 8va/8vb lines
+                    octava_map = {
+                        "8va": "line.staff.octava.plus8",
+                        "8vb": "line.staff.octava.minus8",
+                        "15va": "line.staff.octava.plus15",
+                        "15vb": "line.staff.octava.minus15",
+                    }
+                    style = octava_map.get(elem.type, "line.staff.octava.plus8")
+                    duration = _calc_spanner_duration(
+                        elem.start_bar,
+                        elem.start_pos,
+                        elem.end_bar,
+                        elem.end_pos,
+                        bar.length,
+                    )
+                    if duration > 0:
+                        lines.append(
+                            f"b.AddLine({elem.start_pos}, {duration}, "
+                            f"'{style}', 0, 0, {elem.voice});"
+                        )
+
+                elif isinstance(elem, Pedal):
+                    # Piano pedal lines
+                    duration = _calc_spanner_duration(
+                        elem.start_bar,
+                        elem.start_pos,
+                        elem.end_bar,
+                        elem.end_pos,
+                        bar.length,
+                    )
+                    if duration > 0:
+                        lines.append(
+                            f"b.AddLine({elem.start_pos}, {duration}, "
+                            f"'line.staff.pedal', 0, 0, 1);"
+                        )
+
+                elif isinstance(elem, Trill):
+                    # Trill lines
+                    duration = _calc_spanner_duration(
+                        elem.start_bar,
+                        elem.start_pos,
+                        elem.end_bar,
+                        elem.end_pos,
+                        bar.length,
+                    )
+                    if duration > 0:
+                        lines.append(
+                            f"b.AddLine({elem.start_pos}, {duration}, "
+                            f"'line.staff.trill', 0, 0, {elem.voice});"
+                        )
+
+                elif isinstance(elem, Grace):
+                    # Grace notes - add before the main note
+                    if elem.type == "acciaccatura":
+                        # Need to find the NoteRest at this position first
+                        lines.append(
+                            f"// Grace note at {elem.pos} (acciaccatura) - "
+                            f"requires AddAcciaccaturaBefore on NoteRest"
+                        )
+                    elif elem.type == "appoggiatura":
+                        lines.append(
+                            f"// Grace note at {elem.pos} (appoggiatura) - "
+                            f"requires AddAppoggiaturaBefore on NoteRest"
+                        )
 
                 elif isinstance(elem, Tempo):
                     # Tempo markings with metronome

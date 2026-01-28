@@ -11,6 +11,7 @@ from mahlif.models import (
     Barline,
     Clef,
     Dynamic,
+    Grace,
     Hairpin,
     KeySignature,
     Layout,
@@ -19,6 +20,8 @@ from mahlif.models import (
     Movement,
     Note,
     NoteRest,
+    Octava,
+    Pedal,
     Position,
     Score,
     Slur,
@@ -27,6 +30,7 @@ from mahlif.models import (
     SystemStaff,
     Text,
     TimeSignature,
+    Trill,
     Tuplet,
 )
 
@@ -142,6 +146,10 @@ def _parse_bar_elements(
     | Hairpin
     | Tuplet
     | Barline
+    | Octava
+    | Pedal
+    | Trill
+    | Grace
 ]:
     """Parse all elements within a bar."""
     elements: list[
@@ -155,6 +163,10 @@ def _parse_bar_elements(
         | Hairpin
         | Tuplet
         | Barline
+        | Octava
+        | Pedal
+        | Trill
+        | Grace
     ] = []
 
     for child in bar_elem:
@@ -263,6 +275,51 @@ def _parse_bar_elements(
                     )
                 )
 
+            case "octava":
+                elements.append(
+                    Octava(
+                        type=_get_attr(child, "type", "8va"),
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        end_bar=_get_int(child, "end-bar"),
+                        end_pos=_get_int(child, "end-pos"),
+                        voice=_get_int(child, "voice", 1),
+                    )
+                )
+
+            case "pedal":
+                elements.append(
+                    Pedal(
+                        type=_get_attr(child, "type", "sustain"),
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        end_bar=_get_int(child, "end-bar"),
+                        end_pos=_get_int(child, "end-pos"),
+                    )
+                )
+
+            case "trill":
+                elements.append(
+                    Trill(
+                        start_bar=_get_int(child, "start-bar"),
+                        start_pos=_get_int(child, "start-pos"),
+                        end_bar=_get_int(child, "end-bar"),
+                        end_pos=_get_int(child, "end-pos"),
+                        voice=_get_int(child, "voice", 1),
+                    )
+                )
+
+            case "grace":
+                elements.append(
+                    Grace(
+                        pos=_get_int(child, "pos"),
+                        type=_get_attr(child, "type", "grace"),
+                        pitch=_get_int(child, "pitch"),
+                        dur=_get_int(child, "dur"),
+                        voice=_get_int(child, "voice", 1),
+                    )
+                )
+
             case _:  # pragma: no cover
                 raise ValueError(f"Unknown bar element tag: {child.tag!r}")
 
@@ -316,9 +373,12 @@ def _parse_staff(staff_elem: etree._Element) -> Staff:
         n=_get_int(staff_elem, "n"),
         instrument=_get_attr(staff_elem, "instrument"),
         instrument_short=_get_attr(staff_elem, "instrument-short"),
+        full_name=_get_attr(staff_elem, "full-name"),
+        short_name=_get_attr(staff_elem, "short-name"),
         clef=_get_attr(staff_elem, "clef", "treble"),
         key_sig=_get_int(staff_elem, "key-sig"),
         lines=_get_int(staff_elem, "lines", 5),
+        size=_get_int(staff_elem, "size", 100),
         bars=bars,
         lyrics=lyrics,
     )

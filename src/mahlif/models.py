@@ -160,6 +160,51 @@ class Barline:
 
 
 @dataclass
+class Octava:
+    """An octave line (8va, 8vb, etc.)."""
+
+    type: str  # 8va, 8vb, 15va, 15vb
+    start_bar: int
+    start_pos: int
+    end_bar: int
+    end_pos: int
+    voice: int = 1
+
+
+@dataclass
+class Pedal:
+    """A pedal marking (piano)."""
+
+    type: str  # sustain, sostenuto, una-corda
+    start_bar: int
+    start_pos: int
+    end_bar: int
+    end_pos: int
+
+
+@dataclass
+class Trill:
+    """A trill line."""
+
+    start_bar: int
+    start_pos: int
+    end_bar: int
+    end_pos: int
+    voice: int = 1
+
+
+@dataclass
+class Grace:
+    """A grace note."""
+
+    pos: int
+    type: str  # grace, acciaccatura, appoggiatura
+    pitch: int
+    dur: int
+    voice: int = 1
+
+
+@dataclass
 class Syllable:
     """A lyric syllable."""
 
@@ -197,6 +242,10 @@ class Bar:
         | Hairpin
         | Tuplet
         | Barline
+        | Octava
+        | Pedal
+        | Trill
+        | Grace
     ] = field(default_factory=list)
 
 
@@ -207,9 +256,12 @@ class Staff:
     n: int
     instrument: str = ""
     instrument_short: str = ""
+    full_name: str = ""  # Full instrument name (for display)
+    short_name: str = ""  # Short instrument name (for subsequent systems)
     clef: str = "treble"
     key_sig: int = 0  # Initial key signature
     lines: int = 5
+    size: int = 100  # Staff size percentage (100 = normal)
     bars: list[Bar] = field(default_factory=list)
     lyrics: list[Lyrics] = field(default_factory=list)
 

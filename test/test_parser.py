@@ -9,12 +9,16 @@ from mahlif import parse
 from mahlif.models import Barline
 from mahlif.models import Clef
 from mahlif.models import Dynamic
+from mahlif.models import Grace
 from mahlif.models import Hairpin
 from mahlif.models import KeySignature
 from mahlif.models import NoteRest
+from mahlif.models import Octava
+from mahlif.models import Pedal
 from mahlif.models import Slur
 from mahlif.models import Text
 from mahlif.models import TimeSignature
+from mahlif.models import Trill
 from mahlif.models import Tuplet
 
 
@@ -618,3 +622,101 @@ class TestParseStructure:
         score = parse(xml)
         # These elements are skipped in bar parsing
         assert len(score.staves[0].bars[0].elements) == 0
+
+    def test_parse_octava(self) -> None:
+        """Parse octava (8va/8vb) lines."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <mahlif version="1.0">
+            <staves count="1">
+                <staff n="1">
+                    <bar n="1" length="1024">
+                        <octava type="8va" start-bar="1" start-pos="0"
+                                end-bar="2" end-pos="512" voice="1"/>
+                    </bar>
+                </staff>
+            </staves>
+        </mahlif>
+        """
+        score = parse(xml)
+        elem = score.staves[0].bars[0].elements[0]
+        assert isinstance(elem, Octava)
+        assert elem.type == "8va"
+        assert elem.start_bar == 1
+        assert elem.end_bar == 2
+
+    def test_parse_pedal(self) -> None:
+        """Parse pedal lines."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <mahlif version="1.0">
+            <staves count="1">
+                <staff n="1">
+                    <bar n="1" length="1024">
+                        <pedal type="sustain" start-bar="1" start-pos="0"
+                               end-bar="1" end-pos="1024"/>
+                    </bar>
+                </staff>
+            </staves>
+        </mahlif>
+        """
+        score = parse(xml)
+        elem = score.staves[0].bars[0].elements[0]
+        assert isinstance(elem, Pedal)
+        assert elem.type == "sustain"
+
+    def test_parse_trill(self) -> None:
+        """Parse trill lines."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <mahlif version="1.0">
+            <staves count="1">
+                <staff n="1">
+                    <bar n="1" length="1024">
+                        <trill start-bar="1" start-pos="256"
+                               end-bar="1" end-pos="768" voice="1"/>
+                    </bar>
+                </staff>
+            </staves>
+        </mahlif>
+        """
+        score = parse(xml)
+        elem = score.staves[0].bars[0].elements[0]
+        assert isinstance(elem, Trill)
+        assert elem.start_pos == 256
+        assert elem.end_pos == 768
+
+    def test_parse_grace(self) -> None:
+        """Parse grace notes."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <mahlif version="1.0">
+            <staves count="1">
+                <staff n="1">
+                    <bar n="1" length="1024">
+                        <grace pos="256" type="acciaccatura" pitch="67" dur="64"/>
+                    </bar>
+                </staff>
+            </staves>
+        </mahlif>
+        """
+        score = parse(xml)
+        elem = score.staves[0].bars[0].elements[0]
+        assert isinstance(elem, Grace)
+        assert elem.type == "acciaccatura"
+        assert elem.pitch == 67
+
+    def test_parse_staff_attributes(self) -> None:
+        """Parse extended staff attributes."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <mahlif version="1.0">
+            <staves count="1">
+                <staff n="1" instrument="Violin I"
+                       full-name="Violin I" short-name="Vn. I"
+                       size="75" lines="5">
+                    <bar n="1" length="1024"/>
+                </staff>
+            </staves>
+        </mahlif>
+        """
+        score = parse(xml)
+        staff = score.staves[0]
+        assert staff.full_name == "Violin I"
+        assert staff.short_name == "Vn. I"
+        assert staff.size == 75
