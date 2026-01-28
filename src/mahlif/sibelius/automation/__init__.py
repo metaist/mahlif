@@ -289,6 +289,15 @@ def type_text(text: str, delay: float = 0.1) -> None:
     """)
 
 
+def type_in_field(text: str, delay: float = 0.1) -> None:
+    """Clear field and type text. Use for search boxes that may have old content."""
+    press_key("a", ["command"])  # Select all
+    run_applescript("delay 0.1")
+    press_key("delete")  # Delete selected
+    run_applescript("delay 0.1")
+    type_text(text, delay)
+
+
 def click_button(button_name: str, window: str = "front window") -> bool:
     """Click a button by name. Returns True if successful."""
     try:
@@ -349,8 +358,9 @@ def dismiss_save_changes(save: bool = False) -> bool:
 
 
 def dismiss_quick_start() -> bool:
-    """Dismiss Quick Start by pressing Escape or Close."""
-    press_key("escape")
+    """Dismiss Quick Start by clicking Close button."""
+    # Escape doesn't work on Quick Start - must click Close button
+    click_button("Close")
     run_applescript("delay 0.5")
     return detect_modal() != ModalType.QUICK_START
 
@@ -416,7 +426,12 @@ def open_command_search() -> None:
 
 
 def close_command_search() -> None:
-    """Close command search if open."""
+    """Close command search dropdown if open.
+
+    Note: This doesn't clear the text. Use type_in_field() when typing
+    in the command search to handle any leftover text.
+    """
+    activate()
     press_key("escape")
     run_applescript("delay 0.3")
 
@@ -430,7 +445,7 @@ def run_command(command: str, arrow_down: int = 0) -> None:
                    (to select non-first result)
     """
     open_command_search()
-    type_text(command)
+    type_in_field(command)  # Clear any leftover text first
     run_applescript("delay 0.8")
     for _ in range(arrow_down):
         press_key("down")
@@ -446,6 +461,7 @@ def run_command(command: str, arrow_down: int = 0) -> None:
 
 def close_score(save: bool = False) -> None:
     """Close current score."""
+    activate()
     press_key("w", ["command"])
     run_applescript("delay 0.5")
     modal = detect_modal()
@@ -458,6 +474,8 @@ def create_blank_score() -> bool:
 
     Returns True if successful.
     """
+    activate()
+
     # First, ensure we're in a clean state
     dismiss_all_modals()
 
@@ -469,9 +487,27 @@ def create_blank_score() -> bool:
     if detect_modal() != ModalType.QUICK_START:
         return False
 
-    # Quick Start should show with Blank selected by default
-    # Just press Enter to create blank score
-    press_key("return")
+    # Get position of Blank template and double-click it
+    # Blank is static text 2 in Common list (Bass Staff, Blank, Solo Piano, Treble Staff)
+    pos_str = run_applescript("""
+        tell application "System Events"
+            tell process "Sibelius"
+                tell window "Quick Start"
+                    get position of static text 2 of list "Common" of group 2
+                end tell
+            end tell
+        end tell
+    """)
+    # Parse position "x, y" and click above text (on the image)
+    parts = pos_str.split(", ")
+    x, y = int(parts[0]), int(parts[1])
+    # Image is above the text label, so adjust y up by ~40 pixels
+    click_y = y + 40
+
+    # Use cliclick for reliable double-click
+    import subprocess
+
+    subprocess.run(["cliclick", f"dc:{x},{click_y}"], check=True)
     run_applescript("delay 3")
 
     # Verify score was created
@@ -483,6 +519,9 @@ def ensure_blank_score() -> bool:
 
     Returns True if we end up with a blank score.
     """
+    # Make sure Sibelius is active
+    activate()
+
     # Dismiss any modals first
     dismiss_all_modals()
 
@@ -514,12 +553,9 @@ def reload_plugin(plugin_menu_name: str) -> bool:
     dismiss_all_modals()
     close_command_search()
 
-    # Open Edit Plug-ins
-    open_command_search()
-    type_text("Edit Plug-ins")
-    run_applescript("delay 0.8")
-    press_key("return")
-    run_applescript("delay 2")
+    # Open Edit Plug-ins via command search
+    run_command("Edit Plug-ins")
+    run_applescript("delay 1.5")
 
     # Verify dialog opened
     if detect_modal() != ModalType.EDIT_PLUGINS:
@@ -528,8 +564,8 @@ def reload_plugin(plugin_menu_name: str) -> bool:
             print("  ✗ Failed to open Edit Plugins dialog")
             return False
 
-    # Search for plugin
-    type_text(plugin_menu_name)
+    # Search for plugin (clear field first)
+    type_in_field(plugin_menu_name)
     run_applescript("delay 0.5")
     # First Enter searches, second Enter selects the match
     press_key("return")
@@ -557,13 +593,13 @@ def reload_plugin(plugin_menu_name: str) -> bool:
     return True
 
 
-def run_plugin(plugin_menu_name: str, via_other_menu: bool = True) -> None:
+def run_plugin(plugin_menu_name: str, arrow_down: int = 0) -> None:
     """Run a plugin via command search.
 
     Args:
         plugin_menu_name: The menu name (e.g., "Mahlif: Import Test")
-        via_other_menu: If True, arrow down to select from Home > Plug-ins
-                       (avoids the Commands shortcut which may need selection)
+        arrow_down: Number of times to press down arrow before Enter
+                   (usually 0, but may need 1 if multiple matches)
     """
     print(f"→ Running plugin: {plugin_menu_name}")
 
@@ -572,7 +608,6 @@ def run_plugin(plugin_menu_name: str, via_other_menu: bool = True) -> None:
     close_command_search()
 
     # Run via command search
-    arrow_down = 1 if via_other_menu else 0
     run_command(plugin_menu_name, arrow_down=arrow_down)
     run_applescript("delay 5")
 

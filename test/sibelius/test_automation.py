@@ -839,15 +839,15 @@ def test_run_plugin(capsys: pytest.CaptureFixture[str]) -> None:
     assert "Running plugin: Test Plugin" in captured.out
 
 
-def test_run_plugin_via_other_menu() -> None:
-    """Test run_plugin with via_other_menu option."""
+def test_run_plugin_with_arrow_down() -> None:
+    """Test run_plugin with arrow_down option."""
     from mahlif.sibelius.automation import run_plugin
 
     with patch("mahlif.sibelius.automation.dismiss_all_modals"):
         with patch("mahlif.sibelius.automation.close_command_search"):
             with patch("mahlif.sibelius.automation.run_command") as mock:
                 with patch("mahlif.sibelius.automation.run_applescript"):
-                    run_plugin("Test", via_other_menu=True)
+                    run_plugin("Test", arrow_down=1)
                     mock.assert_called_with("Test", arrow_down=1)
 
 
@@ -1148,3 +1148,18 @@ def test_reload_plugin_window_name_fallback(capsys: pytest.CaptureFixture[str]) 
                                             result = reload_plugin("Test")
                                             # Should proceed since window name matched
                                             assert result is True
+
+
+def test_type_in_field() -> None:
+    """Test type_in_field clears before typing."""
+    from mahlif.sibelius.automation import type_in_field
+
+    with patch("mahlif.sibelius.automation.press_key") as mock_press:
+        with patch("mahlif.sibelius.automation.type_text") as mock_type:
+            with patch("mahlif.sibelius.automation.run_applescript"):
+                type_in_field("test")
+                # Should select all, delete, then type
+                calls = [c[0][0] for c in mock_press.call_args_list]
+                assert "a" in calls
+                assert "delete" in calls
+                mock_type.assert_called_with("test", 0.1)
