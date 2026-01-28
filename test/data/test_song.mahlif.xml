@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mahlif version="1.0">
+  <meta>
+    <work-title>Test Song</work-title>
+    <composer>Test Composer</composer>
+  </meta>
+  
+  <layout>
+    <page-width>210</page-width>
+    <page-height>297</page-height>
+  </layout>
+  
+  <system-staff>
+    <bar n="1" length="1024">
+      <time pos="0" num="4" den="4"/>
+      <key pos="0" fifths="0" mode="major"/>
+    </bar>
+  </system-staff>
+  
+  <staves>
+    <!-- Staff 1: Violin melody with dynamics -->
+    <staff n="1" instrument="Violin" full-name="Violin" short-name="Vln.">
+      <bar n="1" length="1024">
+        <note pos="0" dur="256" pitch="60" voice="1"/>
+        <note pos="256" dur="256" pitch="62" voice="1"/>
+        <note pos="512" dur="256" pitch="64" voice="1"/>
+        <note pos="768" dur="256" pitch="65" voice="1"/>
+        <dynamic pos="0" text="f"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="256" pitch="67" voice="1"/>
+        <note pos="256" dur="256" pitch="69" voice="1"/>
+        <note pos="512" dur="256" pitch="71" voice="1"/>
+        <note pos="768" dur="256" pitch="72" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="256" pitch="72" voice="1" articulations="staccato"/>
+        <note pos="256" dur="256" pitch="71" voice="1" articulations="staccato"/>
+        <note pos="512" dur="256" pitch="69" voice="1" articulations="staccato"/>
+        <note pos="768" dur="256" pitch="67" voice="1" articulations="staccato"/>
+        <dynamic pos="0" text="p"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="60" voice="1" articulations="fermata"/>
+      </bar>
+      <bar n="5" length="1024">
+        <note pos="0" dur="512" pitch="64" voice="1"/>
+        <note pos="512" dur="512" pitch="67" voice="1"/>
+        <slur start-bar="5" start-pos="0" end-bar="5" end-pos="1024" voice="1"/>
+        <dynamic pos="0" text="mf"/>
+      </bar>
+      <bar n="6" length="1024">
+        <note pos="0" dur="512" pitch="72" voice="1"/>
+        <note pos="512" dur="512" pitch="69" voice="1"/>
+        <hairpin start-bar="6" start-pos="0" end-bar="6" end-pos="1024" type="cresc" voice="1"/>
+      </bar>
+      <bar n="7" length="1024">
+        <note pos="0" dur="256" pitch="67" voice="1" articulations="accent"/>
+        <note pos="256" dur="256" pitch="65" voice="1"/>
+        <note pos="512" dur="256" pitch="64" voice="1"/>
+        <note pos="768" dur="256" pitch="62" voice="1"/>
+        <dynamic pos="0" text="ff"/>
+      </bar>
+      <bar n="8" length="1024">
+        <note pos="0" dur="1024" pitch="60" voice="1"/>
+        <barline pos="1024" type="final"/>
+      </bar>
+    </staff>
+    
+    <!-- Staff 2: Cello accompaniment -->
+    <staff n="2" instrument="Cello" full-name="Cello" short-name="Vc.">
+      <bar n="1" length="1024">
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="512" pitch="43" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="512" pitch="43" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+      </bar>
+      <bar n="5" length="1024">
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="6" length="1024">
+        <note pos="0" dur="512" pitch="43" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+      </bar>
+      <bar n="7" length="1024">
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="8" length="1024">
+        <note pos="0" dur="1024" pitch="48" voice="1"/>
+      </bar>
+    </staff>
+    
+    <!-- Staff 3: Piano chords -->
+    <staff n="3" instrument="Piano" full-name="Piano" short-name="Pno.">
+      <bar n="1" length="1024">
+        <chord pos="0" dur="512" voice="1">
+          <n p="60"/>
+          <n p="64"/>
+          <n p="67"/>
+        </chord>
+        <chord pos="512" dur="512" voice="1">
+          <n p="60"/>
+          <n p="64"/>
+          <n p="67"/>
+        </chord>
+      </bar>
+      <bar n="2" length="1024">
+        <chord pos="0" dur="512" voice="1">
+          <n p="55"/>
+          <n p="59"/>
+          <n p="62"/>
+        </chord>
+        <chord pos="512" dur="512" voice="1">
+          <n p="55"/>
+          <n p="59"/>
+          <n p="62"/>
+        </chord>
+      </bar>
+      <bar n="3" length="1024">
+        <chord pos="0" dur="512" voice="1">
+          <n p="57"/>
+          <n p="60"/>
+          <n p="64"/>
+        </chord>
+        <chord pos="512" dur="512" voice="1">
+          <n p="57"/>
+          <n p="60"/>
+          <n p="64"/>
+        </chord>
+      </bar>
+      <bar n="4" length="1024">
+        <chord pos="0" dur="1024" voice="1">
+          <n p="55"/>
+          <n p="59"/>
+          <n p="62"/>
+        </chord>
+      </bar>
+      <bar n="5" length="1024">
+        <chord pos="0" dur="512" voice="1">
+          <n p="60"/>
+          <n p="64"/>
+          <n p="67"/>
+        </chord>
+        <chord pos="512" dur="512" voice="1">
+          <n p="57"/>
+          <n p="60"/>
+          <n p="64"/>
+        </chord>
+      </bar>
+      <bar n="6" length="1024">
+        <chord pos="0" dur="512" voice="1">
+          <n p="53"/>
+          <n p="57"/>
+          <n p="60"/>
+        </chord>
+        <chord pos="512" dur="512" voice="1">
+          <n p="55"/>
+          <n p="59"/>
+          <n p="62"/>
+        </chord>
+      </bar>
+      <bar n="7" length="1024">
+        <chord pos="0" dur="256" voice="1">
+          <n p="60"/>
+          <n p="64"/>
+          <n p="67"/>
+        </chord>
+        <chord pos="256" dur="256" voice="1">
+          <n p="59"/>
+          <n p="62"/>
+          <n p="67"/>
+        </chord>
+        <chord pos="512" dur="256" voice="1">
+          <n p="57"/>
+          <n p="60"/>
+          <n p="64"/>
+        </chord>
+        <chord pos="768" dur="256" voice="1">
+          <n p="55"/>
+          <n p="59"/>
+          <n p="62"/>
+        </chord>
+      </bar>
+      <bar n="8" length="1024">
+        <chord pos="0" dur="1024" voice="1">
+          <n p="48"/>
+          <n p="55"/>
+          <n p="60"/>
+        </chord>
+      </bar>
+    </staff>
+  </staves>
+</mahlif>

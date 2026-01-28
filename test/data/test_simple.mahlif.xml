@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mahlif version="1.0">
+  <meta>
+    <work-title>Simple Test</work-title>
+  </meta>
+  
+  <layout>
+    <page-width>210</page-width>
+    <page-height>297</page-height>
+  </layout>
+  
+  <system-staff>
+    <bar n="1" length="1024">
+      <time pos="0" num="4" den="4"/>
+      <key pos="0" fifths="0" mode="major"/>
+    </bar>
+  </system-staff>
+  
+  <staves>
+    <!-- Staff 1: Simple melody -->
+    <staff n="1" instrument="Violin" full-name="Violin" short-name="Vln.">
+      <bar n="1" length="1024">
+        <clef pos="0" type="treble"/>
+        <note pos="0" dur="256" pitch="60" voice="1"/>
+        <note pos="256" dur="256" pitch="62" voice="1"/>
+        <note pos="512" dur="256" pitch="64" voice="1"/>
+        <note pos="768" dur="256" pitch="65" voice="1"/>
+        <dynamic pos="0" text="f"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="256" pitch="67" voice="1"/>
+        <note pos="256" dur="256" pitch="69" voice="1"/>
+        <note pos="512" dur="256" pitch="71" voice="1"/>
+        <note pos="768" dur="256" pitch="72" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="512" pitch="72" voice="1"/>
+        <note pos="512" dur="512" pitch="67" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="60" voice="1"/>
+      </bar>
+    </staff>
+    
+    <!-- Staff 2: Simple bass -->
+    <staff n="2" instrument="Cello" full-name="Cello" short-name="Vc.">
+      <bar n="1" length="1024">
+        <clef pos="0" type="bass"/>
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="512" pitch="43" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="48" voice="1"/>
+      </bar>
+    </staff>
+  </staves>
+</mahlif>

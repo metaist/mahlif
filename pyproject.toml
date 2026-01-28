@@ -17,10 +17,7 @@ version = "0.1.0"
 description = "Universal music notation interchange format with bidirectional converters"
 keywords = ["music", "notation", "sibelius", "lilypond", "musicxml", "converter"]
 requires-python = ">=3.10,<3.15"
-dependencies = [
-    "rich>=13.0,<15.0",
-    "lxml>=5.0,<6.0",
-]
+dependencies = ["rich>=13.0,<15.0", "lxml>=5.0,<6.0"]
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE.md"]
@@ -85,7 +82,7 @@ clean = """
 """
 
 # Lint
-lint = ["ruff-*", "+cspell"]
+lint = ["ruff-*", "cspell"]
 ruff-format = "uvx ruff format ${@:-.}"
 ruff-lint = "uvx ruff check --fix ${@:-.}"
 cspell = "npx cspell lint --unique --gitignore --exclude '**/_vendor/**' '**/*.{py,txt,md,markdown}'"
