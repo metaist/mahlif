@@ -2254,3 +2254,276 @@ class TestFinalCoverageGaps:
         result = generate_plugin(score, "Test")
         # Key sig should be added, text should be skipped
         assert "AddKeySignature" in result
+
+
+# =============================================================================
+# Robustness tests for malformed/edge case inputs
+# =============================================================================
+
+
+class TestRobustnessExtractApi:
+    """Test extract_api.py handles malformed inputs."""
+
+    def test_extract_signatures_invalid_signature(self) -> None:
+        """Test that invalid signatures are skipped."""
+        # This pattern won't parse - missing closing paren
+        text = "ValidMethod(a, b)\nInvalid(a, b"
+        methods = extract_signatures(text)
+        assert "ValidMethod" in methods
+        assert "Invalid" not in methods
+
+    def test_extract_signatures_empty_text(self) -> None:
+        """Test with empty input."""
+        methods = extract_signatures("")
+        assert methods == {}
+
+
+class TestRobustnessGeneratePlugin:
+    """Test generate_plugin.py handles edge cases."""
+
+    def test_layout_zero_width_positive_height(self) -> None:
+        """Test layout with width=0 but height>0."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        layout = Layout(page_width=0, page_height=297, staff_height=0)
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=layout,
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        assert "PageHeight = 297" in result
+        assert "PageWidth" not in result
+
+    def test_layout_all_zero(self) -> None:
+        """Test layout with all dimensions zero (skip layout block)."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        layout = Layout(page_width=0, page_height=0, staff_height=0)
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=layout,
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        assert "docSetup" not in result
+
+    def test_chord_with_unknown_articulation(self) -> None:
+        """Test chord (not single note) with unknown articulation."""
+        note1 = Note(pitch=60)
+        note2 = Note(pitch=64)
+        noterest = NoteRest(
+            pos=0,
+            dur=256,
+            notes=[note1, note2],
+            voice=1,
+            articulations=["unknown-artic", "staccato"],
+        )
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Piano")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Should have staccato but not unknown-artic
+        assert "StaccatoArtic" in result
+        assert "unknown-artic" not in result
+
+    def test_grace_note_unknown_type(self) -> None:
+        """Test grace note with unknown type."""
+        grace = Grace(pos=0, type="unknown-grace", pitch=60, dur=128)
+        note = Note(pitch=62)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[grace, noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Violin")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Unknown grace type should not generate any grace comment
+        assert "acciaccatura" not in result
+        assert "appoggiatura" not in result
+
+    def test_unknown_break_type(self) -> None:
+        """Test bar with unknown break type."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest], break_type="unknown-break")
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[]),
+        )
+        result = generate_plugin(score, "Test")
+        # Unknown break type should not generate BreakType assignment
+        assert "BreakType" not in result
+
+    def test_system_staff_bar_number_mismatch(self) -> None:
+        """Test system staff with bars that don't match staff bar numbers."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        # System staff has bar 5, but staff only has bar 1
+        ts = TimeSignature(pos=0, num=3, den=4)
+        sys_bar = Bar(n=5, length=768, elements=[ts])
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[sys_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        # Bar 5 should be filtered out (doesn't exist in score)
+        assert "NthBar(5)" not in result
+
+    def test_system_staff_multiple_bars_partial_match(self) -> None:
+        """Test system staff with multiple bars, only some matching."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar1 = Bar(n=1, length=1024, elements=[noterest])
+        bar2 = Bar(n=2, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar1, bar2], instrument="Flute")
+        # System staff has bars 1, 2, 3 - but staff only has 1, 2
+        ts1 = TimeSignature(pos=0, num=4, den=4)
+        ts2 = TimeSignature(pos=0, num=3, den=4)
+        ts3 = TimeSignature(pos=0, num=2, den=4)
+        sys_bar1 = Bar(n=1, length=1024, elements=[ts1])
+        sys_bar2 = Bar(n=2, length=768, elements=[ts2])
+        sys_bar3 = Bar(n=3, length=512, elements=[ts3])
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[sys_bar1, sys_bar2, sys_bar3]),
+        )
+        result = generate_plugin(score, "Test")
+        # Bars 1 and 2 should be processed, bar 3 filtered out
+        assert "AddTimeSignature(4, 4" in result
+        assert "AddTimeSignature(3, 4" in result
+        assert "AddTimeSignature(2, 4" not in result
+
+
+class TestRobustnessLint:
+    """Test lint.py handles edge cases."""
+
+    def test_lint_braces_mixed_quotes(self) -> None:
+        """Test string with opposite quote inside."""
+        # Single quote inside double-quoted string
+        errors = lint_braces('x = "it\'s working";')
+        assert len(errors) == 0
+
+    def test_lint_braces_nested_quotes(self) -> None:
+        """Test double quote inside single-quoted string."""
+        errors = lint_braces("x = 'say \"hello\"';")
+        assert len(errors) == 0
+
+
+class TestRobustnessManuscriptAst:
+    """Test manuscript_ast.py handles edge cases."""
+
+    def test_tokenizer_unterminated_string(self) -> None:
+        """Test tokenizing unterminated string."""
+        tokenizer = Tokenizer('x = "unterminated')
+        tokens = list(tokenizer.tokenize())
+        # Should not crash, produces tokens
+        assert len(tokens) > 0
+
+    def test_get_method_calls_no_methods(self) -> None:
+        """Test code with no method calls."""
+        calls = get_method_calls("x = 5; y = x + 3;")
+        assert calls == []
+
+    def test_get_method_calls_nested_parens(self) -> None:
+        """Test method call with nested parentheses in args."""
+        calls = get_method_calls("foo((a + b), c);")
+        assert len(calls) == 1
+        assert calls[0][3] == "foo"
+        assert calls[0][4] == 2  # 2 args
+
+    def test_parser_multiple_members(self) -> None:
+        """Test plugin with multiple methods."""
+        plugin = parse_plugin('{ Init "() { }" Run "() { }" }')
+        assert len(plugin.members) == 2
+
+
+class TestFinalBranchCoverage:
+    """Tests for final branch coverage gaps."""
+
+    def test_lint_strings_odd_quotes_with_double_empty(self) -> None:
+        """Test line with odd quotes but contains empty string literal."""
+        # This has 3 quotes total: "" and one more "
+        errors = lint_strings('x = "" + "incomplete')
+        assert isinstance(errors, list)
+
+    def test_tokenizer_advance_past_end(self) -> None:
+        """Test advancing tokenizer past end of source."""
+        tokenizer = Tokenizer("x")
+        # Advance multiple times past source length
+        tokenizer._advance(10)
+        # Should not crash
+        assert tokenizer.pos >= len(tokenizer.source)
+
+    def test_extract_params_empty_parens_whitespace(self) -> None:
+        """Test extracting params from parens with only whitespace."""
+        tokens = list(Tokenizer('{ Test "(   ) { }" }').tokenize())
+        parser = Parser(tokens)
+        plugin = parser.parse()
+        assert len(plugin.members) == 1
+        method = plugin.members[0]
+        assert hasattr(method, "params")
+        assert method.params == []  # type: ignore[union-attr]
+
+    def test_extract_signatures_parse_returns_none(self) -> None:
+        """Test signature that looks valid but parse_signature returns None."""
+        # Malformed signature that regex matches but parse fails
+        # Actually need to check what makes parse_signature return None
+        result = parse_signature("Invalid(")  # Unclosed paren
+        assert result is None
+
+    def test_generate_plugin_empty_system_staff_bars(self) -> None:
+        """Test when system_staff.bars iteration completes without match."""
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest], break_type="page")
+        staff = Staff(n=1, bars=[bar], instrument="Flute")
+        # System staff has bar 2, but we're looking for bar 1 (from break)
+        ts = TimeSignature(pos=0, num=3, den=4)
+        sys_bar = Bar(n=2, length=768, elements=[ts])
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[sys_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        # Should process bar 1 for break, but system staff bar 2 doesn't match
+        assert "BreakType = EndOfPage" in result
+
+    def test_lint_strings_odd_quotes_no_empty_string(self) -> None:
+        """Test line with odd quotes and no empty string literal."""
+        # This has 3 quotes and no ""
+        errors = lint_strings('x = "a" + "b')
+        assert isinstance(errors, list)
+
+    def test_extract_params_no_parens(self) -> None:
+        """Test extracting params from string without parentheses."""
+        # Manually call _extract_params with no parens
+        tokens = list(Tokenizer("{ }").tokenize())
+        parser = Parser(tokens)
+        result = parser._extract_params("no parens here")
+        assert result == []

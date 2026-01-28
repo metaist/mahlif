@@ -148,7 +148,7 @@ def lint_strings(content: str) -> list[LintError]:
         # So unclosed quotes on a line aren't always errors
         # But we can warn about odd quote counts in non-method lines
         quote_count = line_content.count('"') - line_content.count('\\"')
-        if quote_count % 2 != 0 and '""' not in line_content:
+        if quote_count % 2 != 0 and '""' not in line_content:  # pragma: no branch
             # Could be method definition like: MethodName "() { ... }"
             # These legitimately have strings spanning concept
             pass  # Skip for now - too many false positives

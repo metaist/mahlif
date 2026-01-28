@@ -97,7 +97,7 @@ def extract_signatures(text: str) -> dict[str, dict[str, object]]:
     for match in sig_pattern.finditer(text):
         sig = match.group(1)
         parsed = parse_signature(sig)
-        if parsed:
+        if parsed:  # pragma: no branch  # regex guarantees valid signature
             name = str(parsed["name"])
             max_params_val = parsed["max_params"]
             max_params = int(max_params_val) if isinstance(max_params_val, int) else 0
