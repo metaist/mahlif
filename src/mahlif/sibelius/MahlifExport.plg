@@ -2,7 +2,7 @@
 	Initialize "() {
 AddToPluginsMenu(_PluginMenuName, 'Run');
 }"
-	_PluginMenuName "Export to Mahlif XML"
+	_PluginMenuName "Mahlif: Export"
 	Run "() {
 if (Sibelius.ProgramVersion < 7000) {
 	Sibelius.MessageBox('This plugin requires Sibelius 7 or later.');
@@ -95,10 +95,6 @@ if (initKey != null) {
 	keySharps = initKey.Sharps;
 }
 xml = xml & ' key-sig=' & q & keySharps & q;
-// Staff size (percentage, 100 = normal)
-xml = xml & ' size=' & q & staff.SmallStaffSize & q;
-// Number of lines
-xml = xml & ' lines=' & q & staff.NumStaveLines & q;
 xml = xml & '>' & nl;
 
 barCount = score.SystemStaff.BarCount;
@@ -448,7 +444,7 @@ xml = '        <octava';
 xml = xml & ' type=' & q & octType & q;
 xml = xml & ' start-bar=' & q & barNum & q;
 xml = xml & ' start-pos=' & q & obj.Position & q;
-xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-bar=' & q & obj.EndBarNumber & q;
 xml = xml & ' end-pos=' & q & obj.EndPosition & q;
 xml = xml & '/>' & nl;
 return xml;
@@ -461,7 +457,7 @@ xml = '        <pedal';
 xml = xml & ' type=' & q & 'sustain' & q;
 xml = xml & ' start-bar=' & q & barNum & q;
 xml = xml & ' start-pos=' & q & obj.Position & q;
-xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-bar=' & q & obj.EndBarNumber & q;
 xml = xml & ' end-pos=' & q & obj.EndPosition & q;
 xml = xml & '/>' & nl;
 return xml;
@@ -473,7 +469,7 @@ nl = Chr(10);
 xml = '        <trill';
 xml = xml & ' start-bar=' & q & barNum & q;
 xml = xml & ' start-pos=' & q & obj.Position & q;
-xml = xml & ' end-bar=' & q & (barNum + obj.EndBarNumber - obj.StartBarNumber) & q;
+xml = xml & ' end-bar=' & q & obj.EndBarNumber & q;
 xml = xml & ' end-pos=' & q & obj.EndPosition & q;
 xml = xml & '/>' & nl;
 return xml;
@@ -507,7 +503,10 @@ xml = '';
 // Check verses 1-5
 for verse = 1 to 6 {
 	hasLyrics = False;
-	lyricsXml = '      <lyrics voice=' & q & '1' & q & ' verse=' & q & verse & q & '>' & nl;
+	verseFont = '';
+	verseFontSize = 0;
+	lyricsXml = '';
+	syllablesXml = '';
 
 	for b = 1 to barCount + 1 {
 		bar = staff.NthBar(b);
@@ -515,26 +514,35 @@ for verse = 1 to 6 {
 			if (obj.Type = 'LyricItem') {
 				objVerse = GetLyricVerse(obj.StyleId);
 				if (objVerse = verse) {
+					// Get font info from first syllable
+					if (not hasLyrics) {
+						verseFont = obj.StyleAsText;
+					}
 					hasLyrics = True;
-					lyricsXml = lyricsXml & '        <syl';
-					lyricsXml = lyricsXml & ' pos=' & q & obj.Position & q;
-					lyricsXml = lyricsXml & ' bar=' & q & b & q;
+					syllablesXml = syllablesXml & '        <syl';
+					syllablesXml = syllablesXml & ' pos=' & q & obj.Position & q;
+					syllablesXml = syllablesXml & ' bar=' & q & b & q;
 					syllableType = obj.SyllableType;
 					if ((syllableType = 1) or (syllableType = 3)) {
-						lyricsXml = lyricsXml & ' hyphen=' & q & 'true' & q;
+						syllablesXml = syllablesXml & ' hyphen=' & q & 'true' & q;
 					}
 					if ((syllableType = 2) or (syllableType = 3)) {
-						lyricsXml = lyricsXml & ' melisma=' & q & 'true' & q;
+						syllablesXml = syllablesXml & ' melisma=' & q & 'true' & q;
 					}
-					lyricsXml = lyricsXml & '>' & XmlEsc(obj.Text) & '</syl>' & nl;
+					syllablesXml = syllablesXml & '>' & XmlEsc(obj.Text) & '</syl>' & nl;
 				}
 			}
 		}
 	}
 
-	lyricsXml = lyricsXml & '      </lyrics>' & nl;
-
 	if (hasLyrics) {
+		lyricsXml = '      <lyrics voice=' & q & '1' & q & ' verse=' & q & verse & q;
+		if (verseFont != '') {
+			lyricsXml = lyricsXml & ' style=' & q & XmlEsc(verseFont) & q;
+		}
+		lyricsXml = lyricsXml & '>' & nl;
+		lyricsXml = lyricsXml & syllablesXml;
+		lyricsXml = lyricsXml & '      </lyrics>' & nl;
 		xml = xml & lyricsXml;
 	}
 }

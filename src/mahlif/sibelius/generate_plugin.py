@@ -83,7 +83,7 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
     # Header
     lines.append("{")
     lines.append('\tInitialize "() {')
-    lines.append(f"AddToPluginsMenu('Mahlif: Import {escape_str(title)}', 'Run');")
+    lines.append("AddToPluginsMenu('Mahlif: Import Test', 'Run');")
     lines.append('}"')
     lines.append('\tRun "() {')
     lines.append("score = Sibelius.ActiveScore;")
@@ -186,14 +186,7 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
 
             lines.append(f"b = st.NthBar({bar.n});")
 
-            # Handle page/system breaks
-            if bar.break_type:
-                break_map = {
-                    "page": "EndOfPage",
-                    "system": "EndOfSystem",
-                }
-                if bar.break_type in break_map:
-                    lines.append(f"b.BreakType = {break_map[bar.break_type]};")
+            # Page/system breaks are handled at system staff level
 
             for elem in bar.elements:
                 if isinstance(elem, NoteRest) and not elem.is_rest:
@@ -442,30 +435,54 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
 
         lines.append("")
 
-    # Add time/key signatures from system staff
-    if score.system_staff.bars:
-        lines.append("// System staff: time/key signatures")
-        for bar in score.system_staff.bars:
-            has_time_or_key = any(
-                isinstance(e, (TimeSignature, KeySignature)) for e in bar.elements
-            )
-            if not has_time_or_key:
-                continue
+    # Collect breaks from first staff (they apply to whole system)
+    breaks: dict[int, str] = {}
+    if score.staves:
+        for bar in score.staves[0].bars:
+            if bar.break_type:
+                breaks[bar.n] = bar.break_type
 
-            lines.append(f"sysBar = score.SystemStaff.NthBar({bar.n});")
-            for elem in bar.elements:
-                if isinstance(elem, TimeSignature):
-                    # AddTimeSignature(top, bottom, cautionary, rewrite)
-                    lines.append(
-                        f"sysBar.AddTimeSignature({elem.num}, {elem.den}, False, False);"
-                    )
-                elif isinstance(elem, KeySignature):
-                    # AddKeySignature(pos, sharps, major)
-                    is_major = "True" if elem.mode == "major" else "False"
-                    lines.append(
-                        f"sysBar.AddKeySignature({elem.pos}, {elem.fifths}, {is_major});"
-                    )
-        lines.append("")
+    # Add breaks, time/key signatures from system staff
+    lines.append("// System staff: breaks, time/key signatures")
+    all_bar_nums = set(breaks.keys())
+    if score.system_staff.bars:
+        for bar in score.system_staff.bars:
+            if any(isinstance(e, (TimeSignature, KeySignature)) for e in bar.elements):
+                all_bar_nums.add(bar.n)
+
+    for bar_n in sorted(all_bar_nums):
+        lines.append(f"sysBar = score.SystemStaff.NthBar({bar_n});")
+
+        # Page/system breaks
+        if bar_n in breaks:
+            break_map = {
+                "page": "EndOfPage",
+                "system": "EndOfSystem",
+            }
+            if breaks[bar_n] in break_map:
+                lines.append(f"sysBar.BreakType = {break_map[breaks[bar_n]]};")
+
+        # Time/key signatures from system staff
+        if score.system_staff.bars:
+            for bar in score.system_staff.bars:
+                if bar.n == bar_n:
+                    for elem in bar.elements:
+                        if isinstance(elem, TimeSignature):
+                            lines.append(
+                                f"sysBar.AddTimeSignature({elem.num}, {elem.den}, False, False);"
+                            )
+                        elif isinstance(elem, KeySignature):
+                            is_major = "True" if elem.mode == "major" else "False"
+                            lines.append(
+                                f"sysBar.AddKeySignature({elem.pos}, {elem.fifths}, {is_major});"
+                            )
+                    break
+    lines.append("")
+
+    # Optimize layout
+    lines.append("// Optimize staff spacing")
+    lines.append("score.OptimizeStaffSpacing(1);")
+    lines.append("")
 
     # Footer
     lines.append("Sibelius.DestroyProgressDialog();")
