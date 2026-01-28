@@ -246,6 +246,8 @@ class Bar:
         | Pedal
         | Trill
         | Grace
+        | Tempo
+        | Rehearsal
     ] = field(default_factory=list)
 
 

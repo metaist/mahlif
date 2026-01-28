@@ -23,11 +23,13 @@ from mahlif.models import (
     Octava,
     Pedal,
     Position,
+    Rehearsal,
     Score,
     Slur,
     Staff,
     Syllable,
     SystemStaff,
+    Tempo,
     Text,
     TimeSignature,
     Trill,
@@ -150,6 +152,8 @@ def _parse_bar_elements(
     | Pedal
     | Trill
     | Grace
+    | Tempo
+    | Rehearsal
 ]:
     """Parse all elements within a bar."""
     elements: list[
@@ -167,6 +171,8 @@ def _parse_bar_elements(
         | Pedal
         | Trill
         | Grace
+        | Tempo
+        | Rehearsal
     ] = []
 
     for child in bar_elem:
