@@ -29,3 +29,7 @@ __pycache__
 /site
 node_modules/
 dist/
+
+# Generated Sibelius plugins (contain embedded score data)
+MahlifImportTest.plg
+*.import.plg
