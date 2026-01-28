@@ -35,6 +35,9 @@ def read_plugin(path: Path) -> str:
         return raw.decode("utf-16-be")
     elif raw.startswith(b"\xff\xfe"):
         return raw.decode("utf-16-le")
+    elif len(raw) >= 2 and raw[0] == 0 and raw[1] != 0:
+        # UTF-16 BE without BOM (first byte is null, second is not)
+        return raw.decode("utf-16-be")
     else:
         return raw.decode("utf-8")
 
