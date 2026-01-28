@@ -31,9 +31,9 @@ theme:
 nav:
   - Home: index.md
   - Schema: schema.md
-  - LilyPond: lilypond.md
   - Formats:
     - Sibelius: formats/sibelius.md
+    - LilyPond: formats/lilypond.md
 
 markdown_extensions:
   - admonition

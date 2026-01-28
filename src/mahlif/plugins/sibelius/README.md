@@ -1,16 +1,27 @@
-# Mahlif Export Plugin for Sibelius
+# Mahlif Plugin for Sibelius
 
-Exports Sibelius scores to Mahlif XML format.
+Bidirectional Sibelius ↔ Mahlif XML conversion.
+
+- **Export**: Sibelius → Mahlif XML ✅
+- **Import**: Mahlif XML → Sibelius 🚧 (in progress)
 
 ## Installation
 
-1. Copy `MahlifExport.plg` to your Sibelius plugins folder:
+### Via CLI (recommended)
+```bash
+mahlif install sibelius
+```
+
+### Manual Installation
+1. Build the plugin (converts UTF-8 to UTF-16 BE):
+   ```bash
+   ./build.sh
+   ```
+2. Copy `dist/MahlifExport.plg` to your Sibelius plugins folder:
    - **Mac**: `~/Library/Application Support/Avid/Sibelius/Plugins/`
    - **Windows**: `%APPDATA%\Avid\Sibelius\Plugins\`
-
-2. Restart Sibelius
-
-3. The plugin appears in the **Plug-ins** menu as "Mahlif Export"
+3. Restart Sibelius
+4. The plugin appears in the **Plug-ins** menu
 
 ## Usage
 

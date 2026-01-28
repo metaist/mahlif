@@ -22,9 +22,9 @@ uv add mahlif
 
 ### Export from Sibelius
 
-1. Copy `plugins/sibelius/MahlifExportFull.plg` to your Sibelius plugins folder
-2. In Sibelius: Home → Plug-ins → Other → Export to Mahlif XML (Full)
-3. Save the `.xml` file
+1. Install the plugin: `mahlif install sibelius`
+2. In Sibelius: Home → Plug-ins → Mahlif Export
+3. Save the `.mahlif.xml` file
 
 ### Convert to LilyPond
 
