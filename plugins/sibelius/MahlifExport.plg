@@ -1,0 +1,906 @@
+{
+	Initialize "() {
+		AddToPluginsMenu(_PluginMenuName, 'Run');
+	}"
+	_PluginMenuName "Export to Mahlif XML"
+
+	Run "() {
+		// Mahlif Export Plugin for Sibelius
+		// Exports score to Mahlif XML format
+		// License: MIT
+		
+		if (Sibelius.ProgramVersion < 7000) {
+			Sibelius.MessageBox('This plugin requires Sibelius 7 or later.');
+			return False;
+		}
+		
+		score = Sibelius.ActiveScore;
+		if (null = score) {
+			Sibelius.MessageBox('No score is open.');
+			return False;
+		}
+		
+		file = Sibelius.SelectFileToSave('Export Mahlif XML', '', '', 'xml', '', 'Mahlif XML');
+		if ('' = file) {
+			return False;
+		}
+		
+		result = exportScore(score);
+		
+		Sibelius.CreateTextFile(file);
+		Sibelius.AppendTextFile(file, result, False);
+		
+		Sibelius.MessageBox('Export complete: ' & file);
+		return True;
+	}"
+
+	exportScore "(score) {
+		xml = '<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n';
+		xml = xml & '<mahlif version=\"1.0\" generator=\"SibeliusPlugin/1.0\">\n';
+		
+		// Meta
+		xml = xml & '  <meta>\n';
+		xml = xml & '    <work-title>' & escapeXml(score.Title) & '</work-title>\n';
+		xml = xml & '    <composer>' & escapeXml(score.Composer) & '</composer>\n';
+		xml = xml & '    <lyricist>' & escapeXml(score.Lyricist) & '</lyricist>\n';
+		xml = xml & '    <arranger>' & escapeXml(score.Arranger) & '</arranger>\n';
+		xml = xml & '    <copyright>' & escapeXml(score.Copyright) & '</copyright>\n';
+		xml = xml & '    <publisher>' & escapeXml(score.Publisher) & '</publisher>\n';
+		xml = xml & '    <source-file>' & escapeXml(score.FileName) & '</source-file>\n';
+		xml = xml & '    <source-format>Sibelius ' & Sibelius.ProgramVersion & '</source-format>\n';
+		xml = xml & '    <duration-ms>' & score.ScoreDuration & '</duration-ms>\n';
+		xml = xml & '  </meta>\n';
+		
+		// Detect movements
+		movements = detectMovements(score);
+		movementCount = movements.NumChildren;
+		
+		if (movementCount > 1) {
+			// Multi-movement work
+			xml = xml & '  <movements>\n';
+			
+			for m = 0 to movementCount - 1 {
+				mov = movements[m];
+				startBar = mov[0];
+				endBar = mov[1];
+				movTitle = mov[2];
+				
+				xml = xml & '    <movement n=\"' & (m + 1) & '\">\n';
+				xml = xml & '      <movement-meta>\n';
+				xml = xml & '        <title>' & escapeXml(movTitle) & '</title>\n';
+				xml = xml & '      </movement-meta>\n';
+				
+				// Layout (same for all movements for now)
+				xml = xml & '      <layout>\n';
+				xml = xml & '        <page width=\"' & score.PageWidth & '\" height=\"' & score.PageHeight & '\" unit=\"mm\"/>\n';
+				xml = xml & '        <staff-height>' & score.StaffHeight & '</staff-height>\n';
+				xml = xml & '      </layout>\n';
+				
+				// Staves for this movement
+				xml = xml & '      <staves count=\"' & score.StaffCount & '\">\n';
+				for s = 1 to score.StaffCount {
+					staff = score.NthStaff(s);
+					xml = xml & exportStaffRange(staff, score, startBar, endBar);
+				}
+				xml = xml & '      </staves>\n';
+				
+				// System staff for this movement
+				xml = xml & exportSystemStaffRange(score.SystemStaff, score, startBar, endBar);
+				
+				xml = xml & '    </movement>\n';
+			}
+			
+			xml = xml & '  </movements>\n';
+		}
+		else {
+			// Single movement - flat structure
+			// Layout
+			xml = xml & '  <layout>\n';
+			xml = xml & '    <page width=\"' & score.PageWidth & '\" height=\"' & score.PageHeight & '\" unit=\"mm\"/>\n';
+			xml = xml & '    <staff-height>' & score.StaffHeight & '</staff-height>\n';
+			xml = xml & '  </layout>\n';
+			
+			// Staves
+			xml = xml & '  <staves count=\"' & score.StaffCount & '\">\n';
+			
+			for s = 1 to score.StaffCount {
+				staff = score.NthStaff(s);
+				xml = xml & exportStaff(staff, score);
+			}
+			
+			xml = xml & '  </staves>\n';
+			
+			// System staff
+			xml = xml & exportSystemStaff(score.SystemStaff, score);
+		}
+		
+		xml = xml & '</mahlif>\n';
+		return xml;
+	}"
+
+	detectMovements "(score) {
+		// Detect movement boundaries based on:
+		// 1. Final barlines followed by content
+		// 2. Movement title text styles
+		// 3. Long rests with title text
+		
+		movements = CreateSparseArray();
+		systemStaff = score.SystemStaff;
+		barCount = systemStaff.BarCount;
+		
+		currentMovementStart = 1;
+		currentMovementTitle = score.Title;
+		
+		for b = 1 to barCount {
+			bar = systemStaff.NthBar(b);
+			
+			// Check for movement title text
+			for each obj in bar {
+				if (obj.Type = 'SystemTextItem') {
+					style = obj.StyleId;
+					// Movement titles are often styled as title or subtitle
+					if (utils.Pos('title', style) >= 0 or 
+					    utils.Pos('movement', style) >= 0 or
+					    utils.Pos('heading', style) >= 0) {
+						
+						// If this isn't bar 1, it's a new movement
+						if (b > 1 and b > currentMovementStart) {
+							// Save previous movement
+							mov = CreateSparseArray();
+							mov[0] = currentMovementStart;
+							mov[1] = b - 1;
+							mov[2] = currentMovementTitle;
+							movements.Push(mov);
+							
+							// Start new movement
+							currentMovementStart = b;
+							currentMovementTitle = obj.Text;
+						}
+						else if (b = 1) {
+							// First bar title
+							currentMovementTitle = obj.Text;
+						}
+					}
+				}
+			}
+			
+			// Check for final barline (could indicate movement end)
+			for each obj in bar {
+				if (obj.Type = 'SpecialBarline') {
+					if (obj.BarlineInternalType = 2) {
+						// Final barline - check if there's more content after
+						if (b < barCount) {
+							nextBar = systemStaff.NthBar(b + 1);
+							hasContent = False;
+							
+							// Check if next bar has real content
+							for each nextObj in nextBar {
+								if (nextObj.Type = 'NoteRest' or 
+								    nextObj.Type = 'SystemTextItem') {
+									hasContent = True;
+								}
+							}
+							
+							// Also check first staff for notes
+							if (not hasContent and score.StaffCount > 0) {
+								staff1 = score.NthStaff(1);
+								nextBar1 = staff1.NthBar(b + 1);
+								for each nextObj in nextBar1 {
+									if (nextObj.Type = 'NoteRest') {
+										noteCount = 0;
+										for each n in nextObj {
+											noteCount = noteCount + 1;
+										}
+										if (noteCount > 0 or not nextObj.Hidden) {
+											hasContent = True;
+										}
+									}
+								}
+							}
+							
+							if (hasContent) {
+								// This final barline marks a movement boundary
+								mov = CreateSparseArray();
+								mov[0] = currentMovementStart;
+								mov[1] = b;
+								mov[2] = currentMovementTitle;
+								movements.Push(mov);
+								
+								currentMovementStart = b + 1;
+								currentMovementTitle = 'Movement ' & (movements.NumChildren + 1);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// Add final movement
+		mov = CreateSparseArray();
+		mov[0] = currentMovementStart;
+		mov[1] = barCount;
+		mov[2] = currentMovementTitle;
+		movements.Push(mov);
+		
+		return movements;
+	}"
+
+	exportStaffRange "(staff, score, startBar, endBar) {
+		xml = '        <staff n=\"' & staff.StaffNum & '\"';
+		xml = xml & ' instrument=\"' & escapeXml(staff.InstrumentName) & '\"';
+		xml = xml & ' instrument-short=\"' & escapeXml(staff.ShortInstrumentName) & '\"';
+		xml = xml & ' clef=\"' & getClefName(staff.InitialClefStyleId) & '\"';
+		xml = xml & ' key-sig=\"' & staff.InitialKeySignature & '\"';
+		xml = xml & ' lines=\"' & getStaffLines(staff) & '\"';
+		xml = xml & '>\n';
+		
+		for b = startBar to endBar {
+			bar = staff.NthBar(b);
+			ssBar = score.SystemStaff.NthBar(b);
+			// Use relative bar number within movement
+			relativeBarNum = b - startBar + 1;
+			xml = xml & exportBarWithRelativeNum(bar, relativeBarNum, b, ssBar);
+		}
+		
+		// Export lyrics for this range
+		xml = xml & exportLyricsRange(staff, startBar, endBar);
+		
+		xml = xml & '        </staff>\n';
+		return xml;
+	}"
+
+	exportBarWithRelativeNum "(bar, relativeBarNum, absoluteBarNum, ssBar) {
+		xml = '          <bar n=\"' & relativeBarNum & '\" length=\"' & bar.Length & '\"';
+		xml = xml & ' absolute-n=\"' & absoluteBarNum & '\"';
+		
+		// Check for breaks at end of this bar
+		breakType = getBreakType(ssBar);
+		if (breakType != '') {
+			xml = xml & ' break=\"' & breakType & '\"';
+		}
+		
+		xml = xml & '>\n';
+		
+		for each obj in bar {
+			xml = xml & '  ' & exportObject(obj, relativeBarNum);
+		}
+		
+		xml = xml & '          </bar>\n';
+		return xml;
+	}"
+
+	exportSystemStaffRange "(systemStaff, score, startBar, endBar) {
+		xml = '      <system-staff>\n';
+		
+		for b = startBar to endBar {
+			bar = systemStaff.NthBar(b);
+			relativeBarNum = b - startBar + 1;
+			hasContent = False;
+			barXml = '        <bar n=\"' & relativeBarNum & '\"';
+			barXml = barXml & ' absolute-n=\"' & b & '\">\n';
+			
+			for each obj in bar {
+				objXml = exportObject(obj, relativeBarNum);
+				if (objXml != '') {
+					hasContent = True;
+					barXml = barXml & '  ' & objXml;
+				}
+			}
+			
+			barXml = barXml & '        </bar>\n';
+			
+			if (hasContent) {
+				xml = xml & barXml;
+			}
+		}
+		
+		xml = xml & '      </system-staff>\n';
+		return xml;
+	}"
+
+	exportLyricsRange "(staff, startBar, endBar) {
+		xml = '';
+		
+		// Collect lyrics by verse
+		for verse = 1 to 5 {
+			hasLyrics = False;
+			lyricsXml = '          <lyrics voice=\"1\" verse=\"' & verse & '\">\n';
+			
+			for b = startBar to endBar {
+				bar = staff.NthBar(b);
+				for each obj in bar {
+					if (obj.Type = 'LyricItem') {
+						if (getLyricVerse(obj.StyleId) = verse) {
+							hasLyrics = True;
+							lyricsXml = lyricsXml & '            <syl pos=\"' & obj.Position & '\"';
+							lyricsXml = lyricsXml & ' bar=\"' & (b - startBar + 1) & '\"';
+							syllableType = obj.SyllableType;
+							if (syllableType = 1 or syllableType = 3) {
+								lyricsXml = lyricsXml & ' hyphen=\"true\"';
+							}
+							if (syllableType = 2 or syllableType = 3) {
+								lyricsXml = lyricsXml & ' melisma=\"true\"';
+							}
+							lyricsXml = lyricsXml & '>' & escapeXml(obj.Text) & '</syl>\n';
+						}
+					}
+				}
+			}
+			
+			lyricsXml = lyricsXml & '          </lyrics>\n';
+			
+			if (hasLyrics) {
+				xml = xml & lyricsXml;
+			}
+		}
+		
+		return xml;
+	}"
+
+	exportStaff "(staff, score) {
+		xml = '    <staff n=\"' & staff.StaffNum & '\"';
+		xml = xml & ' instrument=\"' & escapeXml(staff.InstrumentName) & '\"';
+		xml = xml & ' instrument-short=\"' & escapeXml(staff.ShortInstrumentName) & '\"';
+		xml = xml & ' clef=\"' & getClefName(staff.InitialClefStyleId) & '\"';
+		xml = xml & ' key-sig=\"' & staff.InitialKeySignature & '\"';
+		xml = xml & ' lines=\"' & getStaffLines(staff) & '\"';
+		xml = xml & '>\n';
+		
+		barCount = score.SystemStaff.BarCount;
+		for b = 1 to barCount {
+			bar = staff.NthBar(b);
+			ssBar = score.SystemStaff.NthBar(b);
+			xml = xml & exportBar(bar, b, ssBar);
+		}
+		
+		// Export lyrics
+		xml = xml & exportLyrics(staff, barCount);
+		
+		xml = xml & '    </staff>\n';
+		return xml;
+	}"
+
+	exportBar "(bar, barNum, ssBar) {
+		xml = '      <bar n=\"' & barNum & '\" length=\"' & bar.Length & '\"';
+		
+		// Check for breaks at end of this bar (from system staff bar)
+		breakType = getBreakType(ssBar);
+		if (breakType != '') {
+			xml = xml & ' break=\"' & breakType & '\"';
+		}
+		
+		xml = xml & '>\n';
+		
+		for each obj in bar {
+			xml = xml & exportObject(obj, barNum);
+		}
+		
+		xml = xml & '      </bar>\n';
+		return xml;
+	}"
+
+	exportObject "(obj, barNum) {
+		type = obj.Type;
+		
+		if (type = 'NoteRest') {
+			return exportNoteRest(obj, barNum);
+		}
+		if (type = 'Clef') {
+			return exportClef(obj);
+		}
+		if (type = 'KeySignature') {
+			return exportKeySignature(obj);
+		}
+		if (type = 'TimeSignature') {
+			return exportTimeSignature(obj);
+		}
+		if (type = 'Text') {
+			return exportText(obj);
+		}
+		if (type = 'SystemTextItem') {
+			return exportSystemTextItem(obj);
+		}
+		if (type = 'Slur') {
+			return exportSlur(obj, barNum);
+		}
+		if (type = 'CrescendoLine') {
+			return exportHairpin(obj, barNum, 'cresc');
+		}
+		if (type = 'DiminuendoLine') {
+			return exportHairpin(obj, barNum, 'dim');
+		}
+		if (type = 'Tuplet') {
+			return exportTuplet(obj, barNum);
+		}
+		if (type = 'SpecialBarline') {
+			return exportBarline(obj);
+		}
+		if (type = 'LyricItem') {
+			// Handled separately in exportLyrics
+			return '';
+		}
+		if (type = 'OctavaLine') {
+			return exportOctava(obj, barNum);
+		}
+		if (type = 'Trill') {
+			return exportTrill(obj, barNum);
+		}
+		if (type = 'ArpeggioLine') {
+			return exportArpeggio(obj);
+		}
+		
+		// Unknown type - export as comment
+		return '        <!-- Unknown: ' & type & ' -->\n';
+	}"
+
+	exportNoteRest "(nr, barNum) {
+		noteCount = 0;
+		for each n in nr {
+			noteCount = noteCount + 1;
+		}
+		
+		// Rest
+		if (noteCount = 0) {
+			xml = '        <rest';
+			xml = xml & ' pos=\"' & nr.Position & '\"';
+			xml = xml & ' dur=\"' & nr.Duration & '\"';
+			xml = xml & ' voice=\"' & nr.VoiceNumber & '\"';
+			if (nr.Hidden) {
+				xml = xml & ' hidden=\"true\"';
+			}
+			xml = xml & ' dx=\"' & nr.Dx & '\"';
+			xml = xml & ' dy=\"' & nr.Dy & '\"';
+			xml = xml & '/>\n';
+			return xml;
+		}
+		
+		// Single note
+		if (noteCount = 1) {
+			for each n in nr {
+				xml = '        <note';
+				xml = xml & ' pos=\"' & nr.Position & '\"';
+				xml = xml & ' dur=\"' & nr.Duration & '\"';
+				xml = xml & ' voice=\"' & nr.VoiceNumber & '\"';
+				xml = xml & ' pitch=\"' & n.Pitch & '\"';
+				xml = xml & ' written-pitch=\"' & n.WrittenPitch & '\"';
+				xml = xml & ' diatonic=\"' & n.DiatonicPitch & '\"';
+				xml = xml & ' accidental=\"' & getAccidentalName(n.Accidental) & '\"';
+				if (n.Tied) {
+					xml = xml & ' tied=\"true\"';
+				}
+				if (nr.Hidden) {
+					xml = xml & ' hidden=\"true\"';
+				}
+				xml = xml & ' dx=\"' & nr.Dx & '\"';
+				xml = xml & ' dy=\"' & nr.Dy & '\"';
+				xml = xml & exportArticulations(nr);
+				xml = xml & '/>\n';
+			}
+			return xml;
+		}
+		
+		// Chord
+		xml = '        <chord';
+		xml = xml & ' pos=\"' & nr.Position & '\"';
+		xml = xml & ' dur=\"' & nr.Duration & '\"';
+		xml = xml & ' voice=\"' & nr.VoiceNumber & '\"';
+		xml = xml & ' stem=\"' & getStemDirection(nr) & '\"';
+		xml = xml & ' beam=\"' & getBeamState(nr) & '\"';
+		xml = xml & ' dx=\"' & nr.Dx & '\"';
+		xml = xml & ' dy=\"' & nr.Dy & '\"';
+		xml = xml & exportArticulations(nr);
+		xml = xml & '>\n';
+		
+		for each n in nr {
+			xml = xml & '          <n';
+			xml = xml & ' p=\"' & n.Pitch & '\"';
+			xml = xml & ' d=\"' & n.DiatonicPitch & '\"';
+			xml = xml & ' a=\"' & getAccidentalName(n.Accidental) & '\"';
+			if (n.Tied) {
+				xml = xml & ' t=\"1\"';
+			}
+			xml = xml & '/>\n';
+		}
+		
+		xml = xml & '        </chord>\n';
+		return xml;
+	}"
+
+	exportArticulations "(nr) {
+		art = '';
+		
+		// Sibelius articulation bits
+		if (nr.GetArticulation(1)) { art = art & ' staccato'; }
+		if (nr.GetArticulation(2)) { art = art & ' staccatissimo'; }
+		if (nr.GetArticulation(3)) { art = art & ' wedge'; }
+		if (nr.GetArticulation(4)) { art = art & ' tenuto'; }
+		if (nr.GetArticulation(5)) { art = art & ' accent'; }
+		if (nr.GetArticulation(6)) { art = art & ' marcato'; }
+		if (nr.GetArticulation(7)) { art = art & ' harmonic'; }
+		if (nr.GetArticulation(8)) { art = art & ' plus'; }
+		if (nr.GetArticulation(9)) { art = art & ' up-bow'; }
+		if (nr.GetArticulation(10)) { art = art & ' down-bow'; }
+		if (nr.GetArticulation(13)) { art = art & ' fermata'; }
+		if (nr.GetArticulation(12)) { art = art & ' long-fermata'; }
+		if (nr.GetArticulation(14)) { art = art & ' short-fermata'; }
+		
+		if (art != '') {
+			return ' articulations=\"' & Substring(art, 1) & '\"';
+		}
+		return '';
+	}"
+
+	exportClef "(obj) {
+		xml = '        <clef';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' type=\"' & getClefName(obj.StyleId) & '\"';
+		xml = xml & ' dx=\"' & obj.Dx & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportKeySignature "(obj) {
+		xml = '        <key';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' fifths=\"' & obj.Sharps & '\"';
+		xml = xml & ' mode=\"' & (obj.Major ? 'major' : 'minor') & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportTimeSignature "(obj) {
+		xml = '        <time';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' num=\"' & obj.Numerator & '\"';
+		xml = xml & ' den=\"' & obj.Denominator & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportText "(obj) {
+		// Check if it's a dynamic
+		style = obj.StyleId;
+		if (CharAt(style, 0) = 'f' or CharAt(style, 0) = 'p' or 
+		    CharAt(style, 0) = 'm' or style = 'sf' or style = 'sfz' or
+		    style = 'fp' or style = 'rf' or style = 'fz') {
+			xml = '        <dynamic';
+			xml = xml & ' pos=\"' & obj.Position & '\"';
+			xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+			xml = xml & ' text=\"' & escapeXml(obj.Text) & '\"';
+			xml = xml & ' dx=\"' & obj.Dx & '\"';
+			xml = xml & ' dy=\"' & obj.Dy & '\"';
+			xml = xml & '/>\n';
+			return xml;
+		}
+		
+		// Regular text
+		xml = '        <text';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+		xml = xml & ' style=\"' & escapeXml(obj.StyleId) & '\"';
+		xml = xml & ' dx=\"' & obj.Dx & '\"';
+		xml = xml & ' dy=\"' & obj.Dy & '\"';
+		xml = xml & '>' & escapeXml(obj.Text) & '</text>\n';
+		return xml;
+	}"
+
+	exportSystemTextItem "(obj) {
+		style = obj.StyleId;
+		
+		// Tempo
+		if (style = 'text.system.tempo' or Substring(style, 0, 17) = 'text.system.tempo') {
+			xml = '        <tempo';
+			xml = xml & ' pos=\"' & obj.Position & '\"';
+			xml = xml & ' text=\"' & escapeXml(obj.Text) & '\"';
+			xml = xml & ' dx=\"' & obj.Dx & '\"';
+			xml = xml & ' dy=\"' & obj.Dy & '\"';
+			xml = xml & '/>\n';
+			return xml;
+		}
+		
+		// Rehearsal mark
+		if (style = 'text.system.rehearsal_mark' or Substring(style, 0, 22) = 'text.system.rehearsal') {
+			xml = '        <rehearsal';
+			xml = xml & ' pos=\"' & obj.Position & '\"';
+			xml = xml & ' type=\"custom\"';
+			xml = xml & '>' & escapeXml(obj.Text) & '</rehearsal>\n';
+			return xml;
+		}
+		
+		// Generic system text
+		xml = '        <text';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' style=\"' & escapeXml(obj.StyleId) & '\"';
+		xml = xml & ' dx=\"' & obj.Dx & '\"';
+		xml = xml & ' dy=\"' & obj.Dy & '\"';
+		xml = xml & '>' & escapeXml(obj.Text) & '</text>\n';
+		return xml;
+	}"
+
+	exportSlur "(obj, barNum) {
+		xml = '        <slur';
+		xml = xml & ' start-bar=\"' & barNum & '\"';
+		xml = xml & ' start-pos=\"' & obj.Position & '\"';
+		xml = xml & ' end-bar=\"' & obj.EndBarNumber & '\"';
+		xml = xml & ' end-pos=\"' & obj.EndPosition & '\"';
+		xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportHairpin "(obj, barNum, type) {
+		xml = '        <hairpin';
+		xml = xml & ' type=\"' & type & '\"';
+		xml = xml & ' start-bar=\"' & barNum & '\"';
+		xml = xml & ' start-pos=\"' & obj.Position & '\"';
+		xml = xml & ' end-bar=\"' & obj.EndBarNumber & '\"';
+		xml = xml & ' end-pos=\"' & obj.EndPosition & '\"';
+		xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportTuplet "(obj, barNum) {
+		xml = '        <tuplet';
+		xml = xml & ' start-bar=\"' & barNum & '\"';
+		xml = xml & ' start-pos=\"' & obj.Position & '\"';
+		xml = xml & ' num=\"' & obj.Left & '\"';
+		xml = xml & ' den=\"' & obj.Right & '\"';
+		xml = xml & ' actual=\"' & obj.Left & '\"';
+		xml = xml & ' normal=\"' & obj.Right & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportBarline "(obj) {
+		xml = '        <barline';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' type=\"' & getBarlineType(obj.BarlineInternalType) & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportOctava "(obj, barNum) {
+		xml = '        <octava';
+		xml = xml & ' type=\"' & getOctavaType(obj.StyleId) & '\"';
+		xml = xml & ' start-bar=\"' & barNum & '\"';
+		xml = xml & ' start-pos=\"' & obj.Position & '\"';
+		xml = xml & ' end-bar=\"' & obj.EndBarNumber & '\"';
+		xml = xml & ' end-pos=\"' & obj.EndPosition & '\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportTrill "(obj, barNum) {
+		xml = '        <articulation';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+		xml = xml & ' type=\"trill\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportArpeggio "(obj) {
+		xml = '        <articulation';
+		xml = xml & ' pos=\"' & obj.Position & '\"';
+		xml = xml & ' voice=\"' & obj.VoiceNumber & '\"';
+		xml = xml & ' type=\"arpeggio\"';
+		xml = xml & '/>\n';
+		return xml;
+	}"
+
+	exportLyrics "(staff, barCount) {
+		xml = '';
+		
+		// Collect lyrics by verse
+		for verse = 1 to 5 {
+			hasLyrics = False;
+			lyricsXml = '      <lyrics voice=\"1\" verse=\"' & verse & '\">\n';
+			
+			for b = 1 to barCount {
+				bar = staff.NthBar(b);
+				for each obj in bar {
+					if (obj.Type = 'LyricItem') {
+						// Check verse by style
+						if (getLyricVerse(obj.StyleId) = verse) {
+							hasLyrics = True;
+							lyricsXml = lyricsXml & '        <syl pos=\"' & obj.Position & '\"';
+							syllableType = obj.SyllableType;
+							if (syllableType = 1 or syllableType = 3) {
+								lyricsXml = lyricsXml & ' hyphen=\"true\"';
+							}
+							if (syllableType = 2 or syllableType = 3) {
+								lyricsXml = lyricsXml & ' melisma=\"true\"';
+							}
+							lyricsXml = lyricsXml & '>' & escapeXml(obj.Text) & '</syl>\n';
+						}
+					}
+				}
+			}
+			
+			lyricsXml = lyricsXml & '      </lyrics>\n';
+			
+			if (hasLyrics) {
+				xml = xml & lyricsXml;
+			}
+		}
+		
+		return xml;
+	}"
+
+	exportSystemStaff "(systemStaff, score) {
+		xml = '  <system-staff>\n';
+		
+		barCount = systemStaff.BarCount;
+		for b = 1 to barCount {
+			bar = systemStaff.NthBar(b);
+			hasContent = False;
+			barXml = '    <bar n=\"' & b & '\">\n';
+			
+			for each obj in bar {
+				objXml = exportObject(obj, b);
+				if (objXml != '') {
+					hasContent = True;
+					barXml = barXml & objXml;
+				}
+			}
+			
+			barXml = barXml & '    </bar>\n';
+			
+			if (hasContent) {
+				xml = xml & barXml;
+			}
+		}
+		
+		xml = xml & '  </system-staff>\n';
+		return xml;
+	}"
+
+	// Helper functions
+
+	escapeXml "(text) {
+		text = utils.Replace(text, '&', '&amp;', True);
+		text = utils.Replace(text, '<', '&lt;', True);
+		text = utils.Replace(text, '>', '&gt;', True);
+		text = utils.Replace(text, Chr(34), '&quot;', True);
+		text = utils.Replace(text, Chr(39), '&apos;', True);
+		return text;
+	}"
+
+	getClefName "(styleId) {
+		if (styleId = 'clef.treble' or styleId = 'clef.g') { return 'treble'; }
+		if (styleId = 'clef.bass' or styleId = 'clef.f') { return 'bass'; }
+		if (styleId = 'clef.alto' or styleId = 'clef.c') { return 'alto'; }
+		if (styleId = 'clef.tenor') { return 'tenor'; }
+		if (styleId = 'clef.treble.down.8' or styleId = 'clef.g.down.8') { return 'treble-8vb'; }
+		if (styleId = 'clef.treble.up.8' or styleId = 'clef.g.up.8') { return 'treble-8va'; }
+		if (styleId = 'clef.bass.down.8' or styleId = 'clef.f.down.8') { return 'bass-8vb'; }
+		if (styleId = 'clef.bass.up.8' or styleId = 'clef.f.up.8') { return 'bass-8va'; }
+		if (styleId = 'clef.percussion') { return 'percussion'; }
+		if (styleId = 'clef.tab') { return 'tab'; }
+		return 'treble';
+	}"
+
+	getAccidentalName "(acc) {
+		if (acc = 0) { return ''; }
+		if (acc = 1) { return '#'; }
+		if (acc = 2) { return 'x'; }
+		if (acc = -1) { return 'b'; }
+		if (acc = -2) { return 'bb'; }
+		return '';
+	}"
+
+	getStemDirection "(nr) {
+		if (nr.StemFlipped) {
+			return 'down';
+		}
+		return 'auto';
+	}"
+
+	getBeamState "(nr) {
+		beam = nr.Beam;
+		if (beam = 0) { return 'none'; }
+		if (beam = 1) { return 'start'; }
+		if (beam = 2) { return 'continue'; }
+		if (beam = 3) { return 'end'; }
+		return 'auto';
+	}"
+
+	getBarlineType "(internalType) {
+		if (internalType = 0) { return 'single'; }
+		if (internalType = 1) { return 'double'; }
+		if (internalType = 2) { return 'final'; }
+		if (internalType = 3) { return 'repeat-end'; }
+		if (internalType = 4) { return 'repeat-start'; }
+		if (internalType = 5) { return 'repeat-both'; }
+		if (internalType = 6) { return 'dashed'; }
+		if (internalType = 7) { return 'invisible'; }
+		return 'single';
+	}"
+
+	getOctavaType "(styleId) {
+		if (styleId = 'line.staff.octava.plus8') { return '8va'; }
+		if (styleId = 'line.staff.octava.minus8') { return '8vb'; }
+		if (styleId = 'line.staff.octava.plus15') { return '15va'; }
+		if (styleId = 'line.staff.octava.minus15') { return '15vb'; }
+		return '8va';
+	}"
+
+	getStaffLines "(staff) {
+		// Try to get from instrument type
+		if (Sibelius.ProgramVersion >= 6000) {
+			inst = getInstrument(staff.InitialStyleId);
+			if (inst) {
+				return inst.NumStaveLines;
+			}
+		}
+		return 5;
+	}"
+
+	getInstrument "(styleId) {
+		score = Sibelius.ActiveScore;
+		for each inst in score.InstrumentTypes {
+			if (inst.StyleId = styleId) {
+				return inst;
+			}
+		}
+		return null;
+	}"
+
+	getLyricVerse "(styleId) {
+		// Sibelius styles: text.staff.space.hypen.lyrics.verse1, etc.
+		if (utils.Pos('verse1', styleId) >= 0) { return 1; }
+		if (utils.Pos('verse2', styleId) >= 0) { return 2; }
+		if (utils.Pos('verse3', styleId) >= 0) { return 3; }
+		if (utils.Pos('verse4', styleId) >= 0) { return 4; }
+		if (utils.Pos('verse5', styleId) >= 0) { return 5; }
+		if (utils.Pos('lyrics', styleId) >= 0) { return 1; }
+		return 1;
+	}"
+
+	getBreakType "(bar) {
+		// Check for system or page break after this bar
+		// Sibelius stores breaks in multiple ways depending on version
+		
+		// Method 1: Direct bar properties (Sibelius 7+)
+		// Try PageBreak property
+		pageBreak = False;
+		systemBreak = False;
+		
+		// Use try-style check since properties may not exist
+		pb = bar.PageBreak;
+		if (pb = True or pb = 'true' or pb = 1) {
+			return 'page';
+		}
+		
+		sb = bar.SystemBreak;
+		if (sb = True or sb = 'true' or sb = 1) {
+			return 'system';
+		}
+		
+		// Method 2: Check for break objects in the bar
+		for each obj in bar {
+			type = obj.Type;
+			
+			// PageBreak or SystemBreak object types
+			if (type = 'PageBreak') {
+				return 'page';
+			}
+			if (type = 'SystemBreak') {
+				return 'system';
+			}
+			
+			// Some versions use SpecialBarline with properties
+			if (type = 'SpecialBarline') {
+				if (obj.PageBreak) {
+					return 'page';
+				}
+				if (obj.SystemBreak) {
+					return 'system';
+				}
+			}
+		}
+		
+		return '';
+	}"
+}
