@@ -246,7 +246,9 @@ class TestEncoding:
         with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
             # UTF-16 BE BOM + content
             f.write(b"\xfe\xff")
-            f.write('<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-be"))
+            f.write(
+                '<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-be")
+            )
             path = f.name
         try:
             enc = detect_encoding(path)
@@ -259,7 +261,9 @@ class TestEncoding:
         with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
             # UTF-16 LE BOM + content
             f.write(b"\xff\xfe")
-            f.write('<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-le"))
+            f.write(
+                '<?xml version="1.0" encoding="UTF-16"?>\n<mahlif/>'.encode("utf-16-le")
+            )
             path = f.name
         try:
             enc = detect_encoding(path)
@@ -269,8 +273,12 @@ class TestEncoding:
 
     def test_read_utf8(self) -> None:
         """Read UTF-8 file."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".xml", delete=False, encoding="utf-8") as f:
-            f.write('<?xml version="1.0" encoding="UTF-8"?>\n<mahlif><text>Привет</text></mahlif>')
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".xml", delete=False, encoding="utf-8"
+        ) as f:
+            f.write(
+                '<?xml version="1.0" encoding="UTF-8"?>\n<mahlif><text>Привет</text></mahlif>'
+            )
             path = f.name
         try:
             content = read_xml(path)
@@ -321,13 +329,13 @@ class TestEncoding:
     def test_parse_utf16_file(self) -> None:
         """Parse UTF-16 encoded Mahlif file."""
         with tempfile.NamedTemporaryFile(mode="wb", suffix=".xml", delete=False) as f:
-            content = '''<?xml version="1.0" encoding="UTF-16"?>
+            content = """<?xml version="1.0" encoding="UTF-16"?>
 <mahlif version="1.0">
     <meta>
         <work-title>Тестовая партитура</work-title>
         <composer>Чайковский</composer>
     </meta>
-</mahlif>'''
+</mahlif>"""
             f.write(b"\xfe\xff")
             f.write(content.encode("utf-16-be"))
             path = f.name
