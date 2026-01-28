@@ -366,9 +366,7 @@ def _convert_staff(staff: Staff, bar_count: int) -> str:
 
     bar_contents: list[str] = []
     for bar in staff.bars:
-        bar_lily = _convert_bar(bar, active_slurs, active_hairpins)
-        if bar_lily:
-            bar_contents.append(bar_lily)
+        bar_contents.append(_convert_bar(bar, active_slurs, active_hairpins))
         bar_contents.append("|")  # Bar line
 
     lines.append("    " + " ".join(bar_contents))

@@ -19,17 +19,18 @@ def detect_encoding(path: str | Path) -> str:
         # Read first 4 bytes for BOM detection
         bom = f.read(4)
 
-    # Check for BOM
+    # Check for BOM (order matters - check longer BOMs first)
     if bom[:3] == b"\xef\xbb\xbf":
         return "utf-8-sig"
-    if bom[:2] == b"\xff\xfe":
-        return "utf-16-le"
-    if bom[:2] == b"\xfe\xff":
-        return "utf-16-be"
+    # UTF-32 must be checked before UTF-16 since they share prefix bytes
     if bom[:4] == b"\x00\x00\xfe\xff":
         return "utf-32-be"
     if bom[:4] == b"\xff\xfe\x00\x00":
         return "utf-32-le"
+    if bom[:2] == b"\xff\xfe":
+        return "utf-16-le"
+    if bom[:2] == b"\xfe\xff":
+        return "utf-16-be"
 
     # No BOM - check XML declaration
     # Read enough for <?xml ... encoding="..." ?>
