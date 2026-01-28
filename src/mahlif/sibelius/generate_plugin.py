@@ -19,7 +19,6 @@ from mahlif.models import Clef
 from mahlif.models import Dynamic
 from mahlif.models import Hairpin
 from mahlif.models import KeySignature
-from mahlif.models import Lyrics
 from mahlif.models import NoteRest
 from mahlif.models import Rehearsal
 from mahlif.models import Score
@@ -195,6 +194,16 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                                 lines.append(
                                     f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
                                 )
+                        # dx/dy offsets
+                        if elem.offset.dx != 0:
+                            lines.append(f"\tnr.Dx = {int(elem.offset.dx)};")
+                        if elem.offset.dy != 0:
+                            lines.append(f"\tnr.Dy = {int(elem.offset.dy)};")
+                        # Stem direction
+                        if elem.stem == "up":
+                            lines.append("\tnr.StemDirection = 1;")
+                        elif elem.stem == "down":
+                            lines.append("\tnr.StemDirection = -1;")
                         lines.append("}")
                     else:
                         # Single note
@@ -204,14 +213,28 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                             f"nr = b.AddNote({elem.pos}, {note.pitch}, "
                             f"{elem.dur}, {tied}, {elem.voice});"
                         )
-                        # Articulations
-                        if elem.articulations:
+                        # Articulations, offsets, stem
+                        has_extras = (
+                            elem.articulations
+                            or elem.offset.dx != 0
+                            or elem.offset.dy != 0
+                            or elem.stem in ("up", "down")
+                        )
+                        if has_extras:
                             lines.append("if (nr != null) {")
                             for artic in elem.articulations:
                                 if artic in ARTICULATION_MAP:
                                     lines.append(
                                         f"\tnr.SetArticulation({ARTICULATION_MAP[artic]}, True);"
                                     )
+                            if elem.offset.dx != 0:
+                                lines.append(f"\tnr.Dx = {int(elem.offset.dx)};")
+                            if elem.offset.dy != 0:
+                                lines.append(f"\tnr.Dy = {int(elem.offset.dy)};")
+                            if elem.stem == "up":
+                                lines.append("\tnr.StemDirection = 1;")
+                            elif elem.stem == "down":
+                                lines.append("\tnr.StemDirection = -1;")
                             lines.append("}")
 
                 elif isinstance(elem, Dynamic):
@@ -300,17 +323,6 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                     if elem.type in barline_map:
                         lines.append(f"b.AddSpecialBarline({barline_map[elem.type]});")
 
-                elif isinstance(elem, Lyrics):
-                    # Add lyrics syllables
-                    # AddLyric(pos, dur, text, syllable_type, num_notes, voice)
-                    # syllable_type: 0=end, 1=middle, 2=start
-                    for syl in elem.syllables:
-                        syl_type = 1 if syl.hyphen else 0  # middle or end
-                        lines.append(
-                            f"b.AddLyric({syl.pos}, 256, '{escape_str(syl.text)}', "
-                            f"{syl_type}, 1, {elem.voice});"
-                        )
-
                 elif isinstance(elem, Tempo):
                     # Tempo markings with metronome
                     if elem.text:
@@ -325,6 +337,21 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                         f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
                         f"'text.system.rehearsalmark');"
                     )
+
+        # Add lyrics for this staff (lyrics are at staff level, not bar level)
+        for lyrics in staff.lyrics:
+            lines.append(f"// Lyrics voice {lyrics.voice} verse {lyrics.verse}")
+            for syl in lyrics.syllables:
+                if syl.bar is None:
+                    continue
+                # AddLyric(pos, dur, text, syllable_type, num_notes, voice)
+                # syllable_type: 0=end, 1=middle, 2=start
+                syl_type = 1 if syl.hyphen else 0  # middle or end
+                lines.append(f"b = st.NthBar({syl.bar});")
+                lines.append(
+                    f"b.AddLyric({syl.pos}, 256, '{escape_str(syl.text)}', "
+                    f"{syl_type}, 1, {lyrics.voice});"
+                )
 
         lines.append("")
 

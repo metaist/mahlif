@@ -608,14 +608,13 @@ if (utils.Pos('lyrics', styleId) >= 0) { return 1; }
 return 1;
 }"
 	GetBreakType "(bar) {
-for each obj in bar {
-	type = obj.Type;
-	if (type = 'SystemBreak') {
-		return 'system';
-	}
-	if (type = 'PageBreak') {
-		return 'page';
-	}
+// BreakType is a property on Bar, not an object
+bt = bar.BreakType;
+if (bt = EndOfSystem or bt = EndOfSystemOrPage) {
+	return 'system';
+}
+if (bt = EndOfPage or bt = SpecialPageBreak) {
+	return 'page';
 }
 return '';
 }"
