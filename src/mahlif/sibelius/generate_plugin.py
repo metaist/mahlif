@@ -19,33 +19,52 @@ from mahlif.models import Clef
 from mahlif.models import Dynamic
 from mahlif.models import Hairpin
 from mahlif.models import KeySignature
+from mahlif.models import Lyrics
 from mahlif.models import NoteRest
+from mahlif.models import Rehearsal
 from mahlif.models import Score
 from mahlif.models import Slur
+from mahlif.models import Tempo
 from mahlif.models import Text
 from mahlif.models import TimeSignature
 from mahlif.models import Tuplet
 
+
+def _calc_spanner_duration(
+    start_bar: int,
+    start_pos: int,
+    end_bar: int,
+    end_pos: int,
+    bar_length: int,
+) -> int:
+    """Calculate total duration for a spanner crossing bars."""
+    if start_bar == end_bar:
+        return end_pos - start_pos
+
+    # Cross-bar: remaining in start bar + full bars + end position
+    # This is approximate since bar lengths can vary
+    remaining_in_start = bar_length - start_pos
+    full_bars = (end_bar - start_bar - 1) * bar_length
+    return remaining_in_start + full_bars + end_pos
+
+
 # Articulation name -> ManuScript constant
+# From ManuScript Language.pdf "Articulations" section
 ARTICULATION_MAP = {
     "staccato": "StaccatoArtic",
     "accent": "AccentArtic",
     "tenuto": "TenutoArtic",
     "marcato": "MarcatoArtic",
     "staccatissimo": "StaccatissimoArtic",
-    "fermata": "FermataArtic",
-    "sforzando": "SforzandoArtic",
-    "sforzato": "SforzatoArtic",
-    "trill": "TrillArtic",
-    "turn": "TurnArtic",
-    "mordent": "MordentArtic",
+    "wedge": "WedgeArtic",
+    "fermata": "PauseArtic",  # Called "Pause" in ManuScript
+    "pause": "PauseArtic",
     "up-bow": "UpBowArtic",
     "down-bow": "DownBowArtic",
     "harmonic": "HarmonicArtic",
-    "open": "OpenArtic",
-    "stopped": "StoppedArtic",
-    "snap": "SnapArtic",
     "plus": "PlusArtic",
+    "tri-pause": "TriPauseArtic",
+    "square-pause": "SquarePauseArtic",
 }
 
 
@@ -61,7 +80,7 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
     # Header
     lines.append("{")
     lines.append('\tInitialize "() {')
-    lines.append(f"AddToPluginsMenu('Import: {escape_str(title)}', 'Run');")
+    lines.append(f"AddToPluginsMenu('Mahlif: Import {escape_str(title)}', 'Run');")
     lines.append('}"')
     lines.append('\tRun "() {')
     lines.append("score = Sibelius.ActiveScore;")
@@ -228,31 +247,38 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                 elif isinstance(elem, Slur):
                     # Slurs span from start to end position
                     # AddLine(pos, duration, style)
-                    # Calculate duration based on end position
-                    # For cross-bar slurs, we need the total duration
-                    if elem.start_bar == elem.end_bar:
-                        duration = elem.end_pos - elem.start_pos
-                        if duration > 0:
-                            lines.append(
-                                f"b.AddLine({elem.start_pos}, {duration}, "
-                                f"'line.staff.slur.up', 0, 0, {elem.voice});"
-                            )
-                    # Cross-bar slurs need special handling (skip for now)
+                    duration = _calc_spanner_duration(
+                        elem.start_bar,
+                        elem.start_pos,
+                        elem.end_bar,
+                        elem.end_pos,
+                        bar.length,
+                    )
+                    if duration > 0:
+                        lines.append(
+                            f"b.AddLine({elem.start_pos}, {duration}, "
+                            f"'line.staff.slur.up', 0, 0, {elem.voice});"
+                        )
 
                 elif isinstance(elem, Hairpin):
                     # Hairpins: crescendo or diminuendo
-                    if elem.start_bar == elem.end_bar:
-                        duration = elem.end_pos - elem.start_pos
-                        if duration > 0:
-                            style = (
-                                "line.staff.hairpin.crescendo"
-                                if elem.type == "cresc"
-                                else "line.staff.hairpin.diminuendo"
-                            )
-                            lines.append(
-                                f"b.AddLine({elem.start_pos}, {duration}, "
-                                f"'{style}', 0, 0, {elem.voice});"
-                            )
+                    duration = _calc_spanner_duration(
+                        elem.start_bar,
+                        elem.start_pos,
+                        elem.end_bar,
+                        elem.end_pos,
+                        bar.length,
+                    )
+                    if duration > 0:
+                        style = (
+                            "line.staff.hairpin.crescendo"
+                            if elem.type == "cresc"
+                            else "line.staff.hairpin.diminuendo"
+                        )
+                        lines.append(
+                            f"b.AddLine({elem.start_pos}, {duration}, "
+                            f"'{style}', 0, 0, {elem.voice});"
+                        )
 
                 elif isinstance(elem, Tuplet):
                     # AddTuplet(pos, voice, left, right, unit)
@@ -273,6 +299,32 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                     }
                     if elem.type in barline_map:
                         lines.append(f"b.AddSpecialBarline({barline_map[elem.type]});")
+
+                elif isinstance(elem, Lyrics):
+                    # Add lyrics syllables
+                    # AddLyric(pos, dur, text, syllable_type, num_notes, voice)
+                    # syllable_type: 0=end, 1=middle, 2=start
+                    for syl in elem.syllables:
+                        syl_type = 1 if syl.hyphen else 0  # middle or end
+                        lines.append(
+                            f"b.AddLyric({syl.pos}, 256, '{escape_str(syl.text)}', "
+                            f"{syl_type}, 1, {elem.voice});"
+                        )
+
+                elif isinstance(elem, Tempo):
+                    # Tempo markings with metronome
+                    if elem.text:
+                        lines.append(
+                            f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
+                            f"'text.system.tempo');"
+                        )
+
+                elif isinstance(elem, Rehearsal):
+                    # Rehearsal marks
+                    lines.append(
+                        f"b.AddText({elem.pos}, '{escape_str(elem.text)}', "
+                        f"'text.system.rehearsalmark');"
+                    )
 
         lines.append("")
 
