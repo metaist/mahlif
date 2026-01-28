@@ -197,6 +197,90 @@ def lint_methods(content: str) -> list[LintError]:
     return errors
 
 
+# ManuScript method signatures: (min_params, max_params)
+# Extracted from ManuScript Language.pdf
+METHOD_SIGNATURES: dict[str, tuple[int, int]] = {
+    # Bar methods (also NoteRest.AddNote with 1-4 params, so use union: 1-7)
+    "AddNote": (
+        1,
+        7,
+    ),  # Bar: pos,pitch,dur,[tied,[voice,[diatonic,[string]]]] or NoteRest: pitch,[tied,[diatonic,[string]]]
+    "AddText": (3, 4),  # pos, text, style, [voice]
+    "AddClef": (2, 3),  # pos, clef, [transposed_clef]
+    "AddTimeSignature": (4, 5),  # top, bottom, cautionary, rewrite, [symbol]
+    "AddKeySignature": (3, 6),  # pos, sharps, major, [barline, [hidden, [one_staff]]]
+    "AddSymbol": (2, 2),  # pos, symbol
+    "AddLine": (3, 7),  # pos, dur, style, [dx, [dy, [voice, [hidden]]]]
+    "AddLyric": (3, 6),  # pos, dur, text, [syllable, [notes, [voice]]]
+    "AddSpecialBarline": (1, 2),  # type, [pos]
+    "AddTuplet": (5, 8),  # pos, voice, left, right, unit, [style, [bracket, [dur]]]
+    "AddGuitarFrame": (2, 4),  # pos, chord, [style, [fingerings]]
+    "AddGraphic": (2, 6),  # file, pos, [below, [dx, [dy, [size]]]]
+    # Score methods
+    "AddBars": (1, 1),  # n
+    "CreateInstrument": (1, 1),  # name
+    # Sibelius methods
+    "MessageBox": (1, 1),
+    "CreateProgressDialog": (3, 3),  # text, min, max
+    "UpdateProgressDialog": (2, 2),  # value, text
+    "DestroyProgressDialog": (0, 0),
+    "SelectFileToOpen": (6, 6),
+    "SelectFileToSave": (6, 6),
+    "CreateTextFile": (1, 1),
+    "AppendTextFile": (2, 3),  # file, text, [unicode]
+    "ReadTextFile": (1, 1),
+    # Global functions
+    "AddToPluginsMenu": (2, 2),
+    "CreateSparseArray": (0, 99),  # variadic
+    "CreateArray": (0, 0),
+    "CreateHash": (0, 0),
+    "Length": (1, 1),
+    "Substring": (2, 3),
+    "Chr": (1, 1),
+    "Asc": (1, 1),
+    "Round": (1, 1),
+    "RoundUp": (1, 1),
+    "RoundDown": (1, 1),
+}
+
+
+def lint_method_calls(content: str) -> list[LintError]:
+    """Check method call parameter counts using AST."""
+    from mahlif.sibelius.manuscript_ast import get_method_calls
+
+    errors: list[LintError] = []
+
+    try:
+        calls = get_method_calls(content)
+    except Exception:
+        # If tokenization fails, fall back to no checking
+        return errors
+
+    for line, col, obj, method, arg_count in calls:
+        if method in METHOD_SIGNATURES:
+            min_params, max_params = METHOD_SIGNATURES[method]
+            if arg_count < min_params:
+                errors.append(
+                    LintError(
+                        line,
+                        col,
+                        "E020",
+                        f"{method}() requires at least {min_params} args, got {arg_count}",
+                    )
+                )
+            elif arg_count > max_params:
+                errors.append(
+                    LintError(
+                        line,
+                        col,
+                        "E021",
+                        f"{method}() accepts at most {max_params} args, got {arg_count}",
+                    )
+                )
+
+    return errors
+
+
 def lint_common_issues(content: str) -> list[LintError]:
     """Check for common ManuScript issues."""
     errors: list[LintError] = []
@@ -263,6 +347,7 @@ def lint(path: Path) -> list[LintError]:
     errors.extend(lint_braces(content))
     errors.extend(lint_strings(content))
     errors.extend(lint_methods(content))
+    errors.extend(lint_method_calls(content))
     errors.extend(lint_common_issues(content))
 
     # Sort by line, then column

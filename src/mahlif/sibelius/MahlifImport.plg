@@ -1,0 +1,42 @@
+{
+	Initialize "() {
+AddToPluginsMenu('Mahlif Import Test', 'Run');
+}"
+	Run "() {
+score = Sibelius.ActiveScore;
+if (null = score) {
+	Sibelius.MessageBox('No score');
+	return False;
+}
+
+theStaff = null;
+for each s in score {
+	theStaff = s;
+}
+
+bar = theStaff.NthBar(1);
+msg = '';
+
+// Test AddText for dynamics
+result1 = bar.AddText(0, 'f', 'text.staff.expression');
+msg = msg & 'AddText(expression): ' & result1 & Chr(10);
+
+// AddTimeSignature(top, bottom, allow_cautionary, rewrite_music)
+sysBar2 = score.SystemStaff.NthBar(2);
+result3 = sysBar2.AddTimeSignature(3, 4, False, False);
+msg = msg & 'AddTimeSignature(3,4): ' & result3 & Chr(10);
+
+// AddKeySignature(pos, num_sharps, major_key)
+sysBar3 = score.SystemStaff.NthBar(3);
+result4 = sysBar3.AddKeySignature(0, 2, True);
+msg = msg & 'AddKeySignature(D major): ' & result4 & Chr(10);
+
+// AddClef(pos, clef_style)
+bar4 = theStaff.NthBar(4);
+result5 = bar4.AddClef(0, 'clef.bass');
+msg = msg & 'AddClef(bass): ' & result5 & Chr(10);
+
+Sibelius.MessageBox(msg);
+return True;
+}"
+}

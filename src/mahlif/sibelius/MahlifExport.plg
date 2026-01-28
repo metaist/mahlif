@@ -63,8 +63,7 @@ xml = xml & '  <staves count=' & q & score.StaffCount & q & '>' & nl;
 staffCount = score.StaffCount;
 for s = 1 to staffCount + 1 {
 	staff = score.NthStaff(s);
-	// Use floating point to avoid integer division truncation
-	pct = Round((s * 80.0) / staffCount);
+	pct = (s * 80) / staffCount;
 	Sibelius.UpdateProgressDialog(pct, 'Exporting staff ' & s & ' of ' & staffCount & '...');
 	xml = xml & DoExportStaff(staff, score);
 }
@@ -381,7 +380,7 @@ xml = '';
 for verse = 1 to 6 {
 	hasLyrics = False;
 	lyricsXml = '      <lyrics voice=' & q & '1' & q & ' verse=' & q & verse & q & '>' & nl;
-	
+
 	for b = 1 to barCount + 1 {
 		bar = staff.NthBar(b);
 		for each obj in bar {
@@ -404,9 +403,9 @@ for verse = 1 to 6 {
 			}
 		}
 	}
-	
+
 	lyricsXml = lyricsXml & '      </lyrics>' & nl;
-	
+
 	if (hasLyrics) {
 		xml = xml & lyricsXml;
 	}
@@ -421,24 +420,23 @@ nl = Chr(10);
 xml = '  <system-staff>' & nl;
 
 barCount = systemStaff.BarCount;
+
 for b = 1 to barCount + 1 {
 	bar = systemStaff.NthBar(b);
-	hasContent = False;
-	barXml = '    <bar n=' & q & b & q & '>' & nl;
-	
+	barXml = '    <bar n=' & q & b & q;
+	barXml = barXml & ' length=' & q & bar.Length & q;
+	barXml = barXml & '>' & nl;
+
+	// Export all system objects
 	for each obj in bar {
 		objXml = DoExportSysObject(obj, b);
 		if (objXml != '') {
-			hasContent = True;
 			barXml = barXml & objXml;
 		}
 	}
-	
+
 	barXml = barXml & '    </bar>' & nl;
-	
-	if (hasContent) {
-		xml = xml & barXml;
-	}
+	xml = xml & barXml;
 }
 
 xml = xml & '  </system-staff>' & nl;
@@ -452,7 +450,7 @@ type = obj.Type;
 
 if (type = 'SystemTextItem') {
 	style = obj.StyleId;
-	
+
 	// Tempo
 	if (IsTempoStyle(style)) {
 		xml = '      <tempo';
@@ -463,7 +461,7 @@ if (type = 'SystemTextItem') {
 		xml = xml & '/>' & nl;
 		return xml;
 	}
-	
+
 	// Rehearsal mark
 	if (IsRehearsalStyle(style)) {
 		xml = '      <rehearsal';
@@ -472,7 +470,7 @@ if (type = 'SystemTextItem') {
 		xml = xml & '>' & XmlEsc(obj.Text) & '</rehearsal>' & nl;
 		return xml;
 	}
-	
+
 	// Generic system text
 	xml = '      <text';
 	xml = xml & ' pos=' & q & obj.Position & q;

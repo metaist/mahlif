@@ -9,15 +9,16 @@ BUILD_DIR="$SRC_DIR/../../../dist"
 mkdir -p "$BUILD_DIR"
 
 # Lint first
+REPO_ROOT="$SRC_DIR/../../.."
 echo "Linting plugins..."
 lint_failed=0
 for plg in "$SRC_DIR"/*.plg; do
     [ -f "$plg" ] || continue
     # Only fail on errors (E*), not warnings (W*)
-    if ! python "$SRC_DIR/lint.py" "$plg" 2>&1 | grep -q '\[E[0-9]'; then
+    if ! uv run --project "$REPO_ROOT" python -m mahlif.sibelius.lint "$plg" 2>&1 | grep -q '\[E[0-9]'; then
         :
     else
-        python "$SRC_DIR/lint.py" "$plg"
+        uv run --project "$REPO_ROOT" python -m mahlif.sibelius.lint "$plg"
         lint_failed=1
     fi
 done
