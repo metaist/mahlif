@@ -852,6 +852,120 @@ def test_run_plugin_with_arrow_down() -> None:
                     mock.assert_called_with("Test", arrow_down=1)
 
 
+def test_run_plugin_with_modal_success(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test run_plugin handles success modal."""
+    from mahlif.sibelius.automation import ModalType
+    from mahlif.sibelius.automation import run_plugin
+
+    # Simulate: first detect_modal returns MESSAGE_BOX, then NONE
+    detect_results = iter([ModalType.MESSAGE_BOX, ModalType.NONE])
+
+    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+        with patch("mahlif.sibelius.automation.close_command_search"):
+            with patch("mahlif.sibelius.automation.run_command"):
+                with patch(
+                    "mahlif.sibelius.automation.run_applescript",
+                    return_value="Export complete",
+                ):
+                    with patch(
+                        "mahlif.sibelius.automation.detect_modal",
+                        side_effect=lambda: next(detect_results),
+                    ):
+                        with patch("mahlif.sibelius.automation.press_key"):
+                            success, msg = run_plugin("Test Plugin")
+
+    assert success is True
+    captured = capsys.readouterr()
+    assert "Export complete" in captured.out
+
+
+def test_run_plugin_with_modal_error(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test run_plugin handles error modal."""
+    from mahlif.sibelius.automation import ModalType
+    from mahlif.sibelius.automation import run_plugin
+
+    detect_results = iter([ModalType.MESSAGE_BOX, ModalType.NONE])
+
+    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+        with patch("mahlif.sibelius.automation.close_command_search"):
+            with patch("mahlif.sibelius.automation.run_command"):
+                with patch(
+                    "mahlif.sibelius.automation.run_applescript",
+                    return_value="Plugin error: something failed",
+                ):
+                    with patch(
+                        "mahlif.sibelius.automation.detect_modal",
+                        side_effect=lambda: next(detect_results),
+                    ):
+                        with patch("mahlif.sibelius.automation.press_key"):
+                            success, msg = run_plugin("Test Plugin")
+
+    assert success is False
+    assert "error" in msg.lower()
+    captured = capsys.readouterr()
+    assert "Plugin error" in captured.out
+
+
+def test_run_plugin_modal_applescript_error(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test run_plugin handles AppleScript error in modal."""
+    from mahlif.sibelius.automation import ModalType
+    from mahlif.sibelius.automation import run_plugin
+
+    detect_results = iter([ModalType.MESSAGE_BOX, ModalType.NONE])
+    applescript_calls = [0]
+
+    def mock_applescript(script: str) -> str:
+        applescript_calls[0] += 1
+        # First call is delay, second is get modal text (raises), third is delay
+        if applescript_calls[0] == 2:
+            raise RuntimeError("AppleScript failed")
+        return ""
+
+    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+        with patch("mahlif.sibelius.automation.close_command_search"):
+            with patch("mahlif.sibelius.automation.run_command"):
+                with patch(
+                    "mahlif.sibelius.automation.run_applescript",
+                    side_effect=mock_applescript,
+                ):
+                    with patch(
+                        "mahlif.sibelius.automation.detect_modal",
+                        side_effect=lambda: next(detect_results),
+                    ):
+                        with patch("mahlif.sibelius.automation.press_key"):
+                            success, msg = run_plugin("Test Plugin")
+
+    # Should still succeed (error was caught)
+    assert success is True
+
+
+def test_run_plugin_max_modals_limit(capsys: pytest.CaptureFixture[str]) -> None:
+    """Test run_plugin handles max_modals safety limit."""
+    from mahlif.sibelius.automation import ModalType
+    from mahlif.sibelius.automation import run_plugin
+
+    # Always return MESSAGE_BOX to exhaust the loop
+    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+        with patch("mahlif.sibelius.automation.close_command_search"):
+            with patch("mahlif.sibelius.automation.run_command"):
+                with patch(
+                    "mahlif.sibelius.automation.run_applescript",
+                    return_value="Info message",
+                ):
+                    with patch(
+                        "mahlif.sibelius.automation.detect_modal",
+                        return_value=ModalType.MESSAGE_BOX,
+                    ):
+                        with patch("mahlif.sibelius.automation.press_key"):
+                            success, msg = run_plugin("Test Plugin")
+
+    # Should succeed (no errors in messages)
+    assert success is True
+    captured = capsys.readouterr()
+    # Should have processed 5 modals
+    assert captured.out.count("Info message") == 5
+
+
 # =============================================================================
 # Navigation
 # =============================================================================

@@ -5,6 +5,9 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-name = "mahlif"
 
+[project.scripts]
+mahlif = "mahlif.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/metaist/mahlif"
 Documentation = "https://metaist.github.io/mahlif/"
@@ -82,9 +85,10 @@ clean = """
 """
 
 # Lint
-lint = ["ruff-*", "cspell"]
+lint = ["ruff-*", "sibelius-lint", "cspell"]
 ruff-format = "uvx ruff format ${@:-.}"
 ruff-lint = "uvx ruff check --fix ${@:-.}"
+sibelius-lint = "uv run mahlif sibelius check --fix ${@:-}"
 cspell = "npx cspell lint --unique --gitignore --exclude '**/_vendor/**' '**/*.{py,txt,md,markdown}'"
 
 # Type Check

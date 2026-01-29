@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Generate a Sibelius import plugin from Mahlif XML.
+"""Convert Mahlif XML to Sibelius import plugin.
 
 The generated .plg file contains all score data embedded as ManuScript code,
 avoiding the need for slow file parsing in Sibelius.
 
 Usage:
-    python generate_plugin.py input.mahlif.xml output.plg
+    mahlif convert input.mahlif.xml output.plg
 """
 
 from __future__ import annotations
@@ -546,7 +546,7 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                                     lines.append(
                                         f"sysBar.AddSpecialBarline({barline_map[elem.type]});"
                                     )
-                            case _:
+                            case _:  # pragma: no cover
                                 pass  # Other elements not handled at system level
                     break
     lines.append("")

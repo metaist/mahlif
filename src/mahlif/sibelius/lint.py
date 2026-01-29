@@ -32,9 +32,11 @@ def read_plugin(path: Path) -> str:
     """Read plugin file, handling UTF-8 or UTF-16."""
     raw = path.read_bytes()
     if raw.startswith(b"\xfe\xff"):
-        return raw.decode("utf-16-be")
+        # UTF-16 BE with BOM - skip BOM bytes
+        return raw[2:].decode("utf-16-be")
     elif raw.startswith(b"\xff\xfe"):
-        return raw.decode("utf-16-le")
+        # UTF-16 LE with BOM - skip BOM bytes
+        return raw[2:].decode("utf-16-le")
     elif len(raw) >= 2 and raw[0] == 0 and raw[1] != 0:
         # UTF-16 BE without BOM (first byte is null, second is not)
         return raw.decode("utf-16-be")
@@ -329,29 +331,94 @@ def lint(path: Path) -> list[LintError]:
     return errors
 
 
-def main() -> int:
-    """Main entry point."""
-    if len(sys.argv) < 2:
-        print(f"Usage: {sys.argv[0]} <plugin.plg>")
-        return 1
+def fix_trailing_whitespace(path: Path) -> bool:
+    """Fix trailing whitespace in a plugin file.
 
-    path = Path(sys.argv[1])
-    if not path.exists():
-        print(f"Error: {path} not found")
-        return 1
+    Args:
+        path: Path to plugin file
 
-    errors = lint(path)
+    Returns:
+        True if changes were made
+    """
+    content = read_plugin(path)
+    lines = content.split("\n")
+    fixed_lines = [line.rstrip() for line in lines]
 
-    if not errors:
-        print(f"✓ {path}: No issues found")
-        return 0
+    if lines == fixed_lines:
+        return False
 
-    print(f"✗ {path}: {len(errors)} issue(s) found\n")
-    for error in errors:
-        print(f"  {error}")
+    # Re-read to preserve original encoding for write
+    raw = path.read_bytes()
+    if raw.startswith(b"\xfe\xff"):
+        encoding = "utf-16-be"
+        bom = b"\xfe\xff"
+    elif raw.startswith(b"\xff\xfe"):
+        encoding = "utf-16-le"
+        bom = b"\xff\xfe"
+    else:
+        encoding = "utf-8"
+        bom = b""
+
+    fixed_content = "\n".join(fixed_lines)
+    with open(path, "wb") as f:
+        f.write(bom)
+        f.write(fixed_content.encode(encoding))
+
+    return True
+
+
+def main(args: list[str] | None = None) -> int:
+    """Main entry point.
+
+    Args:
+        args: Command line arguments (default: sys.argv[1:])
+
+    Returns:
+        Exit code (0 for success)
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Lint Sibelius ManuScript .plg files")
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help="Auto-fix trailing whitespace",
+    )
+    parser.add_argument(
+        "files",
+        type=Path,
+        nargs="+",
+        help="Plugin files to check",
+    )
+
+    parsed = parser.parse_args(args)
+
+    total_errors = 0
+    for path in parsed.files:
+        if not path.exists():
+            print(f"Error: {path} not found")
+            total_errors += 1
+            continue
+
+        errors = lint(path)
+
+        if parsed.fix:
+            if fix_trailing_whitespace(path):
+                # Filter out fixed W002 errors
+                errors = [e for e in errors if e.code != "W002"]
+                print(f"✓ {path}: Fixed trailing whitespace")
+
+        if not errors:
+            if not parsed.fix:
+                print(f"✓ {path}: No issues found")
+        else:
+            print(f"✗ {path}: {len(errors)} issue(s) found\n")
+            for error in errors:
+                print(f"  {error}")
+            total_errors += len(errors)
 
     # Return error count (capped at 127 for exit codes)
-    return min(len(errors), 127)
+    return min(total_errors, 127)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -41,13 +41,13 @@ from mahlif.models import Tuplet
 from mahlif.sibelius.extract_api import extract_signatures
 from mahlif.sibelius.extract_api import main as extract_main
 from mahlif.sibelius.extract_api import parse_signature
-from mahlif.sibelius.generate_plugin import ARTICULATION_MAP
-from mahlif.sibelius.generate_plugin import _calc_spanner_duration
-from mahlif.sibelius.generate_plugin import convert_to_utf16
-from mahlif.sibelius.generate_plugin import escape_str
-from mahlif.sibelius.generate_plugin import generate_plugin
-from mahlif.sibelius.generate_plugin import write_plugin
-from mahlif.sibelius.generate_plugin import main as generate_main
+from mahlif.sibelius.convert import ARTICULATION_MAP
+from mahlif.sibelius.convert import _calc_spanner_duration
+from mahlif.sibelius.convert import convert_to_utf16
+from mahlif.sibelius.convert import escape_str
+from mahlif.sibelius.convert import generate_plugin
+from mahlif.sibelius.convert import write_plugin
+from mahlif.sibelius.convert import main as generate_main
 from mahlif.sibelius.lint import LintError
 from mahlif.sibelius.lint import lint
 from mahlif.sibelius.lint import lint_braces
@@ -71,12 +71,12 @@ if TYPE_CHECKING:
 
 
 # =============================================================================
-# generate_plugin tests
+# convert tests
 # =============================================================================
 
 
 class TestGeneratePlugin:
-    """Tests for generate_plugin module."""
+    """Tests for convert module."""
 
     def test_escape_str_basic(self) -> None:
         """Test basic string escaping."""
@@ -109,7 +109,7 @@ class TestGeneratePlugin:
         assert "up-bow" in ARTICULATION_MAP
         assert "down-bow" in ARTICULATION_MAP
 
-    def test_generate_plugin_empty_score(self) -> None:
+    def test_convert_empty_score(self) -> None:
         """Test generating plugin for empty score."""
         score = Score(
             staves=[],
@@ -122,7 +122,7 @@ class TestGeneratePlugin:
         assert "Mahlif: Import Test" in result
         assert "Import complete: 0 staves" in result
 
-    def test_generate_plugin_single_staff_with_notes(self) -> None:
+    def test_convert_single_staff_with_notes(self) -> None:
         """Test generating plugin with notes."""
         note = Note(pitch=60, tied=False)
         noterest = NoteRest(
@@ -160,7 +160,7 @@ class TestGeneratePlugin:
         assert "nr.Dy = 5" in result
         assert "nr.StemDirection = 1" in result
 
-    def test_generate_plugin_chord(self) -> None:
+    def test_convert_chord(self) -> None:
         """Test generating plugin with chord."""
         notes = [Note(pitch=60), Note(pitch=64), Note(pitch=67)]
         noterest = NoteRest(
@@ -183,7 +183,7 @@ class TestGeneratePlugin:
         assert "nr.AddNote(64)" in result
         assert "nr.AddNote(67)" in result
 
-    def test_generate_plugin_dynamics(self) -> None:
+    def test_convert_dynamics(self) -> None:
         """Test generating plugin with dynamics."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -200,7 +200,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "AddText(0, 'ff', 'text.staff.expression')" in result
 
-    def test_generate_plugin_text_styles(self) -> None:
+    def test_convert_text_styles(self) -> None:
         """Test generating plugin with various text styles."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -221,7 +221,7 @@ class TestGeneratePlugin:
         assert "text.staff.expression" in result
         assert "text.staff.plain" in result
 
-    def test_generate_plugin_clefs(self) -> None:
+    def test_convert_clefs(self) -> None:
         """Test generating plugin with clef changes."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -238,7 +238,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "AddClef(0, 'clef.bass')" in result
 
-    def test_generate_plugin_slurs(self) -> None:
+    def test_convert_slurs(self) -> None:
         """Test generating plugin with slurs."""
         slur = Slur(
             start_bar=1,
@@ -266,7 +266,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "AddLine(0, 512, 'line.staff.slur.up'" in result
 
-    def test_generate_plugin_hairpins(self) -> None:
+    def test_convert_hairpins(self) -> None:
         """Test generating plugin with hairpins."""
         cresc = Hairpin(
             start_bar=1,
@@ -304,7 +304,7 @@ class TestGeneratePlugin:
         assert "line.staff.hairpin.crescendo" in result
         assert "line.staff.hairpin.diminuendo" in result
 
-    def test_generate_plugin_tuplets(self) -> None:
+    def test_convert_tuplets(self) -> None:
         """Test generating plugin with tuplets."""
         tuplet = Tuplet(start_bar=1, start_pos=0, num=3, den=2)
         note = Note(pitch=60)
@@ -321,7 +321,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "AddTuplet(0, 1, 3, 2, 256)" in result
 
-    def test_generate_plugin_barlines(self) -> None:
+    def test_convert_barlines(self) -> None:
         """Test generating plugin with special barlines."""
         barline = Barline(pos=1024, type="double")
         note = Note(pitch=60)
@@ -343,7 +343,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "AddSpecialBarline(SpecialBarlineDouble)" in result
 
-    def test_generate_plugin_octava(self) -> None:
+    def test_convert_octava(self) -> None:
         """Test generating plugin with octava lines."""
         octava = Octava(
             start_bar=1,
@@ -372,7 +372,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "line.staff.octava.plus8" in result
 
-    def test_generate_plugin_pedal(self) -> None:
+    def test_convert_pedal(self) -> None:
         """Test generating plugin with pedal lines."""
         pedal = Pedal(
             type="sustain",
@@ -395,7 +395,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "line.staff.pedal" in result
 
-    def test_generate_plugin_trill(self) -> None:
+    def test_convert_trill(self) -> None:
         """Test generating plugin with trill lines."""
         trill = Trill(
             start_bar=1,
@@ -423,7 +423,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "line.staff.trill" in result
 
-    def test_generate_plugin_grace_notes(self) -> None:
+    def test_convert_grace_notes(self) -> None:
         """Test generating plugin with grace notes."""
         grace = Grace(pos=0, type="acciaccatura", pitch=60, dur=128)
         note = Note(pitch=62)
@@ -440,7 +440,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "acciaccatura" in result
 
-    def test_generate_plugin_tempo(self) -> None:
+    def test_convert_tempo(self) -> None:
         """Test generating plugin with tempo markings."""
         tempo = Tempo(pos=0, text="Allegro", bpm=120)
         note = Note(pitch=60)
@@ -463,7 +463,7 @@ class TestGeneratePlugin:
         assert "text.system.tempo" in result
         assert "Allegro" in result
 
-    def test_generate_plugin_rehearsal(self) -> None:
+    def test_convert_rehearsal(self) -> None:
         """Test generating plugin with rehearsal marks."""
         reh = Rehearsal(pos=0, text="A")
         note = Note(pitch=60)
@@ -485,7 +485,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "text.system.rehearsalmark" in result
 
-    def test_generate_plugin_lyrics(self) -> None:
+    def test_convert_lyrics(self) -> None:
         """Test generating plugin with lyrics."""
         syl = Syllable(bar=1, pos=0, text="la", hyphen=True)
         lyrics = Lyrics(voice=1, verse=1, syllables=[syl])
@@ -509,7 +509,7 @@ class TestGeneratePlugin:
         assert "AddLyric" in result
         assert "'la'" in result
 
-    def test_generate_plugin_page_layout(self) -> None:
+    def test_convert_page_layout(self) -> None:
         """Test generating plugin with page layout."""
         layout = Layout(page_width=210, page_height=297, staff_height=7)
         score = Score(
@@ -524,7 +524,7 @@ class TestGeneratePlugin:
         assert "PageHeight = 297" in result
         assert "StaffSize = 7" in result
 
-    def test_generate_plugin_breaks(self) -> None:
+    def test_convert_breaks(self) -> None:
         """Test generating plugin with page/system breaks."""
         note = Note(pitch=60)
         noterest = NoteRest(
@@ -547,7 +547,7 @@ class TestGeneratePlugin:
         assert "EndOfPage" in result
         assert "EndOfSystem" in result
 
-    def test_generate_plugin_time_key_signatures(self) -> None:
+    def test_convert_time_key_signatures(self) -> None:
         """Test generating plugin with time/key signatures."""
         ts = TimeSignature(pos=0, num=3, den=4)
         ks = KeySignature(pos=0, fifths=-2, mode="major")
@@ -572,7 +572,7 @@ class TestGeneratePlugin:
         assert "AddTimeSignature(3, 4" in result
         assert "AddKeySignature(0, -2, True)" in result
 
-    def test_generate_plugin_staff_size(self) -> None:
+    def test_convert_staff_size(self) -> None:
         """Test generating plugin with staff size."""
         note = Note(pitch=60)
         noterest = NoteRest(
@@ -593,7 +593,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "SmallStaffSize = 75" in result
 
-    def test_generate_plugin_stem_down(self) -> None:
+    def test_convert_stem_down(self) -> None:
         """Test generating plugin with stem direction down."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1, stem="down")
@@ -609,7 +609,7 @@ class TestGeneratePlugin:
         result = generate_plugin(score, "Test")
         assert "nr.StemDirection = -1" in result
 
-    def test_generate_plugin_filters_bars_beyond_score(self) -> None:
+    def test_convert_filters_bars_beyond_score(self) -> None:
         """Test that bars beyond score length are filtered."""
         note = Note(pitch=60)
         noterest = NoteRest(
@@ -666,14 +666,12 @@ class TestGeneratePlugin:
 
     def test_generate_main_no_args(self) -> None:
         """Test main with no arguments."""
-        with patch.object(sys, "argv", ["generate_plugin.py"]):
+        with patch.object(sys, "argv", ["convert.py"]):
             assert generate_main() == 1
 
     def test_generate_main_missing_file(self) -> None:
         """Test main with missing input file."""
-        with patch.object(
-            sys, "argv", ["generate_plugin.py", "nonexistent.xml", "out.plg"]
-        ):
+        with patch.object(sys, "argv", ["convert.py", "nonexistent.xml", "out.plg"]):
             assert generate_main() == 1
 
     def test_generate_main_success(self) -> None:
@@ -696,7 +694,7 @@ class TestGeneratePlugin:
 
             out_path = Path(tmpdir) / "test.plg"
             with patch.object(
-                sys, "argv", ["generate_plugin.py", str(xml_path), str(out_path)]
+                sys, "argv", ["convert.py", str(xml_path), str(out_path)]
             ):
                 result = generate_main()
                 assert result == 0
@@ -847,9 +845,10 @@ class TestLint:
             Path(f.name).unlink()
 
     def test_lint_main_no_args(self) -> None:
-        """Test main with no arguments."""
-        with patch.object(sys, "argv", ["lint.py"]):
-            assert lint_main() == 1
+        """Test main with no arguments shows usage and exits."""
+        with pytest.raises(SystemExit) as exc:
+            lint_main([])
+        assert exc.value.code == 2  # argparse exits with 2 for missing args
 
     def test_lint_main_missing_file(self) -> None:
         """Test main with missing file."""
@@ -861,10 +860,44 @@ class TestLint:
         with tempfile.NamedTemporaryFile(suffix=".plg", delete=False, mode="w") as f:
             f.write('{ Initialize "() { AddToPluginsMenu(); }" }')
             f.flush()
-            with patch.object(sys, "argv", ["lint.py", f.name]):
-                result = lint_main()
-                # May have warnings but should run
-                assert result >= 0
+            result = lint_main([f.name])
+            # May have warnings but should run
+            assert result >= 0
+            Path(f.name).unlink()
+
+    def test_lint_main_fix(self) -> None:
+        """Test main with --fix flag."""
+        with tempfile.NamedTemporaryFile(suffix=".plg", delete=False, mode="w") as f:
+            # File with trailing whitespace
+            f.write('{ Initialize "() { AddToPluginsMenu(); }" }   ')
+            f.flush()
+            result = lint_main(["--fix", f.name])
+            assert result >= 0
+            # Check file was fixed
+            content = Path(f.name).read_text()
+            assert not content.endswith("   ")
+            Path(f.name).unlink()
+
+    def test_lint_main_fix_with_remaining_errors(self) -> None:
+        """Test main with --fix when errors remain after fix."""
+        with tempfile.NamedTemporaryFile(suffix=".plg", delete=False, mode="w") as f:
+            # File with trailing whitespace AND a real error (unclosed brace)
+            f.write("{ Initialize   ")  # trailing whitespace + unclosed brace
+            f.flush()
+            result = lint_main(["--fix", f.name])
+            # Should have errors (unclosed brace)
+            assert result > 0
+            Path(f.name).unlink()
+
+    def test_lint_main_fix_no_trailing_whitespace(self) -> None:
+        """Test main with --fix when no trailing whitespace to fix."""
+        with tempfile.NamedTemporaryFile(suffix=".plg", delete=False, mode="w") as f:
+            # Valid file with no trailing whitespace
+            f.write('{ Initialize "() { AddToPluginsMenu(); }" }')
+            f.flush()
+            result = lint_main(["--fix", f.name])
+            # Should succeed (no changes needed)
+            assert result >= 0
             Path(f.name).unlink()
 
 
@@ -1350,7 +1383,7 @@ class TestAutomation:
 class TestAdditionalCoverage:
     """Additional tests for edge cases and remaining coverage."""
 
-    def test_generate_plugin_appoggiatura(self) -> None:
+    def test_convert_appoggiatura(self) -> None:
         """Test appoggiatura grace note path."""
         grace = Grace(pos=0, type="appoggiatura", pitch=60, dur=128)
         note = Note(pitch=62)
@@ -1366,7 +1399,7 @@ class TestAdditionalCoverage:
         result = generate_plugin(score, "Test")
         assert "appoggiatura" in result
 
-    def test_generate_plugin_key_signature_minor(self) -> None:
+    def test_convert_key_signature_minor(self) -> None:
         """Test minor key signature."""
         ks = KeySignature(pos=0, fifths=3, mode="minor")
         note = Note(pitch=60)
@@ -1383,7 +1416,7 @@ class TestAdditionalCoverage:
         result = generate_plugin(score, "Test")
         assert "AddKeySignature(0, 3, False)" in result
 
-    def test_generate_plugin_barline_types(self) -> None:
+    def test_convert_barline_types(self) -> None:
         """Test all barline types."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -1405,7 +1438,7 @@ class TestAdditionalCoverage:
         assert "SpecialBarlineEndRepeat" in result
         assert "SpecialBarlineDashed" in result
 
-    def test_generate_plugin_octava_types(self) -> None:
+    def test_convert_octava_types(self) -> None:
         """Test all octava types."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -1431,7 +1464,7 @@ class TestAdditionalCoverage:
         assert "octava.plus15" in result
         assert "octava.minus15" in result
 
-    def test_generate_plugin_all_clef_types(self) -> None:
+    def test_convert_all_clef_types(self) -> None:
         """Test all clef types."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -1453,7 +1486,7 @@ class TestAdditionalCoverage:
         assert "clef.percussion" in result
         assert "clef.treble" in result  # fallback
 
-    def test_generate_plugin_all_articulations(self) -> None:
+    def test_convert_all_articulations(self) -> None:
         """Test all articulation mappings."""
         note = Note(pitch=60)
         articulations = [
@@ -1493,7 +1526,7 @@ class TestAdditionalCoverage:
         assert "TenutoArtic" in result
         # unknown-artic should be skipped (not in map)
 
-    def test_generate_plugin_tied_note(self) -> None:
+    def test_convert_tied_note(self) -> None:
         """Test tied note."""
         note = Note(pitch=60, tied=True)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -1508,7 +1541,7 @@ class TestAdditionalCoverage:
         result = generate_plugin(score, "Test")
         assert "True" in result  # tied=True
 
-    def test_generate_plugin_zero_duration_spanner(self) -> None:
+    def test_convert_zero_duration_spanner(self) -> None:
         """Test spanners with zero duration are skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -1525,7 +1558,7 @@ class TestAdditionalCoverage:
         # Zero duration slur should not generate AddLine
         assert result.count("AddLine") == 0 or "line.staff.slur" not in result
 
-    def test_generate_plugin_lyrics_without_bar(self) -> None:
+    def test_convert_lyrics_without_bar(self) -> None:
         """Test lyrics syllable without bar is skipped."""
         syl = Syllable(bar=None, pos=0, text="la", hyphen=False)
         lyrics = Lyrics(voice=1, verse=1, syllables=[syl])
@@ -1694,7 +1727,7 @@ class TestFinalCoverage:
         parser._advance()  # Still returns last token
         # Should not crash
 
-    def test_generate_plugin_cli_with_title_from_meta(self) -> None:
+    def test_convert_cli_with_title_from_meta(self) -> None:
         """Test CLI uses work_title when available."""
         with tempfile.TemporaryDirectory() as tmpdir:
             xml_path = Path(tmpdir) / "test.mahlif.xml"
@@ -1712,7 +1745,7 @@ class TestFinalCoverage:
             xml_path.write_text(xml_content, encoding="utf-8")
             out_path = Path(tmpdir) / "test.plg"
             with patch.object(
-                sys, "argv", ["generate_plugin.py", str(xml_path), str(out_path)]
+                sys, "argv", ["convert.py", str(xml_path), str(out_path)]
             ):
                 result = generate_main()
                 assert result == 0
@@ -1809,9 +1842,9 @@ class TestLintEdgeCases:
 
 
 class TestGeneratePluginEdgeCases:
-    """Edge cases for generate_plugin.py."""
+    """Edge cases for convert.py."""
 
-    def test_generate_plugin_rest_only_bar(self) -> None:
+    def test_convert_rest_only_bar(self) -> None:
         """Test bar with only rests is skipped."""
         # Line 185: has_notes is False, continue
         noterest = NoteRest(pos=0, dur=256, notes=[], voice=1)  # Rest
@@ -1827,7 +1860,7 @@ class TestGeneratePluginEdgeCases:
         # Bar should be skipped, no NthBar call
         assert "NthBar(1)" not in result
 
-    def test_generate_plugin_chord_with_offsets(self) -> None:
+    def test_convert_chord_with_offsets(self) -> None:
         """Test chord with dx/dy offsets."""
         # Lines 213, 215: elem.offset.dx != 0 and elem.offset.dy != 0
         note1 = Note(pitch=60)
@@ -1851,7 +1884,7 @@ class TestGeneratePluginEdgeCases:
         assert "nr.Dx = 10" in result
         assert "nr.Dy = -5" in result
 
-    def test_generate_plugin_chord_with_stem_up(self) -> None:
+    def test_convert_chord_with_stem_up(self) -> None:
         """Test chord with stem direction up."""
         # Line 218: elem.stem == "up"
         note1 = Note(pitch=60)
@@ -1874,7 +1907,7 @@ class TestGeneratePluginEdgeCases:
         result = generate_plugin(score, "Test")
         assert "StemDirection = 1" in result
 
-    def test_generate_plugin_chord_with_stem_down(self) -> None:
+    def test_convert_chord_with_stem_down(self) -> None:
         """Test chord with stem direction down."""
         # Line 220: elem.stem == "down"
         note1 = Note(pitch=60)
@@ -1897,7 +1930,7 @@ class TestGeneratePluginEdgeCases:
         result = generate_plugin(score, "Test")
         assert "StemDirection = -1" in result
 
-    def test_generate_plugin_chord_with_articulations(self) -> None:
+    def test_convert_chord_with_articulations(self) -> None:
         """Test chord with articulations."""
         # Lines 207-208: articulations in chord path
         note1 = Note(pitch=60)
@@ -1920,6 +1953,71 @@ class TestGeneratePluginEdgeCases:
         result = generate_plugin(score, "Test")
         assert "StaccatoArtic" in result
         assert "AccentArtic" in result
+
+    def test_system_staff_tempo_with_text(self) -> None:
+        """Test Tempo element with text in system staff."""
+        # Line 529: Tempo() if elem.text in system staff
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Piano")
+        system_bar = Bar(
+            n=1,
+            length=1024,
+            elements=[Tempo(pos=0, text="Allegro", bpm=120)],
+        )
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[system_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        assert "text.system.tempo" in result
+        assert "Allegro" in result
+
+    def test_system_staff_barline(self) -> None:
+        """Test Barline element in system staff."""
+        # Lines 534-546: Barline case in system staff
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Piano")
+        system_bar = Bar(
+            n=1,
+            length=1024,
+            elements=[Barline(pos=0, type="double")],
+        )
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[system_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        assert "SpecialBarlineDouble" in result
+
+    def test_system_staff_barline_unknown_type(self) -> None:
+        """Test Barline with unknown type in system staff."""
+        # Branch: elem.type not in barline_map
+        note = Note(pitch=60)
+        noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
+        bar = Bar(n=1, length=1024, elements=[noterest])
+        staff = Staff(n=1, bars=[bar], instrument="Piano")
+        system_bar = Bar(
+            n=1,
+            length=1024,
+            elements=[Barline(pos=0, type="unknown-barline-type")],
+        )
+        score = Score(
+            staves=[staff],
+            meta=Meta(),
+            layout=Layout(),
+            system_staff=SystemStaff(bars=[system_bar]),
+        )
+        result = generate_plugin(score, "Test")
+        # Unknown type should not produce SpecialBarline call
+        assert "SpecialBarline" not in result
 
 
 class TestManuscriptAstEdgeCases:
@@ -2017,7 +2115,7 @@ class TestFinalCoverageGaps:
         calls = get_method_calls("obj.123;")
         assert len(calls) == 0
 
-    def test_generate_plugin_with_page_layout(self) -> None:
+    def test_convert_with_page_layout(self) -> None:
         """Test generating plugin with page dimensions set."""
         # Lines 150->163: page_width/height > 0
         note = Note(pitch=60)
@@ -2036,7 +2134,7 @@ class TestFinalCoverageGaps:
         assert "PageHeight = 297" in result
         assert "StaffSize = 7" in result
 
-    def test_generate_plugin_with_partial_layout(self) -> None:
+    def test_convert_with_partial_layout(self) -> None:
         """Test layout with only some dimensions."""
         # Test branch where only width is set
         note = Note(pitch=60)
@@ -2054,7 +2152,7 @@ class TestFinalCoverageGaps:
         assert "PageWidth = 210" in result
         assert "PageHeight" not in result
 
-    def test_generate_plugin_zero_duration_hairpin(self) -> None:
+    def test_convert_zero_duration_hairpin(self) -> None:
         """Test hairpin with zero duration is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2073,7 +2171,7 @@ class TestFinalCoverageGaps:
         # Zero duration hairpin should not generate AddLine
         assert "hairpin" not in result
 
-    def test_generate_plugin_zero_duration_trill(self) -> None:
+    def test_convert_zero_duration_trill(self) -> None:
         """Test trill with zero duration is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2089,7 +2187,7 @@ class TestFinalCoverageGaps:
         result = generate_plugin(score, "Test")
         assert "trill" not in result
 
-    def test_generate_plugin_zero_duration_octava(self) -> None:
+    def test_convert_zero_duration_octava(self) -> None:
         """Test octava with zero duration is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2107,7 +2205,7 @@ class TestFinalCoverageGaps:
         result = generate_plugin(score, "Test")
         assert "octava" not in result
 
-    def test_generate_plugin_zero_duration_pedal(self) -> None:
+    def test_convert_zero_duration_pedal(self) -> None:
         """Test pedal with zero duration is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2123,7 +2221,7 @@ class TestFinalCoverageGaps:
         result = generate_plugin(score, "Test")
         assert "pedal" not in result
 
-    def test_generate_plugin_unknown_barline_type(self) -> None:
+    def test_convert_unknown_barline_type(self) -> None:
         """Test unknown barline type is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2140,7 +2238,7 @@ class TestFinalCoverageGaps:
         # Unknown barline should not generate AddSpecialBarline
         assert "AddSpecialBarline" not in result
 
-    def test_generate_plugin_unknown_octava_type(self) -> None:
+    def test_convert_unknown_octava_type(self) -> None:
         """Test unknown octava type falls back to plus8."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2159,7 +2257,7 @@ class TestFinalCoverageGaps:
         # Unknown octava falls back to plus8
         assert "octava.plus8" in result
 
-    def test_generate_plugin_pedal_always_uses_generic_style(self) -> None:
+    def test_convert_pedal_always_uses_generic_style(self) -> None:
         """Test pedal type doesn't affect output style."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2178,7 +2276,7 @@ class TestFinalCoverageGaps:
         # All pedal types use same style
         assert "line.staff.pedal" in result
 
-    def test_generate_plugin_rest_element(self) -> None:
+    def test_convert_rest_element(self) -> None:
         """Test that rest elements are skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2195,7 +2293,7 @@ class TestFinalCoverageGaps:
         # Rest should be skipped, only one AddNote call
         assert result.count("AddNote") == 1
 
-    def test_generate_plugin_tempo_without_text(self) -> None:
+    def test_convert_tempo_without_text(self) -> None:
         """Test that tempo without text is skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2212,7 +2310,7 @@ class TestFinalCoverageGaps:
         # Tempo without text should not add text.system.tempo
         assert "text.system.tempo" not in result
 
-    def test_generate_plugin_key_time_sig_in_bar(self) -> None:
+    def test_convert_key_time_sig_in_bar(self) -> None:
         """Test that key/time signatures in staff bars are skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2231,7 +2329,7 @@ class TestFinalCoverageGaps:
         # Check that we don't crash and the note is still added
         assert "AddNote" in result
 
-    def test_generate_plugin_system_staff_other_element(self) -> None:
+    def test_convert_system_staff_other_element(self) -> None:
         """Test that non-key/time elements in system staff are skipped."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2250,7 +2348,7 @@ class TestFinalCoverageGaps:
         # Text in system staff should not generate anything
         assert "AddNote" in result
 
-    def test_generate_plugin_system_staff_mixed_elements(self) -> None:
+    def test_convert_system_staff_mixed_elements(self) -> None:
         """Test system staff bar with both key sig and other elements."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)
@@ -2294,7 +2392,7 @@ class TestRobustnessExtractApi:
 
 
 class TestRobustnessGeneratePlugin:
-    """Test generate_plugin.py handles edge cases."""
+    """Test convert.py handles edge cases."""
 
     def test_layout_zero_width_positive_height(self) -> None:
         """Test layout with width=0 but height>0."""
@@ -2512,7 +2610,7 @@ class TestFinalBranchCoverage:
         result = parse_signature("Invalid(")  # Unclosed paren
         assert result is None
 
-    def test_generate_plugin_empty_system_staff_bars(self) -> None:
+    def test_convert_empty_system_staff_bars(self) -> None:
         """Test when system_staff.bars iteration completes without match."""
         note = Note(pitch=60)
         noterest = NoteRest(pos=0, dur=256, notes=[note], voice=1)

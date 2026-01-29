@@ -1,14 +1,17 @@
 """Pytest configuration - catch unmocked AppleScript calls."""
 
+from __future__ import annotations
+
 import subprocess
 import traceback
+from typing import Any
 
 import pytest
 
 _original_run = subprocess.run
 
 
-def _guarded_run(*args, **kwargs):
+def _guarded_run(*args: Any, **kwargs: Any) -> subprocess.CompletedProcess[Any]:
     """Raise if osascript is called without mocking."""
     if args and "osascript" in str(args[0]):
         tb = "".join(traceback.format_stack())

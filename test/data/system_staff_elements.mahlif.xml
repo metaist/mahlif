@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mahlif>
+  <meta>
+    <work-title>System Staff Test</work-title>
+  </meta>
+  <layout/>
+  <staves>
+    <staff n="1" instrument="Piano" full-name="Piano" clef="treble">
+      <bars>
+        <bar n="1" length="1024">
+          <note-rest pos="0" dur="256" voice="1">
+            <note pitch="60"/>
+          </note-rest>
+        </bar>
+        <bar n="2" length="1024">
+          <note-rest pos="0" dur="256" voice="1">
+            <note pitch="62"/>
+          </note-rest>
+        </bar>
+      </bars>
+    </staff>
+  </staves>
+  <system-staff>
+    <bars>
+      <bar n="1">
+        <tempo pos="0" text="Allegro" bpm="120"/>
+        <barline type="double"/>
+      </bar>
+      <bar n="2">
+        <tempo pos="0" text="Andante" bpm="80"/>
+        <barline type="final"/>
+      </bar>
+    </bars>
+  </system-staff>
+</mahlif>

@@ -6,10 +6,6 @@ import subprocess
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    pass
 
 SCRIPT_DIR = Path(__file__).parent
 
