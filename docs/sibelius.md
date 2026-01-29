@@ -145,9 +145,35 @@ Warnings are informational:
 | MS-W010 | Missing `Initialize` method |
 | MS-W011 | `Initialize` should call `AddToPluginsMenu` |
 
-!!! note
+### Disabling Warnings
 
-    Disabling specific warnings is planned for a future release ([#6](https://github.com/metaist/mahlif/issues/6)).
+You can disable specific warnings using:
+
+**CLI flags:**
+```bash
+mahlif sibelius check --ignore MS-W002,MS-W003 file.plg
+```
+
+**Inline comments:**
+```manuscript
+// noqa: MS-W002
+someMethod "() { ... }"
+
+x = 1;  // noqa: MS-W002
+
+// mahlif: ignore MS-W002
+someOtherMethod "() { ... }"
+
+// mahlif: disable MS-W002
+// ... code with trailing whitespace ...
+// mahlif: enable MS-W002
+```
+
+**Config file (`mahlif.toml`):**
+```toml
+[sibelius.lint]
+ignore = ["MS-W002", "MS-W003"]
+```
 
 ## Development Workflow
 

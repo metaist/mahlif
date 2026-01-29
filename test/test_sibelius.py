@@ -2644,3 +2644,126 @@ class TestFinalBranchCoverage:
         parser = Parser(tokens)
         result = parser._extract_params("no parens here")
         assert result == []
+
+
+class TestInlineDirectives:
+    """Tests for inline lint directive parsing."""
+
+    def test_noqa_with_codes(self) -> None:
+        """Test noqa with specific codes."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = "// noqa: MS-W002, MS-W003\nx = 1;"
+        directives = parse_inline_directives(content)
+        assert directives.is_ignored(1, "MS-W002")
+        assert directives.is_ignored(1, "MS-W003")
+        # Also applies to next line for comment-only lines
+        assert directives.is_ignored(2, "MS-W002")
+        assert not directives.is_ignored(3, "MS-W002")
+
+    def test_noqa_without_codes(self) -> None:
+        """Test noqa without codes ignores all."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = "// noqa\nx = 1;"
+        directives = parse_inline_directives(content)
+        # Empty set means ignore all
+        assert directives.is_ignored(1, "MS-W002")
+        assert directives.is_ignored(1, "MS-E001")
+        assert directives.is_ignored(2, "MS-W002")
+
+    def test_noqa_inline(self) -> None:
+        """Test noqa on same line as code."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = "x = 1;  // noqa: MS-W002"
+        directives = parse_inline_directives(content)
+        assert directives.is_ignored(1, "MS-W002")
+        # Does not apply to next line (not a comment-only line)
+        assert not directives.is_ignored(2, "MS-W002")
+
+    def test_mahlif_ignore(self) -> None:
+        """Test mahlif: ignore directive."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = "// mahlif: ignore MS-W002\nx = 1;"
+        directives = parse_inline_directives(content)
+        assert directives.is_ignored(1, "MS-W002")
+        assert directives.is_ignored(2, "MS-W002")
+        assert not directives.is_ignored(3, "MS-W002")
+
+    def test_mahlif_disable_enable(self) -> None:
+        """Test mahlif: disable/enable region."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = """line 1
+// mahlif: disable MS-W002
+line 3
+line 4
+// mahlif: enable MS-W002
+line 6"""
+        directives = parse_inline_directives(content)
+        assert not directives.is_ignored(1, "MS-W002")
+        # disable comment line itself is disabled (after processing)
+        assert directives.is_ignored(3, "MS-W002")
+        assert directives.is_ignored(4, "MS-W002")
+        # enable line is still disabled (disable was active at start of line)
+        assert directives.is_ignored(5, "MS-W002")
+        assert not directives.is_ignored(6, "MS-W002")
+
+    def test_disable_multiple_codes(self) -> None:
+        """Test disabling multiple codes at once."""
+        from mahlif.sibelius.lint import parse_inline_directives
+
+        content = """line 1
+// mahlif: disable MS-W002, MS-W003
+line 3"""
+        directives = parse_inline_directives(content)
+        assert directives.is_ignored(3, "MS-W002")
+        assert directives.is_ignored(3, "MS-W003")
+        assert not directives.is_ignored(3, "MS-E001")
+
+    def test_lint_respects_noqa(self, tmp_path: Path) -> None:
+        """Test lint() respects noqa comments."""
+        from mahlif.sibelius.lint import lint
+
+        plg = tmp_path / "test.plg"
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('T', 'R'); }\"   // noqa: MS-W002\n"
+            '    Run "() { }"\n'
+            "}"
+        )
+
+        errors = lint(plg)
+        # W002 should be suppressed by noqa
+        assert not any(e.code == "MS-W002" for e in errors)
+
+    def test_lint_respects_disable_region(self, tmp_path: Path) -> None:
+        """Test lint() respects disable/enable regions."""
+
+        plg = tmp_path / "test.plg"
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('T', 'R'); }\"\n"
+            "    // mahlif: disable MS-W002\n"
+            '    Run "() { }"   \n'  # trailing whitespace
+            "    // mahlif: enable MS-W002\n"
+            "}"
+        )
+
+    def test_lint_can_ignore_inline(self, tmp_path: Path) -> None:
+        """Test lint() can ignore inline directives with respect_inline flag."""
+        from mahlif.sibelius.lint import lint
+
+        plg = tmp_path / "test.plg"
+        # Missing Initialize - triggers W010
+        plg.write_text('{ Run "() { }" }  // noqa: MS-W010')
+
+        # With respect_inline=True, W010 should be suppressed
+        errors_with_inline = lint(plg, respect_inline=True)
+        assert not any(e.code == "MS-W010" for e in errors_with_inline)
+
+        # With respect_inline=False, W010 should NOT be suppressed
+        errors_without_inline = lint(plg, respect_inline=False)
+        assert any(e.code == "MS-W010" for e in errors_without_inline)
