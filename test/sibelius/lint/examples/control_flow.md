@@ -117,6 +117,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
     Run "() {
+        x = 1;
         switch (x) {
             case 1 {
                 y = 1;

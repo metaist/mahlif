@@ -44,6 +44,8 @@ All braces properly matched (no errors expected).
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
     Run "() {
+        x = 1;
+        arr = CreateSparseArray();
         if (x) {
             arr[0] = (1 + 2);
         }

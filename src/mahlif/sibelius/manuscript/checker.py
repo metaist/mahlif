@@ -4,6 +4,7 @@ This module parses tokenized method body content and checks for:
 - Syntax errors (incomplete expressions, missing semicolons)
 - Control flow validation (if/while/for/switch structure)
 - Expression validation
+- Undefined variable detection
 """
 
 from __future__ import annotations
@@ -12,6 +13,46 @@ from .errors import CheckError
 from .tokenizer import MethodBodyTokenizer
 from .tokenizer import Token
 from .tokenizer import TokenType
+
+# ManuScript built-in globals and functions
+BUILTIN_GLOBALS: set[str] = {
+    # Core objects
+    "Sibelius",
+    "Self",
+    # Built-in functions
+    "CreateSparseArray",
+    "CreateArray",
+    "CreateDictionary",
+    "CreateHash",
+    "SparseArray",
+    "Trace",
+    "TypeOf",
+    "IsObject",
+    "CharAt",
+    "Length",
+    "Substring",
+    "Chr",
+    "Asc",
+    "JoinStrings",
+    "SplitString",
+    "Round",
+    "RoundUp",
+    "RoundDown",
+    "Abs",
+    "Min",
+    "Max",
+    "RandomNumber",
+    "RandomSeed",
+    # Common object types often used as constructors
+    "Array",
+    "Dictionary",
+    "Hash",
+    # Syllable type constants
+    "StartOfWord",
+    "MiddleOfWord",
+    "EndOfWord",
+    "SingleSyllable",
+}
 
 
 class MethodBodyChecker:
@@ -413,6 +454,16 @@ class MethodBodyChecker:
 
     def _parse_assignment_or_expr(self) -> None:
         """Parse assignment or simple expression."""
+        # Check if this looks like a simple assignment: IDENTIFIER = ...
+        # Add the target to local_vars BEFORE parsing so we don't warn about it
+        if self._check(TokenType.IDENTIFIER):
+            # Peek ahead to see if this is an assignment
+            if self.pos + 1 < len(self.tokens):
+                next_tok = self.tokens[self.pos + 1]
+                if next_tok.type == TokenType.ASSIGN:
+                    # Pre-register this variable as defined
+                    self.local_vars.add(self._current().value)
+
         # Parse left side
         self._parse_or_expr()
         self._skip_comments()
@@ -582,8 +633,25 @@ class MethodBodyChecker:
         elif self._check(TokenType.TRUE, TokenType.FALSE, TokenType.NULL):
             self._advance()
         elif self._check(TokenType.IDENTIFIER):
-            self._advance()
-            # TODO: Track variable usage for undefined var checking
+            token = self._advance()
+            var_name = token.value
+            # Check if variable is defined
+            if (
+                var_name not in self.defined_vars
+                and var_name not in self.local_vars
+                and var_name not in BUILTIN_GLOBALS
+            ):
+                # Only warn if it's not followed by ( - could be a method call
+                # or followed by . - could be an object access
+                if not self._check(TokenType.LPAREN, TokenType.DOT):
+                    self.errors.append(
+                        CheckError(
+                            token.line,
+                            token.col,
+                            "MS-W020",
+                            f"Variable '{var_name}' may be undefined",
+                        )
+                    )
         elif self._check(TokenType.LPAREN):
             self._advance()
             self._parse_expression()

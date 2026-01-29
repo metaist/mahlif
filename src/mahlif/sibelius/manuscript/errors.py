@@ -59,3 +59,6 @@ W002_TRAILING_WS = "MS-W002"  # Trailing whitespace
 W003_INDENT = "MS-W003"  # Inconsistent indent
 W010_NO_INIT = "MS-W010"  # Missing Initialize method
 W011_NO_MENU = "MS-W011"  # Initialize should call AddToPluginsMenu
+
+# Semantic warnings (MS-W02x)
+W020_UNDEFINED_VAR = "MS-W020"  # Possibly undefined variable

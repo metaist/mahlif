@@ -95,6 +95,36 @@ def extract_method_bodies(content: str) -> list[tuple[str, str, int, int]]:
     return methods
 
 
+def extract_plugin_variables(content: str) -> set[str]:
+    """Extract plugin-level variable names.
+
+    Plugin variables are defined as: VarName "value"
+    These are available to all methods in the plugin.
+
+    Args:
+        content: Plugin file content
+
+    Returns:
+        Set of variable names defined at plugin level
+    """
+    variables: set[str] = set()
+    lines = content.split("\n")
+
+    # Pattern: identifier followed by quoted string (variable definition)
+    # But NOT Initialize, Run, or method-like names with () in the string
+    var_pattern = re.compile(r'^\s*([A-Za-z_][A-Za-z0-9_]*)\s+"[^(]')
+
+    for line in lines:
+        match = var_pattern.match(line)
+        if match:
+            name = match.group(1)
+            # Exclude known method names
+            if name not in {"Initialize", "Run"}:
+                variables.add(name)
+
+    return variables
+
+
 def lint_method_bodies(content: str) -> list[LintError]:
     """Check method body content for syntax errors.
 
@@ -111,6 +141,7 @@ def lint_method_bodies(content: str) -> list[LintError]:
 
     errors: list[LintError] = []
     methods = extract_method_bodies(content)
+    plugin_vars = extract_plugin_variables(content)
 
     for method_name, body, start_line, start_col in methods:
         # Extract parameters from body (format: "(params) { code }")
@@ -139,6 +170,7 @@ def lint_method_bodies(content: str) -> list[LintError]:
                             body_line,
                             body_col,
                             params,
+                            plugin_vars,
                         )
 
                         # Convert CheckErrors to LintErrors
