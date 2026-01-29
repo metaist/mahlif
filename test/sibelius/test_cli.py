@@ -960,6 +960,133 @@ class TestMainCLIIntegration:
         assert result == 0
 
 
+class TestParseCodes:
+    """Tests for _parse_codes helper function."""
+
+    def test_empty_string(self) -> None:
+        """Test empty string returns empty set."""
+        from mahlif.sibelius.cli import _parse_codes
+
+        assert _parse_codes("") == set()
+
+    def test_single_code(self) -> None:
+        """Test single code."""
+        from mahlif.sibelius.cli import _parse_codes
+
+        assert _parse_codes("W002") == {"W002"}
+
+    def test_multiple_codes(self) -> None:
+        """Test multiple comma-separated codes."""
+        from mahlif.sibelius.cli import _parse_codes
+
+        assert _parse_codes("W002,W003,E001") == {"W002", "W003", "E001"}
+
+    def test_whitespace_handling(self) -> None:
+        """Test whitespace is stripped."""
+        from mahlif.sibelius.cli import _parse_codes
+
+        assert _parse_codes(" W002 , W003 ") == {"W002", "W003"}
+
+    def test_empty_items_ignored(self) -> None:
+        """Test empty items are ignored."""
+        from mahlif.sibelius.cli import _parse_codes
+
+        assert _parse_codes("W002,,W003") == {"W002", "W003"}
+
+
+class TestLintFlags:
+    """Tests for lint --ignore, --fixable, --unfixable flags."""
+
+    def test_ignore_single_code(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test --ignore with single code."""
+        plg = tmp_path / "test.plg"
+        plg.write_text(
+            """{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() { x = 1;   }"
+}"""
+        )  # Has trailing whitespace (W002)
+
+        result = sibelius_main(["check", "--ignore", "W002", str(plg)])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "No issues found" in captured.out
+
+    def test_ignore_multiple_codes(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test --ignore with multiple comma-separated codes."""
+        plg = tmp_path / "test.plg"
+        # Missing Initialize (W010) and AddToPluginsMenu (W011)
+        plg.write_text('{ Run "() { }" }')
+
+        result = sibelius_main(["check", "--ignore", "W010,W011", str(plg)])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "No issues found" in captured.out
+
+    def test_unfixable_prevents_fix(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test --unfixable prevents auto-fix."""
+        plg = tmp_path / "test.plg"
+        # Write content with actual trailing whitespace at end of line
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('Test', 'Run'); }\"   \n"
+            '    Run "() { }"\n'
+            "}"
+        )
+
+        sibelius_main(["check", "--fix", "--unfixable", "W002", str(plg)])
+        # Should report the warning but not fix it
+        captured = capsys.readouterr()
+        assert "W002" in captured.out
+        assert "Fixed" not in captured.out
+        # Verify file still has trailing whitespace
+        content = plg.read_text()
+        assert '}"   \n' in content
+
+    def test_fixable_limits_fixes(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test --fixable limits which codes are fixed."""
+        plg = tmp_path / "test.plg"
+        # Write content with actual trailing whitespace at end of line
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('Test', 'Run'); }\"   \n"
+            '    Run "() { }"\n'
+            "}"
+        )
+
+        # Only allow E001 to be fixed (not W002)
+        sibelius_main(["check", "--fix", "--fixable", "E001", str(plg)])
+        captured = capsys.readouterr()
+        assert "W002" in captured.out
+        assert "Fixed" not in captured.out
+
+    def test_fixable_allows_specified(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test --fixable allows specified codes to be fixed."""
+        plg = tmp_path / "test.plg"
+        # Write content with actual trailing whitespace at end of line
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('Test', 'Run'); }\"   \n"
+            '    Run "() { }"\n'
+            "}"
+        )
+
+        result = sibelius_main(["check", "--fix", "--fixable", "W002", str(plg)])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "Fixed trailing whitespace" in captured.out
+
+
 class TestManuscriptAlias:
     """Tests for manuscript alias (language-focused alternative to sibelius)."""
 

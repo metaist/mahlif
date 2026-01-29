@@ -21,6 +21,20 @@ import sys
 from pathlib import Path
 
 
+def _parse_codes(codes_str: str) -> set[str]:
+    """Parse comma-separated rule codes into a set.
+
+    Args:
+        codes_str: Comma-separated codes like "W002,W003"
+
+    Returns:
+        Set of code strings
+    """
+    if not codes_str:
+        return set()
+    return {code.strip() for code in codes_str.split(",") if code.strip()}
+
+
 def add_subparsers(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
     name: str = "sibelius",
@@ -119,6 +133,24 @@ def _add_commands(parser: argparse.ArgumentParser) -> None:
         help="Show what would be fixed without fixing",
     )
     check_parser.add_argument(
+        "--ignore",
+        type=str,
+        default="",
+        help="Comma-separated list of rule codes to disable (e.g., W002,W003)",
+    )
+    check_parser.add_argument(
+        "--fixable",
+        type=str,
+        default="",
+        help="Comma-separated list of rule codes eligible for fix (default: all)",
+    )
+    check_parser.add_argument(
+        "--unfixable",
+        type=str,
+        default="",
+        help="Comma-separated list of rule codes ineligible for fix",
+    )
+    check_parser.add_argument(
         "files",
         type=Path,
         nargs="*",
@@ -178,9 +210,14 @@ def run_command(args: argparse.Namespace) -> int:
 
     elif args.sibelius_command == "check":
         from mahlif.sibelius.build import find_plugin_sources
-        from mahlif.sibelius.lint import lint
         from mahlif.sibelius.lint import fix_trailing_whitespace
+        from mahlif.sibelius.lint import lint
         from mahlif.sibelius.lint import read_plugin
+
+        # Parse comma-separated code lists
+        ignore_codes = _parse_codes(args.ignore)
+        fixable_codes = _parse_codes(args.fixable)
+        unfixable_codes = _parse_codes(args.unfixable)
 
         # Filter empty paths (Path('') becomes Path('.'))
         files = [f for f in args.files if str(f) != "."]
@@ -202,21 +239,35 @@ def run_command(args: argparse.Namespace) -> int:
 
             errors = lint(path)
 
+            # Filter out ignored errors
+            if ignore_codes:
+                errors = [e for e in errors if e.code not in ignore_codes]
+
             if args.fix:
+                # Determine which codes are fixable
+                # If --fixable is specified, only those codes are fixable
+                # If --unfixable is specified, those codes are not fixable
+                # Default: all fixable codes are fixable
+                def is_fixable(code: str) -> bool:
+                    if code in unfixable_codes:
+                        return False
+                    if fixable_codes:
+                        return code in fixable_codes
+                    return True
+
                 # Check if there's trailing whitespace to fix
                 content = read_plugin(path)
                 lines = content.split("\n")
                 has_trailing = any(line != line.rstrip() for line in lines)
 
-                if has_trailing:
+                if has_trailing and is_fixable("W002"):
                     if args.dry_run:
                         print(f"Would fix: {path} (trailing whitespace)")
                     else:
                         fix_trailing_whitespace(path)
                         print(f"✓ {path}: Fixed trailing whitespace")
-
-                # Filter out fixed W002 errors
-                errors = [e for e in errors if e.code != "W002"]
+                    # Filter out fixed W002 errors
+                    errors = [e for e in errors if e.code != "W002"]
 
             if not errors:
                 if not args.fix:
