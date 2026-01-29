@@ -1091,6 +1091,80 @@ class TestLintFlags:
         assert "Fixed trailing whitespace" in captured.out
 
 
+class TestConfigFileIntegration:
+    """Tests for config file integration with check command."""
+
+    def test_config_ignore_from_mahlif_toml(
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test --ignore from mahlif.toml."""
+        # Create config file
+        config_file = tmp_path / "mahlif.toml"
+        config_file.write_text('[sibelius.lint]\nignore = ["MS-W010", "MS-W011"]')
+
+        # Create plugin file without Initialize (triggers W010, W011)
+        plg = tmp_path / "test.plg"
+        plg.write_text('{ Run "() { }" }')
+
+        monkeypatch.chdir(tmp_path)
+        result = sibelius_main(["check", str(plg)])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "No issues found" in captured.out
+
+    def test_cli_overrides_config(
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test CLI flags merge with config (both are applied)."""
+        # Config ignores W010
+        config_file = tmp_path / "mahlif.toml"
+        config_file.write_text('[sibelius.lint]\nignore = ["MS-W010"]')
+
+        # Plugin without Initialize (triggers W010, W011)
+        plg = tmp_path / "test.plg"
+        plg.write_text('{ Run "() { }" }')
+
+        monkeypatch.chdir(tmp_path)
+
+        # CLI also ignores W011, so both should be ignored
+        result = sibelius_main(["check", "--ignore", "MS-W011", str(plg)])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "No issues found" in captured.out
+
+    def test_config_unfixable(
+        self,
+        tmp_path: Path,
+        capsys: pytest.CaptureFixture[str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Test unfixable from config file."""
+        # Config makes W002 unfixable
+        config_file = tmp_path / "mahlif.toml"
+        config_file.write_text('[sibelius.lint]\nunfixable = ["MS-W002"]')
+
+        # Plugin with trailing whitespace
+        plg = tmp_path / "test.plg"
+        plg.write_text(
+            "{\n"
+            "    Initialize \"() { AddToPluginsMenu('Test', 'Run'); }\"   \n"
+            '    Run "() { }"\n'
+            "}"
+        )
+
+        monkeypatch.chdir(tmp_path)
+        sibelius_main(["check", "--fix", str(plg)])
+        captured = capsys.readouterr()
+        assert "MS-W002" in captured.out
+        assert "Fixed" not in captured.out
+
+
 class TestManuscriptAlias:
     """Tests for manuscript alias (language-focused alternative to sibelius)."""
 

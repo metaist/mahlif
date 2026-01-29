@@ -209,15 +209,24 @@ def run_command(args: argparse.Namespace) -> int:
         return error_count
 
     elif args.sibelius_command == "check":
+        from mahlif.config import load_config
         from mahlif.sibelius.build import find_plugin_sources
         from mahlif.sibelius.lint import fix_trailing_whitespace
         from mahlif.sibelius.lint import lint
         from mahlif.sibelius.lint import read_plugin
 
-        # Parse comma-separated code lists
-        ignore_codes = _parse_codes(args.ignore)
-        fixable_codes = _parse_codes(args.fixable)
-        unfixable_codes = _parse_codes(args.unfixable)
+        # Load config file
+        config = load_config()
+
+        # Parse comma-separated code lists from CLI (overrides config)
+        cli_ignore = _parse_codes(args.ignore)
+        cli_fixable = _parse_codes(args.fixable)
+        cli_unfixable = _parse_codes(args.unfixable)
+
+        # Merge CLI flags with config (CLI takes precedence)
+        ignore_codes = cli_ignore | config.sibelius.lint.ignore
+        fixable_codes = cli_fixable | config.sibelius.lint.fixable
+        unfixable_codes = cli_unfixable | config.sibelius.lint.unfixable
 
         # Filter empty paths (Path('') becomes Path('.'))
         files = [f for f in args.files if str(f) != "."]

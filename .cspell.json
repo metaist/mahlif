@@ -3,7 +3,6 @@
   "language": "en",
   "words": [
     "aeses",
-    "autouse",
     "aigen",
     "APPDATA",
     "applescript",
@@ -11,6 +10,7 @@
     "Artic",
     "attacca",
     "Autobuild",
+    "autouse",
     "Bärenreiter",
     "barline",
     "barlines",
@@ -19,9 +19,8 @@
     "cliclick",
     "Cmaj",
     "codeql",
-    "cogapp",
     "cog.outl",
-    "outl",
+    "cogapp",
     "corda",
     "cosmofy",
     "cresc",
@@ -40,9 +39,10 @@
     "gliss",
     "Glissandi",
     "hairpin",
-    "hardlink",
-    "hardlinks",
     "hairpins",
+    "hardlink",
+    "hardlinked",
+    "hardlinks",
     "htmlcov",
     "hypen",
     "iconv",
@@ -72,6 +72,7 @@
     "octava",
     "octavas",
     "osascript",
+    "outl",
     "pathlib",
     "pdftotext",
     "pdoc",
@@ -114,6 +115,7 @@
     "Привет",
     "Тестовая",
     "Чайковский",
-    "מַחֲלִיף"
+    "מַחֲלִיף",
+    "redef"
   ]
 }
