@@ -264,6 +264,11 @@ def main(args: list[str] | None = None) -> int:
 
     add_sibelius_subparsers(subparsers)
 
+    # manuscript (alias for sibelius - language-focused vs host-focused)
+    from mahlif.sibelius.cli import add_subparsers as add_manuscript_subparsers
+
+    add_manuscript_subparsers(subparsers, name="manuscript")
+
     parsed = parser.parse_args(args)
 
     if parsed.command is None:
@@ -274,7 +279,7 @@ def main(args: list[str] | None = None) -> int:
         return cmd_convert(parsed)
     elif parsed.command == "stats":
         return cmd_stats(parsed)
-    elif parsed.command == "sibelius":
+    elif parsed.command in ("sibelius", "manuscript"):
         from mahlif.sibelius.cli import run_command
 
         return run_command(parsed)

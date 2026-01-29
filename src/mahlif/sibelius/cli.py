@@ -1,12 +1,15 @@
 """CLI for Sibelius-related commands.
 
 Usage:
+    mahlif sibelius install            # Install plugins to Sibelius
     mahlif sibelius build              # Build all plugins to dist/
     mahlif sibelius build --install    # Build to Sibelius plugin directory
     mahlif sibelius check              # Lint ManuScript files
+    mahlif sibelius list               # List available plugins
     mahlif sibelius show-plugin-dir    # Show Sibelius plugin directory
 
 Or standalone:
+    python -m mahlif.sibelius install
     python -m mahlif.sibelius build
     python -m mahlif.sibelius check
 """
@@ -20,18 +23,27 @@ from pathlib import Path
 
 def add_subparsers(
     subparsers: argparse._SubParsersAction[argparse.ArgumentParser],
+    name: str = "sibelius",
 ) -> None:
-    """Add sibelius subcommand to main CLI parser.
+    """Add sibelius/manuscript subcommand to main CLI parser.
 
     Args:
         subparsers: Subparsers from main CLI
+        name: Name of the subcommand ("sibelius" or "manuscript")
     """
-    sibelius_parser = subparsers.add_parser(
-        "sibelius",
-        help="Sibelius plugin tools",
-        description="Commands for Sibelius plugin development and installation",
+    if name == "manuscript":
+        help_text = "ManuScript language tools (alias for sibelius)"
+        description = "Commands for ManuScript development (alias for sibelius)"
+    else:
+        help_text = "Sibelius plugin tools"
+        description = "Commands for Sibelius plugin development and installation"
+
+    parser = subparsers.add_parser(
+        name,
+        help=help_text,
+        description=description,
     )
-    _add_commands(sibelius_parser)
+    _add_commands(parser)
 
 
 def _add_commands(parser: argparse.ArgumentParser) -> None:
@@ -111,6 +123,19 @@ def _add_commands(parser: argparse.ArgumentParser) -> None:
         type=Path,
         nargs="*",
         help="Files to check (default: all .plg in sibelius directory)",
+    )
+
+    # install (user-friendly shortcut for build --install)
+    install_parser = subparsers.add_parser(
+        "install",
+        help="Install plugins to Sibelius",
+        description="Build and install plugins to Sibelius plugin directory",
+    )
+    install_parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        help="Show what would be done without doing it",
     )
 
     # list
@@ -205,6 +230,15 @@ def run_command(args: argparse.Namespace) -> int:
                 total_errors += error_count
 
         return min(total_errors, 127)
+
+    elif args.sibelius_command == "install":
+        from mahlif.sibelius.build import build_plugins
+
+        error_count, _ = build_plugins(
+            install=True,
+            dry_run=args.dry_run,
+        )
+        return error_count
 
     elif args.sibelius_command == "list":
         from mahlif.sibelius.build import find_plugin_sources

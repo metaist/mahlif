@@ -842,6 +842,37 @@ class TestSibeliusCLI:
         captured = capsys.readouterr()
         assert "No .plg files found" in captured.out
 
+    def test_install_command(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test install command (shortcut for build --install)."""
+        sibelius_dir = tmp_path / "sibelius"
+        with patch(
+            "mahlif.sibelius.build.get_sibelius_plugin_dir",
+            return_value=sibelius_dir,
+        ):
+            result = sibelius_main(["install"])
+        assert result == 0
+        # Should have installed plugins to sibelius_dir
+        assert sibelius_dir.exists()
+        assert any(sibelius_dir.glob("*.plg"))
+
+    def test_install_command_dry_run(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """Test install command with --dry-run."""
+        sibelius_dir = tmp_path / "sibelius"
+        with patch(
+            "mahlif.sibelius.build.get_sibelius_plugin_dir",
+            return_value=sibelius_dir,
+        ):
+            result = sibelius_main(["install", "--dry-run"])
+        assert result == 0
+        # Should NOT have created directory
+        assert not sibelius_dir.exists()
+        captured = capsys.readouterr()
+        assert "Would build" in captured.out
+
     def test_list_command(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test list command shows available plugins."""
         result = sibelius_main(["list"])
@@ -927,3 +958,60 @@ class TestMainCLIIntegration:
 
         result = main(["sibelius", "check", str(plg)])
         assert result == 0
+
+
+class TestManuscriptAlias:
+    """Tests for manuscript alias (language-focused alternative to sibelius)."""
+
+    def test_manuscript_check_via_main(self, tmp_path: Path) -> None:
+        """Test mahlif manuscript check."""
+        from mahlif.cli import main
+
+        plg = tmp_path / "test.plg"
+        plg.write_text(
+            """{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() { }"
+}"""
+        )
+
+        result = main(["manuscript", "check", str(plg)])
+        assert result == 0
+
+    def test_manuscript_build_via_main(self, tmp_path: Path) -> None:
+        """Test mahlif manuscript build."""
+        from mahlif.cli import main
+
+        source_dir = tmp_path / "src"
+        source_dir.mkdir()
+        output_dir = tmp_path / "dist"
+
+        (source_dir / "test.plg").write_text(
+            """{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() { }"
+}"""
+        )
+
+        result = main(
+            [
+                "manuscript",
+                "build",
+                "--source",
+                str(source_dir),
+                "-o",
+                str(output_dir),
+                "-q",
+            ]
+        )
+        assert result == 0
+        assert (output_dir / "test.plg").exists()
+
+    def test_manuscript_list_via_main(self, capsys: pytest.CaptureFixture[str]) -> None:
+        """Test mahlif manuscript list."""
+        from mahlif.cli import main
+
+        result = main(["manuscript", "list"])
+        assert result == 0
+        captured = capsys.readouterr()
+        assert "Available plugins:" in captured.out
