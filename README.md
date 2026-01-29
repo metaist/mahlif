@@ -12,16 +12,40 @@
 > **Experimental / Pre-release Software**
 >
 > This project is in early development. APIs may change without notice.
-> Not recommended for production use. Expect bugs and incomplete features.
 
-## Why?
+## Why Mahlif?
 
 Music notation software stores scores in proprietary formats that don't interoperate well. MusicXML exists but loses layout precision. Mahlif provides:
 
-1. **Mahlif XML** — An intermediate format that preserves pixel-accurate layout (dx/dy offsets)
-2. **Bidirectional converters** for Sibelius, Finale, Dorico, LilyPond, and MusicXML
+1. **Mahlif XML** — An intermediate format preserving pixel-accurate layout (dx/dy offsets)
+2. **Bidirectional converters** for notation software
 
-Current focus: Sibelius → Mahlif XML → LilyPond → PDF
+<!--[[[cog
+# Format support matrix is maintained in docs/index.md
+# Run: cog -r README.md
+import cog
+cog.outl("## Format Support")
+cog.outl("")
+cog.outl("| Format | Import | Export | Notes |")
+cog.outl("|--------|--------|--------|-------|")
+cog.outl("| Sibelius | ✅ Plugin | 🚧 Plugin | Export ~80% complete |")
+cog.outl("| LilyPond | — | ✅ CLI | ~70% features |")
+cog.outl("| MusicXML | ❌ | ❌ | Planned |")
+cog.outl("| Finale | ❌ | ❌ | Planned |")
+cog.outl("| Dorico | ❌ | ❌ | Planned |")
+]]]-->
+## Format Support
+
+| Format | Import | Export | Notes |
+|--------|--------|--------|-------|
+| Sibelius | ✅ Plugin | 🚧 Plugin | Export ~80% complete |
+| LilyPond | — | ✅ CLI | ~70% features |
+| MusicXML | ❌ | ❌ | Planned |
+| Finale | ❌ | ❌ | Planned |
+| Dorico | ❌ | ❌ | Planned |
+<!--[[[end]]]-->
+
+Current focus: **Sibelius → Mahlif XML → LilyPond → PDF**
 
 ## Install
 
@@ -31,39 +55,46 @@ pip install mahlif
 uv add mahlif
 ```
 
-## Usage
+## Quick Start
 
 ### Export from Sibelius
 
-1. Copy `plugins/sibelius/MahlifExportFull.plg` to your Sibelius plugins folder:
-   - **Mac**: `~/Library/Application Support/Avid/Sibelius/Plugins/Other/`
-   - **Windows**: `%APPDATA%\Avid\Sibelius\Plugins\Other\`
-2. Convert to UTF-16 BE (required by Sibelius):
-   ```bash
-   iconv -f UTF-8 -t UTF-16BE MahlifExportFull.plg > temp.plg
-   printf '\xfe\xff' > MahlifExportFull.plg
-   cat temp.plg >> MahlifExportFull.plg
-   ```
-3. Restart Sibelius
-4. Home → Plug-ins → Other → Export to Mahlif XML (Full)
-5. Save the `.xml` file
+```bash
+# Install the export plugin
+mahlif sibelius build --install
+```
+
+Then in Sibelius: **Home → Plug-ins → Mahlif → Export to Mahlif XML**
 
 ### Convert to LilyPond
 
 ```bash
-mahlif convert score.xml -o score.ly
-mahlif render score.xml -o score.pdf
+# Convert to LilyPond source
+mahlif convert score.mahlif.xml score.ly
+
+# Compile to PDF (requires LilyPond installed)
+lilypond score.ly
 ```
 
 ### Python API
 
 ```python
-from mahlif import parse, to_lilypond
+from mahlif import parse
+from mahlif.lilypond import to_lilypond
 
-score = parse("score.xml")
-lilypond_code = to_lilypond(score)
+score = parse("score.mahlif.xml")
+lily_source = to_lilypond(score)
 ```
+
+## Documentation
+
+See the [full documentation](docs/index.md) for:
+
+- [CLI Reference](docs/cli.md) — All commands and options
+- [Sibelius](docs/sibelius.md) — Plugin installation, linter, property mapping
+- [LilyPond](docs/lilypond.md) — Export features and limitations
+- [Schema](docs/schema.md) — Mahlif XML format specification
 
 ## License
 
-[MIT License](https://github.com/metaist/mahlif/blob/main/LICENSE.md)
+[MIT License](LICENSE.md)
