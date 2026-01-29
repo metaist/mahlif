@@ -5,6 +5,8 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from mahlif import parse
 from mahlif.models import Barline
 from mahlif.models import Clef
@@ -37,6 +39,16 @@ class TestParseBasic:
         score = parse(xml)
         assert score.meta.work_title == "Test Score"
         assert score.is_multi_movement is False
+
+    def test_parse_invalid_root_element(self) -> None:
+        """Reject invalid root element."""
+        xml = """<?xml version="1.0" encoding="UTF-8"?>
+        <invalid-root>
+            <meta><work-title>Test</work-title></meta>
+        </invalid-root>
+        """
+        with pytest.raises(ValueError, match="Invalid root element"):
+            parse(xml)
 
     def test_parse_bytes(self) -> None:
         """Parse from raw bytes."""
@@ -605,23 +617,27 @@ class TestParseStructure:
         assert len(score.movements[0].staves) == 1
         assert score.movements[0].staves[0].instrument == "Piano"
 
-    def test_parse_tempo_and_rehearsal_ignored(self) -> None:
-        """Tempo and rehearsal in bars are ignored (handled at system level)."""
+    def test_parse_tempo_and_rehearsal(self) -> None:
+        """Tempo and rehearsal in bars are parsed."""
         xml = """<?xml version="1.0" encoding="UTF-8"?>
         <mahlif version="1.0">
             <staves count="1">
                 <staff n="1">
                     <bar n="1" length="1024">
-                        <tempo pos="0" text="Allegro"/>
-                        <rehearsal pos="0">A</rehearsal>
+                        <tempo pos="0" text="Allegro" bpm="120"/>
+                        <rehearsal pos="0" type="letter">A</rehearsal>
                     </bar>
                 </staff>
             </staves>
         </mahlif>
         """
         score = parse(xml)
-        # These elements are skipped in bar parsing
-        assert len(score.staves[0].bars[0].elements) == 0
+        elements = score.staves[0].bars[0].elements
+        assert len(elements) == 2
+        assert elements[0].text == "Allegro"  # type: ignore[union-attr]
+        assert elements[0].bpm == 120.0  # type: ignore[union-attr]
+        assert elements[1].text == "A"  # type: ignore[union-attr]
+        assert elements[1].type == "letter"  # type: ignore[union-attr]
 
     def test_parse_octava(self) -> None:
         """Parse octava (8va/8vb) lines."""

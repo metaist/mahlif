@@ -237,12 +237,23 @@ def _parse_bar_elements(
                 )
 
             case "tempo":
-                # Tempo goes in system staff but may appear in bars
-                pass  # Handled at system-staff level
+                elements.append(
+                    Tempo(
+                        pos=_get_int(child, "pos"),
+                        text=_get_attr(child, "text") or "",
+                        bpm=_get_float(child, "bpm") or None,
+                        offset=_parse_position(child),
+                    )
+                )
 
             case "rehearsal":
-                # Rehearsal goes in system staff
-                pass
+                elements.append(
+                    Rehearsal(
+                        pos=_get_int(child, "pos"),
+                        text=child.text or _get_attr(child, "text") or "",
+                        type=_get_attr(child, "type") or "custom",  # type: ignore[arg-type]
+                    )
+                )
 
             case "slur":
                 elements.append(
@@ -497,6 +508,10 @@ def parse(source: str | Path | bytes) -> Score:
     else:
         # It's an XML string (assumed UTF-8)
         root = etree.fromstring(source.encode("utf-8"))
+
+    # Validate root element
+    if root.tag != "mahlif":
+        raise ValueError(f"Invalid root element: {root.tag!r}. Expected 'mahlif'.")
 
     # Meta
     meta_elem = root.find("meta")

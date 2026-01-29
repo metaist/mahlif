@@ -483,12 +483,15 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
             if bar.break_type:
                 breaks[bar.n] = bar.break_type
 
-    # Add breaks, time/key signatures from system staff
-    lines.append("// System staff: breaks, time/key signatures")
+    # Add breaks, time/key signatures, tempo, barlines from system staff
+    lines.append("// System staff: breaks, time/key, tempo, barlines")
     all_bar_nums = set(breaks.keys())
     if score.system_staff.bars:
         for bar in score.system_staff.bars:
-            if any(isinstance(e, (TimeSignature, KeySignature)) for e in bar.elements):
+            if any(
+                isinstance(e, (TimeSignature, KeySignature, Tempo, Barline))
+                for e in bar.elements
+            ):
                 all_bar_nums.add(bar.n)
 
     # Filter to only bars that exist in the score
@@ -507,7 +510,7 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
             if breaks[bar_n] in break_map:
                 lines.append(f"sysBar.BreakType = {break_map[breaks[bar_n]]};")
 
-        # Time/key signatures from system staff
+        # Time/key signatures, tempo, barlines from system staff
         if score.system_staff.bars:
             for bar in score.system_staff.bars:
                 if bar.n == bar_n:
@@ -522,8 +525,29 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
                                 lines.append(
                                     f"sysBar.AddKeySignature({elem.pos}, {elem.fifths}, {is_major});"
                                 )
+                            case Tempo() if elem.text:
+                                lines.append(
+                                    f"sysBar.AddText({elem.pos}, '{escape_str(elem.text)}', "
+                                    f"'text.system.tempo');"
+                                )
+                            case Barline():
+                                barline_map = {
+                                    "double": "SpecialBarlineDouble",
+                                    "final": "SpecialBarlineFinal",
+                                    "repeat-start": "SpecialBarlineStartRepeat",
+                                    "repeat-end": "SpecialBarlineEndRepeat",
+                                    "dashed": "SpecialBarlineDashed",
+                                    "invisible": "SpecialBarlineInvisible",
+                                    "tick": "SpecialBarlineTick",
+                                    "short": "SpecialBarlineShort",
+                                    "dotted": "SpecialBarlineDotted",
+                                }
+                                if elem.type in barline_map:
+                                    lines.append(
+                                        f"sysBar.AddSpecialBarline({barline_map[elem.type]});"
+                                    )
                             case _:
-                                pass  # Other elements handled at staff level
+                                pass  # Other elements not handled at system level
                     break
     lines.append("")
 

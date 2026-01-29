@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<score title="Round Trip Test" composer="Test">
+<mahlif title="Round Trip Test" composer="Test">
   <layout>
     <page-width>210</page-width>
     <page-height>297</page-height>
@@ -201,4 +201,4 @@
       </bar>
     </staff>
   </staves>
-</score>
+</mahlif>
