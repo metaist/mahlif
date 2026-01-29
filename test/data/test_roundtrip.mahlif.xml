@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<score title="Round Trip Test" composer="Test">
+  <layout>
+    <page-width>210</page-width>
+    <page-height>297</page-height>
+    <staff-size>7</staff-size>
+  </layout>
+  
+  <system-staff>
+    <bar n="1" length="1024">
+      <tempo pos="0" text="Allegro" bpm="120"/>
+      <time pos="0" num="4" den="4"/>
+    </bar>
+    <bar n="2" length="1024"/>
+    <bar n="3" length="1024"/>
+    <bar n="4" length="1024">
+      <barline pos="1024" type="double"/>
+    </bar>
+    <bar n="5" length="1024">
+      <tempo pos="0" text="Slower" bpm="80"/>
+    </bar>
+    <bar n="6" length="1024"/>
+    <bar n="7" length="1024"/>
+    <bar n="8" length="1024">
+      <barline pos="1024" type="final"/>
+    </bar>
+  </system-staff>
+  
+  <staves>
+    <!-- Voice with lyrics -->
+    <staff instrument="Voice" name="Soprano">
+      <bar n="1" length="1024">
+        <clef pos="0" type="treble"/>
+        <note pos="0" dur="256" pitch="67" voice="1"/>
+        <note pos="256" dur="256" pitch="69" voice="1"/>
+        <note pos="512" dur="256" pitch="71" voice="1"/>
+        <note pos="768" dur="256" pitch="72" voice="1"/>
+        <dynamic pos="0" text="mf"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="512" pitch="74" voice="1"/>
+        <note pos="512" dur="512" pitch="72" voice="1"/>
+        <slur start-bar="2" start-pos="0" end-bar="2" end-pos="1024" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="256" pitch="71" voice="1" articulations="accent"/>
+        <note pos="256" dur="256" pitch="69" voice="1" articulations="staccato"/>
+        <note pos="512" dur="256" pitch="67" voice="1" articulations="tenuto"/>
+        <note pos="768" dur="256" pitch="65" voice="1"/>
+        <hairpin start-bar="3" start-pos="0" end-bar="3" end-pos="1024" type="cresc" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="64" voice="1"/>
+        <dynamic pos="0" text="f" dx="10" dy="-5"/>
+      </bar>
+      <bar n="5" length="1024">
+        <note pos="0" dur="512" pitch="72" voice="1"/>
+        <note pos="512" dur="512" pitch="71" voice="1"/>
+        <dynamic pos="0" text="p"/>
+      </bar>
+      <bar n="6" length="1024">
+        <note pos="0" dur="256" pitch="69" voice="1"/>
+        <note pos="256" dur="256" pitch="67" voice="1"/>
+        <note pos="512" dur="512" pitch="65" voice="1"/>
+        <hairpin start-bar="6" start-pos="0" end-bar="6" end-pos="1024" type="dim" voice="1"/>
+      </bar>
+      <bar n="7" length="1024">
+        <note pos="0" dur="512" pitch="64" voice="1"/>
+        <note pos="512" dur="256" pitch="65" voice="1"/>
+        <note pos="768" dur="256" pitch="67" voice="1"/>
+      </bar>
+      <bar n="8" length="1024">
+        <note pos="0" dur="1024" pitch="60" voice="1"/>
+        <dynamic pos="0" text="pp"/>
+      </bar>
+      
+      <!-- Lyrics at staff level -->
+      <lyrics voice="1" verse="1">
+        <syl pos="0" bar="1">Hel</syl>
+        <syl pos="256" bar="1" hyphen="true">lo</syl>
+        <syl pos="512" bar="1">World,</syl>
+        <syl pos="768" bar="1">this</syl>
+        <syl pos="0" bar="2">is</syl>
+        <syl pos="512" bar="2">a</syl>
+        <syl pos="0" bar="3">round</syl>
+        <syl pos="256" bar="3">trip</syl>
+        <syl pos="512" bar="3">test</syl>
+        <syl pos="768" bar="3">for</syl>
+        <syl pos="0" bar="4" melisma="true">you.</syl>
+        <syl pos="0" bar="5">Se</syl>
+        <syl pos="512" bar="5" hyphen="true">cond</syl>
+        <syl pos="0" bar="6">sec</syl>
+        <syl pos="256" bar="6" hyphen="true">tion</syl>
+        <syl pos="512" bar="6">here.</syl>
+        <syl pos="0" bar="7">Al</syl>
+        <syl pos="512" bar="7" hyphen="true">most</syl>
+        <syl pos="768" bar="7">done,</syl>
+        <syl pos="0" bar="8">end.</syl>
+      </lyrics>
+    </staff>
+    
+    <!-- Piano with chords -->
+    <staff instrument="Piano" name="Piano">
+      <bar n="1" length="1024">
+        <clef pos="0" type="treble"/>
+        <note pos="0" dur="512" pitch="60" voice="1"/>
+        <note pos="0" dur="512" pitch="64" voice="1"/>
+        <note pos="0" dur="512" pitch="67" voice="1"/>
+        <note pos="512" dur="512" pitch="62" voice="1"/>
+        <note pos="512" dur="512" pitch="65" voice="1"/>
+        <note pos="512" dur="512" pitch="69" voice="1"/>
+        <dynamic pos="0" text="mf"/>
+        <text pos="0" text="legato" style="technique"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="256" pitch="64" voice="1"/>
+        <note pos="256" dur="256" pitch="65" voice="1"/>
+        <note pos="512" dur="256" pitch="67" voice="1"/>
+        <note pos="768" dur="256" pitch="69" voice="1"/>
+        <slur start-bar="2" start-pos="0" end-bar="2" end-pos="1024" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="512" pitch="71" voice="1"/>
+        <note pos="512" dur="512" pitch="72" voice="1"/>
+        <hairpin start-bar="3" start-pos="0" end-bar="3" end-pos="1024" type="cresc" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="74" voice="1"/>
+        <note pos="0" dur="1024" pitch="67" voice="1"/>
+        <note pos="0" dur="1024" pitch="62" voice="1"/>
+        <dynamic pos="0" text="f"/>
+      </bar>
+      <bar n="5" length="1024">
+        <note pos="0" dur="512" pitch="72" voice="1"/>
+        <note pos="512" dur="512" pitch="69" voice="1"/>
+        <dynamic pos="0" text="mp"/>
+      </bar>
+      <bar n="6" length="1024">
+        <note pos="0" dur="256" pitch="67" voice="1"/>
+        <note pos="256" dur="256" pitch="65" voice="1"/>
+        <note pos="512" dur="256" pitch="64" voice="1"/>
+        <note pos="768" dur="256" pitch="62" voice="1"/>
+        <hairpin start-bar="6" start-pos="0" end-bar="6" end-pos="1024" type="dim" voice="1"/>
+      </bar>
+      <bar n="7" length="1024">
+        <note pos="0" dur="512" pitch="60" voice="1"/>
+        <note pos="0" dur="512" pitch="64" voice="1"/>
+        <note pos="0" dur="512" pitch="67" voice="1"/>
+        <note pos="512" dur="512" pitch="59" voice="1"/>
+        <note pos="512" dur="512" pitch="62" voice="1"/>
+        <note pos="512" dur="512" pitch="65" voice="1"/>
+      </bar>
+      <bar n="8" length="1024">
+        <note pos="0" dur="1024" pitch="60" voice="1"/>
+        <note pos="0" dur="1024" pitch="64" voice="1"/>
+        <note pos="0" dur="1024" pitch="67" voice="1"/>
+        <dynamic pos="0" text="pp"/>
+      </bar>
+    </staff>
+    
+    <!-- Cello with bass clef -->
+    <staff instrument="Cello" name="Cello">
+      <bar n="1" length="1024">
+        <clef pos="0" type="bass"/>
+        <note pos="0" dur="512" pitch="48" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+        <dynamic pos="0" text="mf"/>
+      </bar>
+      <bar n="2" length="1024">
+        <note pos="0" dur="1024" pitch="52" voice="1"/>
+        <slur start-bar="2" start-pos="0" end-bar="3" end-pos="512" voice="1"/>
+      </bar>
+      <bar n="3" length="1024">
+        <note pos="0" dur="512" pitch="53" voice="1"/>
+        <note pos="512" dur="512" pitch="55" voice="1"/>
+        <hairpin start-bar="3" start-pos="0" end-bar="3" end-pos="1024" type="cresc" voice="1"/>
+      </bar>
+      <bar n="4" length="1024">
+        <note pos="0" dur="1024" pitch="48" voice="1"/>
+        <dynamic pos="0" text="f"/>
+      </bar>
+      <bar n="5" length="1024">
+        <note pos="0" dur="256" pitch="48" voice="1"/>
+        <note pos="256" dur="256" pitch="50" voice="1"/>
+        <note pos="512" dur="256" pitch="52" voice="1"/>
+        <note pos="768" dur="256" pitch="53" voice="1"/>
+        <dynamic pos="0" text="p"/>
+      </bar>
+      <bar n="6" length="1024">
+        <note pos="0" dur="512" pitch="55" voice="1"/>
+        <note pos="512" dur="512" pitch="53" voice="1"/>
+        <hairpin start-bar="6" start-pos="0" end-bar="6" end-pos="1024" type="dim" voice="1"/>
+      </bar>
+      <bar n="7" length="1024">
+        <note pos="0" dur="512" pitch="52" voice="1"/>
+        <note pos="512" dur="512" pitch="50" voice="1"/>
+      </bar>
+      <bar n="8" length="1024">
+        <note pos="0" dur="1024" pitch="48" voice="1"/>
+        <dynamic pos="0" text="pp"/>
+      </bar>
+    </staff>
+  </staves>
+</score>

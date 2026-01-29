@@ -1,6 +1,6 @@
 # Project-Specific (mahlif)
 
-**Goal**: Universal music notation interchange format (Mahlif XML) with bidirectional converters for Sibelius, Finale, Dorico, LilyPond, and MusicXML. Current focus: Sibelius → Mahlif XML → LilyPond → PDF.
+**Goal**: Universal music notation interchange format (Mahlif XML) with bidirectional converters for Sibelius, Finale, Dorico, LilyPond, and MusicXML.
 
 ## Development Commands
 

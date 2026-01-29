@@ -109,10 +109,29 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
     lines.append("}")
     lines.append("")
 
-    # Create instruments
+    # Create instruments with custom names
+    # Use generic instrument types to avoid Sibelius reordering by instrument family
+    # CreateInstrument(style, change_names, full_name, short_name)
     for staff in score.staves:
-        instrument = staff.instrument or f"Staff {staff.n}"
-        lines.append(f"score.CreateInstrument('{escape_str(instrument)}');")
+        # Determine clef: check staff attribute, then first bar's clef element
+        clef = staff.clef
+        if clef == "treble" and staff.bars:
+            for elem in staff.bars[0].elements:
+                if isinstance(elem, Clef):
+                    clef = elem.type
+                    break
+
+        # Use generic staff type based on clef to avoid instrument family reordering
+        if clef == "bass":
+            instrument_style = "instrument.other.bassclef"
+        else:
+            instrument_style = "instrument.other.trebleclef"
+        full_name = staff.full_name or staff.instrument or f"Staff {staff.n}"
+        short_name = staff.short_name or staff.instrument_short or ""
+        lines.append(
+            f"score.CreateInstrument('{instrument_style}', True, "
+            f"'{escape_str(full_name)}', '{escape_str(short_name)}');"
+        )
 
     lines.append("")
 

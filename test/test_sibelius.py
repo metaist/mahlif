@@ -150,7 +150,10 @@ class TestGeneratePlugin:
         )
 
         result = generate_plugin(score, "Test")
-        assert "CreateInstrument('Flute')" in result
+        assert (
+            "CreateInstrument('instrument.other.trebleclef', True, 'Flute', 'Fl.')"
+            in result
+        )
         assert "AddNote(0, 60, 256" in result
         assert "SetArticulation(StaccatoArtic" in result
         assert "nr.Dx = 10" in result
