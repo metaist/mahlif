@@ -241,7 +241,9 @@ def _parse_bar_elements(
                     Tempo(
                         pos=_get_int(child, "pos"),
                         text=_get_attr(child, "text") or "",
-                        bpm=_get_float(child, "bpm") or None,
+                        bpm=int(_get_float(child, "bpm"))
+                        if _get_float(child, "bpm")
+                        else None,
                         offset=_parse_position(child),
                     )
                 )

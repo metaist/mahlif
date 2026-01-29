@@ -2495,13 +2495,15 @@ class TestFinalBranchCoverage:
 
     def test_extract_params_empty_parens_whitespace(self) -> None:
         """Test extracting params from parens with only whitespace."""
+        from mahlif.sibelius.manuscript_ast import MethodDef
+
         tokens = list(Tokenizer('{ Test "(   ) { }" }').tokenize())
         parser = Parser(tokens)
         plugin = parser.parse()
         assert len(plugin.members) == 1
         method = plugin.members[0]
-        assert hasattr(method, "params")
-        assert method.params == []  # type: ignore[union-attr]
+        assert isinstance(method, MethodDef)
+        assert method.params == []
 
     def test_extract_signatures_parse_returns_none(self) -> None:
         """Test signature that looks valid but parse_signature returns None."""

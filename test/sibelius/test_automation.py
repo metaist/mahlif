@@ -689,15 +689,16 @@ def test_ensure_blank_score_already_open() -> None:
     """Test ensure_blank_score when score already open."""
     from mahlif.sibelius.automation import ensure_blank_score
 
-    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
-        with patch("mahlif.sibelius.automation.is_score_open", return_value=True):
-            with patch("mahlif.sibelius.automation.close_score"):
-                with patch(
-                    "mahlif.sibelius.automation.create_blank_score",
-                    return_value=True,
-                ):
-                    result = ensure_blank_score()
-                    assert result is True
+    with patch("mahlif.sibelius.automation.activate"):
+        with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+            with patch("mahlif.sibelius.automation.is_score_open", return_value=True):
+                with patch("mahlif.sibelius.automation.close_score"):
+                    with patch(
+                        "mahlif.sibelius.automation.create_blank_score",
+                        return_value=True,
+                    ):
+                        result = ensure_blank_score()
+                        assert result is True
 
 
 # =============================================================================
@@ -1110,14 +1111,15 @@ def test_ensure_blank_score_no_score_open() -> None:
     """Test ensure_blank_score when no score open."""
     from mahlif.sibelius.automation import ensure_blank_score
 
-    with patch("mahlif.sibelius.automation.dismiss_all_modals"):
-        with patch("mahlif.sibelius.automation.is_score_open", return_value=False):
-            with patch(
-                "mahlif.sibelius.automation.create_blank_score", return_value=True
-            ) as mock:
-                result = ensure_blank_score()
-                assert result is True
-                mock.assert_called_once()
+    with patch("mahlif.sibelius.automation.activate"):
+        with patch("mahlif.sibelius.automation.dismiss_all_modals"):
+            with patch("mahlif.sibelius.automation.is_score_open", return_value=False):
+                with patch(
+                    "mahlif.sibelius.automation.create_blank_score", return_value=True
+                ) as mock:
+                    result = ensure_blank_score()
+                    assert result is True
+                    mock.assert_called_once()
 
 
 def test_reload_plugin_window_name_fallback(capsys: pytest.CaptureFixture[str]) -> None:

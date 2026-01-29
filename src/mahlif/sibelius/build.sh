@@ -28,7 +28,7 @@ if [ $lint_failed -eq 1 ]; then
     exit 1
 fi
 
-# Build
+# Build - main directory
 for plg in "$SRC_DIR"/*.plg; do
     [ -f "$plg" ] || continue
     name=$(basename "$plg")
@@ -36,6 +36,18 @@ for plg in "$SRC_DIR"/*.plg; do
     # Strip trailing whitespace during conversion
     printf '\xfe\xff' > "$BUILD_DIR/$name"
     sed 's/[[:space:]]*$//' "$plg" | iconv -f UTF-8 -t UTF-16BE >> "$BUILD_DIR/$name"
+done
+
+# Build - subdirectories (like cyrus/)
+for subdir in "$SRC_DIR"/*/; do
+    [ -d "$subdir" ] || continue
+    for plg in "$subdir"*.plg; do
+        [ -f "$plg" ] || continue
+        name=$(basename "$plg")
+        echo "Converting $name (from $(basename "$subdir"))..."
+        printf '\xfe\xff' > "$BUILD_DIR/$name"
+        sed 's/[[:space:]]*$//' "$plg" | iconv -f UTF-8 -t UTF-16BE >> "$BUILD_DIR/$name"
+    done
 done
 
 echo "Done. Now reload in Sibelius: File > Plug-ins > Edit Plug-ins > Unload/Reload"
