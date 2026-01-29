@@ -711,8 +711,8 @@ class TestLint:
 
     def test_lint_error_str(self) -> None:
         """Test LintError string representation."""
-        err = LintError(10, 5, "E001", "Test error")
-        assert str(err) == "10:5 [E001] Test error"
+        err = LintError(10, 5, "MS-E001", "Test error")
+        assert str(err) == "10:5 [MS-E001] Test error"
 
     def test_read_plugin_utf8(self) -> None:
         """Test reading UTF-8 plugin."""
@@ -754,17 +754,17 @@ class TestLint:
         """Test unmatched closing brace."""
         errors = lint_braces("{ } }")
         assert len(errors) == 1
-        assert errors[0].code == "E001"
+        assert errors[0].code == "MS-E001"
 
     def test_lint_braces_mismatched(self) -> None:
         """Test mismatched braces."""
         errors = lint_braces("{ [ }")
-        assert any(e.code == "E002" for e in errors)
+        assert any(e.code == "MS-E002" for e in errors)
 
     def test_lint_braces_unclosed(self) -> None:
         """Test unclosed brace."""
         errors = lint_braces("{ foo(")
-        assert any(e.code == "E003" for e in errors)
+        assert any(e.code == "MS-E003" for e in errors)
 
     def test_lint_braces_in_string(self) -> None:
         """Test braces inside strings are ignored."""
@@ -785,7 +785,7 @@ class TestLint:
         """Test reserved word as method name."""
         errors = lint_methods('if "()"')
         assert len(errors) == 1
-        assert errors[0].code == "W001"
+        assert errors[0].code == "MS-W001"
 
     def test_lint_methods_valid(self) -> None:
         """Test valid method name."""
@@ -795,38 +795,40 @@ class TestLint:
     def test_lint_common_trailing_whitespace(self) -> None:
         """Test trailing whitespace detection."""
         errors = lint_common_issues("foo ")
-        assert any(e.code == "W002" for e in errors)
+        assert any(e.code == "MS-W002" for e in errors)
 
     def test_lint_common_long_line(self) -> None:
         """Test long line detection."""
         errors = lint_common_issues("x" * 250)
-        assert any(e.code == "W003" for e in errors)
+        assert any(e.code == "MS-W003" for e in errors)
 
     def test_lint_plugin_structure_missing_brace(self) -> None:
         """Test missing opening brace."""
         errors = lint_plugin_structure("Initialize")
-        assert any(e.code == "E010" for e in errors)
+        assert any(e.code == "MS-E010" for e in errors)
 
     def test_lint_plugin_structure_missing_end(self) -> None:
         """Test missing closing brace."""
         errors = lint_plugin_structure("{")
-        assert any(e.code == "E011" for e in errors)
+        assert any(e.code == "MS-E011" for e in errors)
 
     def test_lint_plugin_structure_missing_init(self) -> None:
         """Test missing Initialize method."""
         errors = lint_plugin_structure("{ Run }")
-        assert any(e.code == "W010" for e in errors)
+        assert any(e.code == "MS-W010" for e in errors)
 
     def test_lint_plugin_structure_missing_menu(self) -> None:
         """Test missing AddToPluginsMenu."""
         errors = lint_plugin_structure("{ Initialize }")
-        assert any(e.code == "W011" for e in errors)
+        assert any(e.code == "MS-W011" for e in errors)
 
     def test_lint_plugin_structure_valid(self) -> None:
         """Test valid plugin structure."""
         content = "{ Initialize AddToPluginsMenu }"
         errors = lint_plugin_structure(content)
-        assert not any(e.code in ("E010", "E011", "W010", "W011") for e in errors)
+        assert not any(
+            e.code in ("MS-E010", "MS-E011", "MS-W010", "MS-W011") for e in errors
+        )
 
     def test_lint_method_calls_tokenize_error(self) -> None:
         """Test that tokenize errors don't crash lint."""
@@ -1688,7 +1690,7 @@ class TestFinalCoverage:
     def test_lint_common_issues_tab_trailing(self) -> None:
         """Test tab as trailing whitespace."""
         errors = lint_common_issues("foo\t")
-        assert any(e.code == "W002" for e in errors)
+        assert any(e.code == "MS-W002" for e in errors)
 
     def test_lint_strings_comment_line(self) -> None:
         """Test comment line is skipped in string checking."""
@@ -1829,7 +1831,7 @@ class TestLintEdgeCases:
         # Line 240: arg_count < min_params
         # AddNote requires at least 1 arg
         errors = lint_method_calls("AddNote();")
-        assert any(e.code == "E020" for e in errors)
+        assert any(e.code == "MS-E020" for e in errors)
 
     def test_lint_method_calls_too_many_args(self) -> None:
         """Test method with too many arguments."""

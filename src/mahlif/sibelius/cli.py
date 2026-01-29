@@ -260,20 +260,20 @@ def run_command(args: argparse.Namespace) -> int:
                 lines = content.split("\n")
                 has_trailing = any(line != line.rstrip() for line in lines)
 
-                if has_trailing and is_fixable("W002"):
+                if has_trailing and is_fixable("MS-W002"):
                     if args.dry_run:
                         print(f"Would fix: {path} (trailing whitespace)")
                     else:
                         fix_trailing_whitespace(path)
                         print(f"✓ {path}: Fixed trailing whitespace")
                     # Filter out fixed W002 errors
-                    errors = [e for e in errors if e.code != "W002"]
+                    errors = [e for e in errors if e.code != "MS-W002"]
 
             if not errors:
                 if not args.fix:
                     print(f"✓ {path}: No issues found")
             else:
-                error_count = sum(1 for e in errors if e.code.startswith("E"))
+                error_count = sum(1 for e in errors if e.code.startswith("MS-E"))
                 warning_count = len(errors) - error_count
                 print(f"✗ {path}: {error_count} error(s), {warning_count} warning(s)")
                 for error in errors:

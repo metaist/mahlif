@@ -828,7 +828,7 @@ class TestSibeliusCLI:
         assert result >= 1
         captured = capsys.readouterr()
         assert "error(s)" in captured.out
-        assert "E003" in captured.out  # Unclosed brace error
+        assert "MS-E003" in captured.out  # Unclosed brace error
 
     def test_check_command_default_files(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
@@ -973,25 +973,29 @@ class TestParseCodes:
         """Test single code."""
         from mahlif.sibelius.cli import _parse_codes
 
-        assert _parse_codes("W002") == {"W002"}
+        assert _parse_codes("MS-W002") == {"MS-W002"}
 
     def test_multiple_codes(self) -> None:
         """Test multiple comma-separated codes."""
         from mahlif.sibelius.cli import _parse_codes
 
-        assert _parse_codes("W002,W003,E001") == {"W002", "W003", "E001"}
+        assert _parse_codes("MS-W002,MS-W003,MS-E001") == {
+            "MS-W002",
+            "MS-W003",
+            "MS-E001",
+        }
 
     def test_whitespace_handling(self) -> None:
         """Test whitespace is stripped."""
         from mahlif.sibelius.cli import _parse_codes
 
-        assert _parse_codes(" W002 , W003 ") == {"W002", "W003"}
+        assert _parse_codes(" MS-W002 , MS-W003 ") == {"MS-W002", "MS-W003"}
 
     def test_empty_items_ignored(self) -> None:
         """Test empty items are ignored."""
         from mahlif.sibelius.cli import _parse_codes
 
-        assert _parse_codes("W002,,W003") == {"W002", "W003"}
+        assert _parse_codes("MS-W002,,MS-W003") == {"MS-W002", "MS-W003"}
 
 
 class TestLintFlags:
@@ -1009,7 +1013,7 @@ class TestLintFlags:
 }"""
         )  # Has trailing whitespace (W002)
 
-        result = sibelius_main(["check", "--ignore", "W002", str(plg)])
+        result = sibelius_main(["check", "--ignore", "MS-W002", str(plg)])
         assert result == 0
         captured = capsys.readouterr()
         assert "No issues found" in captured.out
@@ -1022,7 +1026,7 @@ class TestLintFlags:
         # Missing Initialize (W010) and AddToPluginsMenu (W011)
         plg.write_text('{ Run "() { }" }')
 
-        result = sibelius_main(["check", "--ignore", "W010,W011", str(plg)])
+        result = sibelius_main(["check", "--ignore", "MS-W010,MS-W011", str(plg)])
         assert result == 0
         captured = capsys.readouterr()
         assert "No issues found" in captured.out
@@ -1040,10 +1044,10 @@ class TestLintFlags:
             "}"
         )
 
-        sibelius_main(["check", "--fix", "--unfixable", "W002", str(plg)])
+        sibelius_main(["check", "--fix", "--unfixable", "MS-W002", str(plg)])
         # Should report the warning but not fix it
         captured = capsys.readouterr()
-        assert "W002" in captured.out
+        assert "MS-W002" in captured.out
         assert "Fixed" not in captured.out
         # Verify file still has trailing whitespace
         content = plg.read_text()
@@ -1063,9 +1067,9 @@ class TestLintFlags:
         )
 
         # Only allow E001 to be fixed (not W002)
-        sibelius_main(["check", "--fix", "--fixable", "E001", str(plg)])
+        sibelius_main(["check", "--fix", "--fixable", "MS-E001", str(plg)])
         captured = capsys.readouterr()
-        assert "W002" in captured.out
+        assert "MS-W002" in captured.out
         assert "Fixed" not in captured.out
 
     def test_fixable_allows_specified(
@@ -1081,7 +1085,7 @@ class TestLintFlags:
             "}"
         )
 
-        result = sibelius_main(["check", "--fix", "--fixable", "W002", str(plg)])
+        result = sibelius_main(["check", "--fix", "--fixable", "MS-W002", str(plg)])
         assert result == 0
         captured = capsys.readouterr()
         assert "Fixed trailing whitespace" in captured.out

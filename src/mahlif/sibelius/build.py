@@ -194,12 +194,12 @@ def build_plugins(
     for plg in plugins:
         errors = lint(plg)
         # Only fail on errors (E*), not warnings (W*)
-        error_count = sum(1 for e in errors if e.code.startswith("E"))
+        error_count = sum(1 for e in errors if e.code.startswith("MS-E"))
         if error_count > 0:
             if verbose:
                 print(f"✗ {plg.name}: {error_count} error(s)")
                 for error in errors:
-                    if error.code.startswith("E"):
+                    if error.code.startswith("MS-E"):
                         print(f"  {error}")
             lint_failed = True
 
@@ -243,8 +243,12 @@ def build_plugins(
                 if verbose:
                     print(f"  {output_path.name} -> {link_path}")
                 if not dry_run:
-                    # Remove existing file/link first
                     if link_path.exists():
+                        # Check if already hardlinked to the same inode
+                        if link_path.stat().st_ino == output_path.stat().st_ino:
+                            # Already a valid hardlink, nothing to do
+                            continue
+                        # Different file, need to replace
                         link_path.unlink()
                     link_path.hardlink_to(output_path)
 

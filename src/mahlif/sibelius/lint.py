@@ -96,7 +96,7 @@ def lint_braces(content: str) -> list[LintError]:
         elif char in ")}]":
             if not stack:
                 errors.append(
-                    LintError(line, col, "E001", f"Unmatched closing '{char}'")
+                    LintError(line, col, "MS-E001", f"Unmatched closing '{char}'")
                 )
             else:
                 open_line, open_col, open_char = stack.pop()
@@ -106,7 +106,7 @@ def lint_braces(content: str) -> list[LintError]:
                         LintError(
                             line,
                             col,
-                            "E002",
+                            "MS-E002",
                             f"Mismatched brace: expected '{expected}' "
                             f"(opened at {open_line}:{open_col}), got '{char}'",
                         )
@@ -117,7 +117,9 @@ def lint_braces(content: str) -> list[LintError]:
 
     # Check for unclosed braces
     for open_line, open_col, open_char in stack:
-        errors.append(LintError(open_line, open_col, "E003", f"Unclosed '{open_char}'"))
+        errors.append(
+            LintError(open_line, open_col, "MS-E003", f"Unclosed '{open_char}'")
+        )
 
     return errors
 
@@ -195,7 +197,7 @@ def lint_methods(content: str) -> list[LintError]:
                     LintError(
                         line_num,
                         1,
-                        "W001",
+                        "MS-W001",
                         f"Method name '{method_name}' is a reserved word",
                     )
                 )
@@ -246,7 +248,7 @@ def lint_method_calls(content: str) -> list[LintError]:
                     LintError(
                         line,
                         col,
-                        "E020",
+                        "MS-E020",
                         f"{method}() requires at least {min_params} args, got {arg_count}",
                     )
                 )
@@ -255,7 +257,7 @@ def lint_method_calls(content: str) -> list[LintError]:
                     LintError(
                         line,
                         col,
-                        "E021",
+                        "MS-E021",
                         f"{method}() accepts at most {max_params} args, got {arg_count}",
                     )
                 )
@@ -272,14 +274,17 @@ def lint_common_issues(content: str) -> list[LintError]:
         # Check for trailing whitespace
         if line_content.endswith(" ") or line_content.endswith("\t"):
             errors.append(
-                LintError(line_num, len(line_content), "W002", "Trailing whitespace")
+                LintError(line_num, len(line_content), "MS-W002", "Trailing whitespace")
             )
 
         # Check for very long lines
         if len(line_content) > 200:
             errors.append(
                 LintError(
-                    line_num, 200, "W003", f"Line too long ({len(line_content)} chars)"
+                    line_num,
+                    200,
+                    "MS-W003",
+                    f"Line too long ({len(line_content)} chars)",
                 )
             )
 
@@ -293,22 +298,22 @@ def lint_plugin_structure(content: str) -> list[LintError]:
     # Must start with { (strip BOM if present)
     stripped = content.lstrip("\ufeff").strip()
     if not stripped.startswith("{"):
-        errors.append(LintError(1, 1, "E010", "Plugin must start with '{'"))
+        errors.append(LintError(1, 1, "MS-E010", "Plugin must start with '{'"))
 
     # Must end with }
     if not stripped.endswith("}"):
         errors.append(
-            LintError(content.count("\n") + 1, 1, "E011", "Plugin must end with '}'")
+            LintError(content.count("\n") + 1, 1, "MS-E011", "Plugin must end with '}'")
         )
 
     # Should have Initialize method
     if "Initialize" not in content:
-        errors.append(LintError(1, 1, "W010", "Missing 'Initialize' method"))
+        errors.append(LintError(1, 1, "MS-W010", "Missing 'Initialize' method"))
 
     # Initialize should call AddToPluginsMenu
     if "Initialize" in content and "AddToPluginsMenu" not in content:
         errors.append(
-            LintError(1, 1, "W011", "Initialize should call 'AddToPluginsMenu'")
+            LintError(1, 1, "MS-W011", "Initialize should call 'AddToPluginsMenu'")
         )
 
     return errors
@@ -405,7 +410,7 @@ def main(args: list[str] | None = None) -> int:
         if parsed.fix:
             if fix_trailing_whitespace(path):
                 # Filter out fixed W002 errors
-                errors = [e for e in errors if e.code != "W002"]
+                errors = [e for e in errors if e.code != "MS-W002"]
                 print(f"✓ {path}: Fixed trailing whitespace")
 
         if not errors:

@@ -12,21 +12,18 @@ Mahlif provides bidirectional support for Sibelius via ManuScript plugins.
 ### Install the Export Plugin
 
 ```bash
-# Build and install to Sibelius plugin directory
-mahlif sibelius build --install
-
-# Or with hardlinks for development (edit source, reload in Sibelius)
-mahlif sibelius build --hardlink
+# Install plugins to Sibelius
+mahlif sibelius install
 ```
 
-**Manual installation:**
+**For developers:**
 
 ```bash
 # Build plugins to dist/
 mahlif sibelius build
 
-# Copy to Sibelius
-cp dist/MahlifExport.plg "~/Library/Application Support/Avid/Sibelius/Plugins/"
+# Or with hardlinks (edit source, reload in Sibelius)
+mahlif sibelius build --hardlink
 ```
 
 ### Export from Sibelius
@@ -49,6 +46,18 @@ mahlif sibelius show-plugin-dir
 ```
 
 ## CLI Commands
+
+### `mahlif sibelius install`
+
+Install plugins to Sibelius plugin directory.
+
+```bash
+# Install all plugins
+mahlif sibelius install
+
+# Preview without installing
+mahlif sibelius install --dry-run
+```
 
 ### `mahlif sibelius build`
 
@@ -118,11 +127,11 @@ Errors block the build:
 
 | Code | Description |
 |------|-------------|
-| E001 | Unmatched closing brace |
-| E002 | Mismatched brace type (e.g., `{` closed with `]`) |
-| E003 | Unclosed brace at end of file |
-| E010 | Plugin must start with `{` |
-| E011 | Plugin must end with `}` |
+| MS-E001 | Unmatched closing brace |
+| MS-E002 | Mismatched brace type (e.g., `{` closed with `]`) |
+| MS-E003 | Unclosed brace at end of file |
+| MS-E010 | Plugin must start with `{` |
+| MS-E011 | Plugin must end with `}` |
 
 ### Warning Codes
 
@@ -130,13 +139,15 @@ Warnings are informational:
 
 | Code | Description |
 |------|-------------|
-| W001 | Method name is a reserved word |
-| W002 | Trailing whitespace (auto-fixable with `--fix`) |
-| W003 | Line too long (>200 characters) |
-| W010 | Missing `Initialize` method |
-| W011 | `Initialize` should call `AddToPluginsMenu` |
+| MS-W001 | Method name is a reserved word |
+| MS-W002 | Trailing whitespace (auto-fixable with `--fix`) |
+| MS-W003 | Line too long (>200 characters) |
+| MS-W010 | Missing `Initialize` method |
+| MS-W011 | `Initialize` should call `AddToPluginsMenu` |
 
-> **Note:** Disabling specific warnings is planned for a future release ([#6](https://github.com/metaist/mahlif/issues/6)).
+!!! note
+
+    Disabling specific warnings is planned for a future release ([#6](https://github.com/metaist/mahlif/issues/6)).
 
 ## Development Workflow
 
@@ -152,7 +163,9 @@ mahlif sibelius build
 # Reload in Sibelius: File → Plug-ins → Edit Plug-ins → select plugin → Unload → Load
 ```
 
-> **Note:** Sibelius doesn't follow symlinks reliably. Use hardlinks or direct copies.
+!!! note
+
+    Sibelius doesn't follow symlinks reliably. Use hardlinks or direct copies.
 
 ---
 
@@ -161,9 +174,10 @@ mahlif sibelius build
 This section maps Mahlif XML elements to Sibelius ManuScript API properties.
 Properties are verified against the official ManuScript Language Guide (2024).
 
-> **Legend:**
-> - ❌ Not yet implemented
-> - ⚠️ Partial support or caveats
+!!! info "Legend"
+
+    - ❌ Not yet implemented
+    - ⚠️ Partial support or caveats
 
 ### Score Metadata
 
@@ -241,7 +255,6 @@ A `NoteRest` contains zero or more `Note` objects. Zero notes = rest.
 | `dy=""` | `NoteRest.Dy` | int | 1/32nd space |
 | `stem=""` | `NoteRest.StemFlipped` | bool | |
 | `beam=""` | `NoteRest.Beam` | int | 0-3 |
-| ❌ `grace=""` | `NoteRest.GraceNote` | bool | read only |
 | ❌ `cue=""` | — | — | |
 
 #### Duration Values
@@ -360,6 +373,50 @@ Dynamics are detected when `StyleId` contains "dynamic".
 | `num=""` | `Tuplet.Left` | int |
 | `den=""` | `Tuplet.Right` | int |
 
+### Octava Lines
+
+| Mahlif XML | Sibelius Property | Type |
+|------------|-------------------|------|
+| `<octava type="">` | `OctavaLine.StyleId` | string |
+| `start-bar=""` | Current bar | int |
+| `start-pos=""` | `OctavaLine.Position` | int |
+| `end-bar=""` | `OctavaLine.EndBarNumber` | int |
+| `end-pos=""` | `OctavaLine.EndPosition` | int |
+
+Types: `8va`, `8vb`, `15va`, `15vb`
+
+### Pedal Lines
+
+| Mahlif XML | Sibelius Property | Type |
+|------------|-------------------|------|
+| `<pedal type="">` | `PedalLine` | — |
+| `start-bar=""` | Current bar | int |
+| `start-pos=""` | `PedalLine.Position` | int |
+| `end-bar=""` | `PedalLine.EndBarNumber` | int |
+| `end-pos=""` | `PedalLine.EndPosition` | int |
+
+Types: `sustain`
+
+### Trills
+
+| Mahlif XML | Sibelius Property | Type |
+|------------|-------------------|------|
+| `<trill start-bar="">` | Current bar | int |
+| `start-pos=""` | `Trill.Position` | int |
+| `end-bar=""` | `Trill.EndBarNumber` | int |
+| `end-pos=""` | `Trill.EndPosition` | int |
+
+### Grace Notes
+
+| Mahlif XML | Sibelius Property | Type |
+|------------|-------------------|------|
+| `<grace pos="">` | `GraceNote.Position` | int |
+| `type=""` | `GraceNote.IsAcciaccatura`, `IsAppoggiatura` | string |
+| `pitch=""` | `GraceNote.Pitch` | int |
+| `dur=""` | `GraceNote.Duration` | int |
+
+Types: `grace`, `acciaccatura`, `appoggiatura`
+
 ### Barlines
 
 | Mahlif Value | Sibelius Type |
@@ -418,14 +475,22 @@ All `BarObject`-derived objects support:
 | `Dx` | 1/32nd staff space (horizontal) |
 | `Dy` | 1/32nd staff space (vertical) |
 
+### Supported Spanners/Lines
+
+The export plugin handles these line types:
+
+| Feature | Mahlif Element |
+|---------|----------------|
+| Octava lines | `<octava type="8va/8vb/15va/15vb">` |
+| Pedal lines | `<pedal type="sustain">` |
+| Trills | `<trill>` |
+| Grace notes | `<grace type="grace/acciaccatura/appoggiatura">` |
+
 ### Not Yet Supported
 
 | Feature | Priority |
 |---------|----------|
 | Chord symbols | Medium |
-| Octava lines | Medium |
-| Pedal lines | Low |
-| Trills | Medium |
 | Glissandi | Low |
 | Tremolo | Medium |
 | Cross-staff notes | Low |

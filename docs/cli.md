@@ -130,12 +130,39 @@ mahlif sibelius <subcommand> [options]
 
 | Subcommand | Description |
 |------------|-------------|
+| [`install`](#sibelius-install) | Install plugins to Sibelius |
 | [`build`](#sibelius-build) | Build plugins from source |
 | [`check`](#sibelius-check) | Lint ManuScript files |
 | [`list`](#sibelius-list) | List available plugins |
 | [`show-plugin-dir`](#sibelius-show-plugin-dir) | Show plugin directory |
 
 See [Sibelius](sibelius.md) for detailed documentation.
+
+---
+
+### `sibelius install`
+
+Install plugins to Sibelius plugin directory.
+
+```bash
+mahlif sibelius install [options]
+```
+
+#### Options
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Show what would be done without installing |
+
+#### Examples
+
+```bash
+# Install all plugins
+mahlif sibelius install
+
+# Preview installation
+mahlif sibelius install --dry-run
+```
 
 ---
 
@@ -198,7 +225,7 @@ mahlif sibelius check [files...] [options]
 
 | Option | Description |
 |--------|-------------|
-| `--fix` | Automatically fix trailing whitespace (W002) |
+| `--fix` | Automatically fix trailing whitespace (MS-W002) |
 | `--dry-run` | Show what would be fixed without modifying files |
 | `--quiet`, `-q` | Only show errors, not warnings |
 
