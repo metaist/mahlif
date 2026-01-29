@@ -290,12 +290,15 @@ def type_text(text: str, delay: float = 0.1) -> None:
 
 
 def type_in_field(text: str, delay: float = 0.1) -> None:
-    """Clear field and type text. Use for search boxes that may have old content."""
+    """Select all and type text, replacing any existing content.
+
+    NOTE: Assumes the field already has focus. Caller must ensure focus first.
+    Some dialogs auto-focus fields (e.g., Edit Plug-ins Find box),
+    others require explicit focus (e.g., Quick Start search).
+    """
     press_key("a", ["command"])  # Select all
     run_applescript("delay 0.1")
-    press_key("delete")  # Delete selected
-    run_applescript("delay 0.1")
-    type_text(text, delay)
+    type_text(text, delay)  # Typing replaces selection
 
 
 def click_button(button_name: str, window: str = "front window") -> bool:
@@ -487,27 +490,24 @@ def create_blank_score() -> bool:
     if detect_modal() != ModalType.QUICK_START:
         return False
 
-    # Get position of Blank template and double-click it
-    # Blank is static text 2 in Common list (Bass Staff, Blank, Solo Piano, Treble Staff)
-    pos_str = run_applescript("""
+    # Focus the search field in Quick Start
+    run_applescript("""
         tell application "System Events"
             tell process "Sibelius"
                 tell window "Quick Start"
-                    get position of static text 2 of list "Common" of group 2
+                    set focused of text field 1 of group 2 to true
                 end tell
             end tell
         end tell
     """)
-    # Parse position "x, y" and click above text (on the image)
-    parts = pos_str.split(", ")
-    x, y = int(parts[0]), int(parts[1])
-    # Image is above the text label, so adjust y up by ~40 pixels
-    click_y = y + 40
+    run_applescript("delay 0.3")
 
-    # Use cliclick for reliable double-click
-    import subprocess
-
-    subprocess.run(["cliclick", f"dc:{x},{click_y}"], check=True)
+    # Search for Blank, Tab into results, Enter to select
+    type_in_field("Blank")
+    run_applescript("delay 0.5")
+    press_key("tab")
+    run_applescript("delay 0.3")
+    press_key("return")
     run_applescript("delay 3")
 
     # Verify score was created
@@ -564,11 +564,8 @@ def reload_plugin(plugin_menu_name: str) -> bool:
             print("  ✗ Failed to open Edit Plugins dialog")
             return False
 
-    # Search for plugin (clear field first)
+    # Search for plugin - Enter finds and selects the match
     type_in_field(plugin_menu_name)
-    run_applescript("delay 0.5")
-    # First Enter searches, second Enter selects the match
-    press_key("return")
     run_applescript("delay 0.5")
     press_key("return")
     run_applescript("delay 0.5")
@@ -593,13 +590,16 @@ def reload_plugin(plugin_menu_name: str) -> bool:
     return True
 
 
-def run_plugin(plugin_menu_name: str, arrow_down: int = 0) -> None:
+def run_plugin(plugin_menu_name: str, arrow_down: int = 0) -> tuple[bool, str]:
     """Run a plugin via command search.
 
     Args:
         plugin_menu_name: The menu name (e.g., "Mahlif: Import Test")
         arrow_down: Number of times to press down arrow before Enter
                    (usually 0, but may need 1 if multiple matches)
+
+    Returns:
+        (success, message) tuple. If error, message contains error text.
     """
     print(f"→ Running plugin: {plugin_menu_name}")
 
@@ -610,6 +610,38 @@ def run_plugin(plugin_menu_name: str, arrow_down: int = 0) -> None:
     # Run via command search
     run_command(plugin_menu_name, arrow_down=arrow_down)
     run_applescript("delay 5")
+
+    # Handle completion/error modals
+    errors: list[str] = []
+    max_modals = 5  # Safety limit
+    for _ in range(max_modals):
+        if detect_modal() != ModalType.MESSAGE_BOX:
+            break
+
+        # Get message text from the modal
+        try:
+            msg = run_applescript("""
+                tell application "System Events"
+                    tell process "Sibelius"
+                        get value of static text 1 of front window
+                    end tell
+                end tell
+            """)
+            if msg and "error" in msg.lower():
+                errors.append(msg)
+                print(f"  ✗ Plugin error: {msg}")
+            else:
+                print(f"  ✓ {msg}")
+        except RuntimeError:
+            pass
+
+        # Dismiss this modal
+        press_key("return")
+        run_applescript("delay 0.5")
+
+    if errors:
+        return False, "\n".join(errors)
+    return True, ""
 
 
 # =============================================================================

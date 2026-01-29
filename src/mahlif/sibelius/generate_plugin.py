@@ -328,12 +328,17 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
 
                     case Barline():
                         # Special barlines (repeat, double, final)
+                        # Constants from ManuScript: SpecialBarline* globals
                         barline_map = {
-                            "double": "DoubleBarline",
-                            "final": "FinalBarline",
-                            "repeat-start": "StartRepeatBarline",
-                            "repeat-end": "EndRepeatBarline",
-                            "dashed": "DashedBarline",
+                            "double": "SpecialBarlineDouble",
+                            "final": "SpecialBarlineFinal",
+                            "repeat-start": "SpecialBarlineStartRepeat",
+                            "repeat-end": "SpecialBarlineEndRepeat",
+                            "dashed": "SpecialBarlineDashed",
+                            "invisible": "SpecialBarlineInvisible",
+                            "tick": "SpecialBarlineTick",
+                            "short": "SpecialBarlineShort",
+                            "dotted": "SpecialBarlineDotted",
                         }
                         if elem.type in barline_map:
                             lines.append(
@@ -521,7 +526,15 @@ def generate_plugin(score: Score, title: str = "Imported Score") -> str:
 def convert_to_utf16(source: Path, dest: Path) -> None:
     """Convert UTF-8 plugin to UTF-16 BE with BOM."""
     content = source.read_text(encoding="utf-8")
-    with open(dest, "wb") as f:
+    write_plugin(dest, content)
+
+
+def write_plugin(path: Path, content: str) -> None:
+    """Write plugin content as UTF-16 BE with BOM.
+
+    Sibelius requires UTF-16 BE encoding with BOM prefix.
+    """
+    with open(path, "wb") as f:
         f.write(b"\xfe\xff")
         f.write(content.encode("utf-16-be"))
 

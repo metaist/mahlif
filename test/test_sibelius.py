@@ -46,6 +46,7 @@ from mahlif.sibelius.generate_plugin import _calc_spanner_duration
 from mahlif.sibelius.generate_plugin import convert_to_utf16
 from mahlif.sibelius.generate_plugin import escape_str
 from mahlif.sibelius.generate_plugin import generate_plugin
+from mahlif.sibelius.generate_plugin import write_plugin
 from mahlif.sibelius.generate_plugin import main as generate_main
 from mahlif.sibelius.lint import LintError
 from mahlif.sibelius.lint import lint
@@ -337,7 +338,7 @@ class TestGeneratePlugin:
         )
 
         result = generate_plugin(score, "Test")
-        assert "AddSpecialBarline(DoubleBarline)" in result
+        assert "AddSpecialBarline(SpecialBarlineDouble)" in result
 
     def test_generate_plugin_octava(self) -> None:
         """Test generating plugin with octava lines."""
@@ -646,6 +647,19 @@ class TestGeneratePlugin:
             # Decode and verify content
             content = data[2:].decode("utf-16-be")
             assert content == "Hello"
+
+    def test_write_plugin(self) -> None:
+        """Test write_plugin writes UTF-16 BE with BOM."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dst = Path(tmpdir) / "test.plg"
+            write_plugin(dst, "Test content")
+
+            # Check for BOM
+            data = dst.read_bytes()
+            assert data[:2] == b"\xfe\xff"
+            # Decode and verify content
+            content = data[2:].decode("utf-16-be")
+            assert content == "Test content"
 
     def test_generate_main_no_args(self) -> None:
         """Test main with no arguments."""
@@ -1383,10 +1397,10 @@ class TestAdditionalCoverage:
             system_staff=SystemStaff(bars=[]),
         )
         result = generate_plugin(score, "Test")
-        assert "FinalBarline" in result
-        assert "StartRepeatBarline" in result
-        assert "EndRepeatBarline" in result
-        assert "DashedBarline" in result
+        assert "SpecialBarlineFinal" in result
+        assert "SpecialBarlineStartRepeat" in result
+        assert "SpecialBarlineEndRepeat" in result
+        assert "SpecialBarlineDashed" in result
 
     def test_generate_plugin_octava_types(self) -> None:
         """Test all octava types."""

@@ -1151,15 +1151,14 @@ def test_reload_plugin_window_name_fallback(capsys: pytest.CaptureFixture[str]) 
 
 
 def test_type_in_field() -> None:
-    """Test type_in_field clears before typing."""
+    """Test type_in_field selects all then types (replacing selection)."""
     from mahlif.sibelius.automation import type_in_field
 
     with patch("mahlif.sibelius.automation.press_key") as mock_press:
         with patch("mahlif.sibelius.automation.type_text") as mock_type:
             with patch("mahlif.sibelius.automation.run_applescript"):
                 type_in_field("test")
-                # Should select all, delete, then type
+                # Should select all with Cmd+A, then type (typing replaces selection)
                 calls = [c[0][0] for c in mock_press.call_args_list]
                 assert "a" in calls
-                assert "delete" in calls
                 mock_type.assert_called_with("test", 0.1)
