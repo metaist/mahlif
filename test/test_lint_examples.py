@@ -14,7 +14,7 @@ import pytest
 from mahlif.sibelius.lint import lint
 
 
-EXAMPLES_DIR = Path(__file__).parent / "examples"
+EXAMPLES_DIR = Path(__file__).parent / "sibelius" / "lint" / "examples"
 
 
 def parse_example_file(path: Path) -> list[tuple[str, str, set[str]]]:

@@ -61,7 +61,7 @@ uv add mahlif
 
 ```bash
 # Install the export plugin
-mahlif sibelius build --install
+mahlif sibelius install
 ```
 
 Then in Sibelius: **Home → Plug-ins → Mahlif → Export to Mahlif XML**

@@ -38,9 +38,9 @@ from mahlif.models import Text
 from mahlif.models import TimeSignature
 from mahlif.models import Trill
 from mahlif.models import Tuplet
-from mahlif.sibelius.extract_api import extract_signatures
-from mahlif.sibelius.extract_api import main as extract_main
-from mahlif.sibelius.extract_api import parse_signature
+from mahlif.sibelius.manuscript.api import extract_signatures
+from mahlif.sibelius.manuscript.api import main as extract_main
+from mahlif.sibelius.manuscript.api import parse_signature
 from mahlif.sibelius.convert import ARTICULATION_MAP
 from mahlif.sibelius.convert import _calc_spanner_duration
 from mahlif.sibelius.convert import convert_to_utf16
@@ -58,13 +58,13 @@ from mahlif.sibelius.lint import lint_plugin_structure
 from mahlif.sibelius.lint import lint_strings
 from mahlif.sibelius.lint import main as lint_main
 from mahlif.sibelius.lint import read_plugin
-from mahlif.sibelius.manuscript_ast import Parser
-from mahlif.sibelius.manuscript_ast import Token
-from mahlif.sibelius.manuscript_ast import TokenType
-from mahlif.sibelius.manuscript_ast import Tokenizer
-from mahlif.sibelius.manuscript_ast import get_method_calls
-from mahlif.sibelius.manuscript_ast import parse_plugin
-from mahlif.sibelius.manuscript_ast import Plugin
+from mahlif.sibelius.manuscript.ast import Parser
+from mahlif.sibelius.manuscript.ast import Token
+from mahlif.sibelius.manuscript.ast import TokenType
+from mahlif.sibelius.manuscript.ast import Tokenizer
+from mahlif.sibelius.manuscript.ast import get_method_calls
+from mahlif.sibelius.manuscript.ast import parse_plugin
+from mahlif.sibelius.manuscript.ast import Plugin
 
 if TYPE_CHECKING:
     pass
@@ -1801,23 +1801,19 @@ class TestLintEdgeCases:
         errors = lint_strings('x = "" + "a')
         assert isinstance(errors, list)
 
-    def test_lint_method_calls_json_not_exists(self) -> None:
-        """Test when manuscript_api.json doesn't exist."""
-        # Line 205: if not json_path.exists()
-        with patch("mahlif.sibelius.lint.Path") as mock_path:
-            mock_path.return_value.parent.__truediv__ = (
-                lambda s, x: mock_path.return_value
-            )
-            mock_path.return_value.exists.return_value = False
-            # Force reload of signatures
-            import mahlif.sibelius.lint as lint_module
+    def test_lint_method_calls_empty_signatures(self) -> None:
+        """Test lint_method_calls with empty signatures."""
+        import mahlif.sibelius.lint.methods as methods_module
 
-            old_sigs = lint_module.METHOD_SIGNATURES
-            lint_module.METHOD_SIGNATURES = lint_module._load_method_signatures()
-            # Should return empty dict, no errors
+        old_sigs = methods_module.METHOD_SIGNATURES
+        methods_module.METHOD_SIGNATURES = {}
+        try:
+            # With no signatures, unknown methods are not errors
             errors = lint_method_calls("foo();")
-            lint_module.METHOD_SIGNATURES = old_sigs
             assert isinstance(errors, list)
+            assert errors == []
+        finally:
+            methods_module.METHOD_SIGNATURES = old_sigs
 
     def test_lint_method_calls_tokenization_exception(self) -> None:
         """Test when get_method_calls raises exception."""
@@ -2595,7 +2591,7 @@ class TestFinalBranchCoverage:
 
     def test_extract_params_empty_parens_whitespace(self) -> None:
         """Test extracting params from parens with only whitespace."""
-        from mahlif.sibelius.manuscript_ast import MethodDef
+        from mahlif.sibelius.manuscript.ast import MethodDef
 
         tokens = list(Tokenizer('{ Test "(   ) { }" }').tokenize())
         parser = Parser(tokens)

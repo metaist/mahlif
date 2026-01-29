@@ -4,10 +4,9 @@ Universal music notation interchange format with bidirectional converters.
 
 **מַחֲלִיף** (machalif/mahlif) = Hebrew for "exchanger/converter"
 
-> [!WARNING]
-> **Experimental / Pre-release Software**
->
-> This project is in early development. APIs may change without notice.
+!!! warning "Experimental / Pre-release Software"
+
+    This project is in early development. APIs may change without notice.
 
 ## Why Mahlif?
 
@@ -18,10 +17,14 @@ Music notation software stores scores in proprietary formats that don't interope
 
 ## Install
 
+First, [install `uv`](https://docs.astral.sh/uv/getting-started/installation/).
+
 ```bash
-pip install mahlif
-# or
-uv add mahlif
+# Try it out (no install needed)
+uvx mahlif --help
+
+# Or install globally
+uv tool install mahlif
 ```
 
 ## Format Support
@@ -34,7 +37,7 @@ uv add mahlif
 | Finale | ❌ | ❌ | Planned |
 | Dorico | ❌ | ❌ | Planned |
 
-Current focus: **Sibelius → Mahlif XML → LilyPond → PDF**
+Current focus: **Sibelius ↔ Mahlif XML**
 
 ## Quick Start
 
@@ -42,7 +45,7 @@ Current focus: **Sibelius → Mahlif XML → LilyPond → PDF**
 
 ```bash
 # Install the export plugin
-mahlif sibelius build --install
+mahlif sibelius install
 ```
 
 Then in Sibelius: **Home → Plug-ins → Mahlif → Export to Mahlif XML**

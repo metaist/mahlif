@@ -128,7 +128,7 @@ coverage = ["coverage-*"]
 # Documentation
 docs = ["cog", "mkdocs build"]
 cog = "cog -r README.md docs/*.md"
-mkdocs-serve = "mkdocs serve"
+docs-serve = "mkdocs serve"
 
 # Common
 dev.help = "lint, type-check, and unit tests"
