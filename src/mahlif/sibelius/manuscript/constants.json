@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "source": "ManuScript Language.pdf, Chapter 7",
+  "categories": {
+    "truth_values": {
+      "description": "Boolean constants",
+      "constants": {
+        "True": {"value": 1, "type": "boolean"},
+        "False": {"value": 0, "type": "boolean"}
+      }
+    },
+    "measurements": {
+      "description": "Measurement units",
+      "constants": {
+        "Space": {"value": 32, "type": "int", "description": "One space on the staff"},
+        "StaffHeight": {"value": 128, "type": "int", "description": "Height of a 5-line staff"}
+      }
+    },
+    "durations": {
+      "description": "Note duration values in 256ths of a quarter note",
+      "constants": {
+        "Long": {"value": 4096, "type": "int"},
+        "Breve": {"value": 2048, "type": "int"},
+        "DottedBreve": {"value": 3072, "type": "int"},
+        "Whole": {"value": 1024, "type": "int"},
+        "Semibreve": {"value": 1024, "type": "int", "alias": "Whole"},
+        "DottedWhole": {"value": 1536, "type": "int"},
+        "Half": {"value": 512, "type": "int"},
+        "Minim": {"value": 512, "type": "int", "alias": "Half"},
+        "DottedHalf": {"value": 768, "type": "int"},
+        "DottedMinim": {"value": 768, "type": "int", "alias": "DottedHalf"},
+        "Quarter": {"value": 256, "type": "int"},
+        "Crotchet": {"value": 256, "type": "int", "alias": "Quarter"},
+        "DottedQuarter": {"value": 384, "type": "int"},
+        "DottedCrotchet": {"value": 384, "type": "int", "alias": "DottedQuarter"},
+        "Eighth": {"value": 128, "type": "int"},
+        "Quaver": {"value": 128, "type": "int", "alias": "Eighth"},
+        "DottedEighth": {"value": 192, "type": "int"},
+        "DottedQuaver": {"value": 192, "type": "int", "alias": "DottedEighth"},
+        "Sixteenth": {"value": 64, "type": "int"},
+        "Semiquaver": {"value": 64, "type": "int", "alias": "Sixteenth"},
+        "DottedSixteenth": {"value": 96, "type": "int"},
+        "DottedSemiquaver": {"value": 96, "type": "int", "alias": "DottedSixteenth"},
+        "ThirtySecond": {"value": 32, "type": "int"},
+        "Demisemiquaver": {"value": 32, "type": "int", "alias": "ThirtySecond"},
+        "SixtyFourth": {"value": 16, "type": "int"},
+        "Hemidemisemiquaver": {"value": 16, "type": "int", "alias": "SixtyFourth"},
+        "OneHundredTwentyEighth": {"value": 8, "type": "int"},
+        "Semihemidemisemiquaver": {"value": 8, "type": "int", "alias": "OneHundredTwentyEighth"}
+      }
+    },
+    "syllable_types": {
+      "description": "LyricItem syllable position constants",
+      "constants": {
+        "MiddleOfWord": {"value": 0, "type": "int", "description": "Syllable in middle of word"},
+        "EndOfWord": {"value": 1, "type": "int", "description": "Syllable at end of word"},
+        "StartOfWord": {"value": 2, "type": "int", "description": "Syllable at start of word"},
+        "SingleSyllable": {"value": 3, "type": "int", "description": "Single syllable word"}
+      }
+    },
+    "bar_number_formats": {
+      "description": "Bar number format constants for AddBarNumber",
+      "constants": {
+        "BarNumberFormatNormal": {"value": 0, "type": "int"},
+        "BarNumberFormatNumberLetterLower": {"value": 1, "type": "int"},
+        "BarNumberFormatNumberLetterUpper": {"value": 2, "type": "int"}
+      }
+    }
+  },
+  "global_objects": {
+    "Sibelius": {
+      "type": "Application",
+      "description": "The main Sibelius application object"
+    },
+    "Self": {
+      "type": "Plugin",
+      "description": "The current plugin context"
+    }
+  },
+  "builtin_functions": {
+    "CreateSparseArray": {"returns": "SparseArray", "params": []},
+    "CreateArray": {"returns": "Array", "params": []},
+    "CreateDictionary": {"returns": "Dictionary", "params": []},
+    "CreateHash": {"returns": "Hash", "params": []},
+    "Trace": {"returns": "void", "params": ["message"]},
+    "TypeOf": {"returns": "string", "params": ["object"]},
+    "IsObject": {"returns": "boolean", "params": ["value"]},
+    "Chr": {"returns": "string", "params": ["code"]},
+    "Asc": {"returns": "int", "params": ["char"]},
+    "CharAt": {"returns": "string", "params": ["string", "index"]},
+    "Length": {"returns": "int", "params": ["string"]},
+    "Substring": {"returns": "string", "params": ["string", "start", "length?"]},
+    "JoinStrings": {"returns": "string", "params": ["array", "separator"]},
+    "SplitString": {"returns": "array", "params": ["string", "separator"]},
+    "Round": {"returns": "int", "params": ["number"]},
+    "RoundUp": {"returns": "int", "params": ["number"]},
+    "RoundDown": {"returns": "int", "params": ["number"]},
+    "Abs": {"returns": "int", "params": ["number"]},
+    "Min": {"returns": "number", "params": ["a", "b"]},
+    "Max": {"returns": "number", "params": ["a", "b"]},
+    "RandomNumber": {"returns": "int", "params": []},
+    "RandomSeed": {"returns": "void", "params": ["seed"]}
+  }
+}

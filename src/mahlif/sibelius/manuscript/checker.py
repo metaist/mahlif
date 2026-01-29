@@ -14,45 +14,47 @@ from .tokenizer import MethodBodyTokenizer
 from .tokenizer import Token
 from .tokenizer import TokenType
 
-# ManuScript built-in globals and functions
-BUILTIN_GLOBALS: set[str] = {
-    # Core objects
-    "Sibelius",
-    "Self",
-    # Built-in functions
-    "CreateSparseArray",
-    "CreateArray",
-    "CreateDictionary",
-    "CreateHash",
-    "SparseArray",
-    "Trace",
-    "TypeOf",
-    "IsObject",
-    "CharAt",
-    "Length",
-    "Substring",
-    "Chr",
-    "Asc",
-    "JoinStrings",
-    "SplitString",
-    "Round",
-    "RoundUp",
-    "RoundDown",
-    "Abs",
-    "Min",
-    "Max",
-    "RandomNumber",
-    "RandomSeed",
-    # Common object types often used as constructors
-    "Array",
-    "Dictionary",
-    "Hash",
-    # Syllable type constants
-    "StartOfWord",
-    "MiddleOfWord",
-    "EndOfWord",
-    "SingleSyllable",
-}
+import json
+from pathlib import Path
+
+
+def _load_builtin_globals() -> set[str]:
+    """Load built-in globals from constants.json."""
+    json_path = Path(__file__).parent / "constants.json"
+    globals_set: set[str] = set()
+
+    if json_path.exists():
+        with open(json_path) as f:
+            data = json.load(f)
+
+        # Add global objects
+        for name in data.get("global_objects", {}):
+            globals_set.add(name)
+
+        # Add built-in functions
+        for name in data.get("builtin_functions", {}):
+            globals_set.add(name)
+
+        # Add all constants from all categories
+        for category in data.get("categories", {}).values():
+            for name in category.get("constants", {}):
+                globals_set.add(name)
+
+    # Fallback if JSON not found or incomplete
+    if not globals_set:
+        globals_set = {
+            "Sibelius",
+            "Self",
+            "CreateSparseArray",
+            "True",
+            "False",
+        }
+
+    return globals_set
+
+
+# Load at module import time
+BUILTIN_GLOBALS: set[str] = _load_builtin_globals()
 
 
 class MethodBodyChecker:
