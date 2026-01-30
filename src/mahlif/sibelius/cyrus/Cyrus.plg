@@ -36,43 +36,41 @@ totalBars = (endBar - startBar + 1) * numStaves;
 Sibelius.CreateProgressDialog('Processing...', 0, 100);
 barsDone = 0;
 cancelled = False;
-staffIdx = 0;
-for each staff in score {
-	if (cancelled) {
-		staff = null;
-	} else {
-		isSelected = False;
-		for i = 0 to 100 {
-			if (selectedStaves[i] = null) {
-				i = 100;
-			} else {
-				if (selectedStaves[i] = staff.StaffNum) {
-					isSelected = True;
-					i = 100;
-				}
+currentSection = '';
+currentPage = 1;
+for barNum = startBar to endBar + 1 {
+	if (not(cancelled)) {
+		sysBar = score.SystemStaff.NthBar(barNum);
+		for each obj in sysBar {
+			if (obj.Type = 'RehearsalMark') {
+				currentSection = obj.MarkAsText;
 			}
 		}
-		if (isSelected) {
-			staffIdx = staffIdx + 1;
-			staffName = staff.InstrumentName;
-			currentSection = '';
-			currentPage = 1;
-			for barNum = startBar to endBar + 1 {
-				if (not(cancelled)) {
+		staffIdx = 0;
+		for each staff in score {
+			if (not(cancelled)) {
+				isSelected = False;
+				for i = 0 to 100 {
+					if (selectedStaves[i] = null) {
+						i = 100;
+					} else {
+						if (selectedStaves[i] = staff.StaffNum) {
+							isSelected = True;
+							i = 100;
+						}
+					}
+				}
+				if (isSelected) {
+					staffIdx = staffIdx + 1;
+					staffName = staff.InstrumentName;
 					pct = (barsDone * 100) / totalBars;
-					staffProgress = 'Staff ' & staffIdx & '/' & numStaves & ' (' & staffName & ')' & Chr(10) & 'Bar ' & barNum & '/' & endBar;
+					staffProgress = 'Bar ' & barNum & '/' & endBar & Chr(10) & 'Staff ' & staffIdx & '/' & numStaves & ' (' & staffName & ')';
 					continueProcessing = Sibelius.UpdateProgressDialog(pct, staffProgress);
 					if (not(continueProcessing)) {
 						cancelled = True;
 					} else {
 						bar = staff.NthBar(barNum);
 						displayBarNum = bar.ExternalBarNumberString;
-						sysBar = score.SystemStaff.NthBar(barNum);
-						for each obj in sysBar {
-							if (obj.Type = 'RehearsalMark') {
-								currentSection = obj.MarkAsText;
-							}
-						}
 						if (bar.OnNthPage > 0) {
 							currentPage = bar.OnNthPage;
 						}
@@ -119,7 +117,7 @@ if (cancelled) {
 	Sibelius.MessageBox('Processing cancelled.');
 	return header;
 }
-header = '=== Cyrus Report (build 35) ===' & Chr(10);
+header = '=== Cyrus Report (build 36) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
