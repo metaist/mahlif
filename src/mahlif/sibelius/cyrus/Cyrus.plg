@@ -74,7 +74,7 @@ for each staff in score {
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report ===' & Chr(10);
+header = '=== Cyrus Report (build 7) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -159,7 +159,9 @@ newIpaB = remaining;
 if (hasStress) {
 	newIpaB = GetStressMarker() & newIpaB;
 }
-return 'CHNG test5';
+ipaObjA.Text = newIpaA;
+ipaObjB.Text = newIpaB;
+return 'CHNG test6';
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
