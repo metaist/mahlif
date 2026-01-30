@@ -627,3 +627,36 @@ def test_lint_for_loop_bounds_nonzero_start() -> None:
     content = '{ Run "() { for i = 1 to Length(x) - 1 { y = i; } }" }'
     errors = lint_for_loop_bounds(content)
     assert errors == []
+
+
+# =============================================================================
+# MS-W027: Duplicate method definition
+# =============================================================================
+
+
+def test_duplicate_method_warning(tmp_path: Path) -> None:
+    """Test warning for duplicate method definitions."""
+    plg = tmp_path / "test.plg"
+    plg.write_text(
+        """{
+Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+Run "() { }"
+Initialize "() { }"
+}"""
+    )
+    errors = lint(plg)
+    assert any(e.code == "MS-W027" and "Initialize" in e.message for e in errors)
+
+
+def test_no_duplicate_method_warning(tmp_path: Path) -> None:
+    """Test no warning when methods are unique."""
+    plg = tmp_path / "test.plg"
+    plg.write_text(
+        """{
+Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+Run "() { }"
+}"""
+    )
+    errors = lint(plg)
+    w027_errors = [e for e in errors if e.code == "MS-W027"]
+    assert w027_errors == []

@@ -33,7 +33,7 @@ Braces are required even for single statements.
 ```manuscript
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
-    Run "() {
+    Run "(x) {
         if (x = 1)
             y = 2;
     }"
@@ -342,7 +342,8 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
-(none)
+- `MS-W030` - Empty statement (lone ';')
+- `MS-W030` - Empty statement (second one)
 
 ## For Statement - Missing Loop Variable
 

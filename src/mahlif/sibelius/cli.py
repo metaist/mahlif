@@ -151,6 +151,17 @@ def _add_commands(parser: argparse.ArgumentParser) -> None:
         help="Comma-separated list of rule codes ineligible for fix",
     )
     check_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Treat all warnings as errors",
+    )
+    check_parser.add_argument(
+        "--error",
+        type=str,
+        default="",
+        help="Comma-separated list of warning codes to treat as errors (e.g., MS-W020)",
+    )
+    check_parser.add_argument(
         "files",
         type=Path,
         nargs="*",
@@ -245,11 +256,14 @@ def run_command(args: argparse.Namespace) -> int:
         cli_ignore = _parse_codes(args.ignore)
         cli_fixable = _parse_codes(args.fixable)
         cli_unfixable = _parse_codes(args.unfixable)
+        cli_error = _parse_codes(args.error)
 
         # Merge CLI flags with config (CLI takes precedence)
         ignore_codes = cli_ignore | config.sibelius.lint.ignore
         fixable_codes = cli_fixable | config.sibelius.lint.fixable
         unfixable_codes = cli_unfixable | config.sibelius.lint.unfixable
+        error_codes = cli_error | config.sibelius.lint.error
+        strict_mode = args.strict or config.sibelius.lint.strict
 
         # Filter empty paths (Path('') becomes Path('.'))
         files = [f for f in args.files if str(f) != "."]
@@ -305,7 +319,18 @@ def run_command(args: argparse.Namespace) -> int:
                 if not args.fix:
                     print(f"✓ {path}: No issues found")
             else:
-                error_count = sum(1 for e in errors if e.code.startswith("MS-E"))
+                # Count errors: MS-E* are always errors
+                # Warnings (MS-W*) become errors if --strict or in --error list
+                def is_error(code: str) -> bool:
+                    if code.startswith("MS-E"):
+                        return True
+                    if strict_mode:
+                        return True
+                    if code in error_codes:
+                        return True
+                    return False
+
+                error_count = sum(1 for e in errors if is_error(e.code))
                 warning_count = len(errors) - error_count
                 print(f"✗ {path}: {error_count} error(s), {warning_count} warning(s)")
                 for error in errors:

@@ -50,11 +50,9 @@ class MethodBodyTokenizer:
                 self._advance()
                 continue
 
-            # Newline
+            # Newline - _advance() handles line/col tracking
             if char == "\n":
                 self._advance()
-                self.line += 1
-                self.col = 1
                 continue
 
             # Comment

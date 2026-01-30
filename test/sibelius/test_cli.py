@@ -1065,7 +1065,7 @@ def test_ignore_single_code(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
     plg.write_text(
         """{
 Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
-Run "() { x = 1;   }"
+Run "() { return 1;   }"
 }"""
     )  # Has trailing whitespace (W002)
 

@@ -144,6 +144,15 @@ class MethodBodyChecker:
         self.defined_vars: set[str] = defined_vars or set()
         self.local_vars: set[str] = set()
         self.plugin_methods: set[str] = plugin_methods or set()
+        # Track variable assignments and usages for unused variable detection
+        self.var_assignments: dict[str, Token] = {}  # name -> first assignment token
+        self.var_usages: set[str] = set()  # names that have been read
+        # Track return seen for unreachable code detection
+        self.return_seen: bool = False
+        self.unreachable_warned: bool = False  # Only warn once per block
+        # Track whether we're at statement level (vs inside expression)
+        # Only at statement level is `x = y` an assignment; inside expressions it's comparison
+        self.in_statement_context: bool = False
 
     def check(self) -> list[CheckError]:
         """Run all checks and return errors."""
@@ -157,6 +166,22 @@ class MethodBodyChecker:
         while not self._check(TokenType.EOF):
             self._parse_statement()
             self._skip_comments()
+
+        # Report unused variables (assigned but never read)
+        for var_name, token in self.var_assignments.items():
+            if var_name not in self.var_usages:
+                # Skip loop variables - they're often not "used" in the body
+                # but that's intentional
+                if var_name in self.defined_vars:
+                    continue  # Parameters should always be considered "used"
+                self.errors.append(
+                    CheckError(
+                        token.line,
+                        token.col,
+                        "MS-W025",
+                        f"Variable '{var_name}' is assigned but never used",
+                    )
+                )
 
         return self.errors
 
@@ -195,6 +220,19 @@ class MethodBodyChecker:
         """Parse a single statement."""
         self._skip_comments()
 
+        # Check for unreachable code after return
+        if self.return_seen and not self.unreachable_warned:
+            if not self._check(TokenType.RBRACE, TokenType.EOF):
+                self.errors.append(
+                    CheckError(
+                        self._current().line,
+                        self._current().col,
+                        "MS-W026",
+                        "Unreachable code after return statement",
+                    )
+                )
+                self.unreachable_warned = True
+
         # Control flow statements
         if self._check(TokenType.IF):
             self._parse_if()
@@ -222,7 +260,15 @@ class MethodBodyChecker:
             self._advance()
             return
         elif self._check(TokenType.SEMICOLON):
-            # Empty statement
+            # Empty statement - warn about it
+            self.errors.append(
+                CheckError(
+                    self._current().line,
+                    self._current().col,
+                    "MS-W030",
+                    "Empty statement (lone ';')",
+                )
+            )
             self._advance()
         elif self._check(
             TokenType.EOF
@@ -240,6 +286,10 @@ class MethodBodyChecker:
         if not self._expect(TokenType.LPAREN, "Expected '(' after 'if'"):
             self._recover_to_brace()
             return
+
+        # Check for constant condition before parsing
+        self._skip_comments()
+        self._check_constant_condition("if")
 
         # Parse condition
         self._parse_expression()
@@ -305,9 +355,13 @@ class MethodBodyChecker:
                 # Type followed by var
                 var_token = self._advance()
                 self.local_vars.add(var_token.value)
+                # Loop variables are implicitly used
+                self.var_usages.add(var_token.value)
             elif self._check(TokenType.IN):
                 # Just var, no type
                 self.local_vars.add(first_ident.value)
+                # Loop variables are implicitly used
+                self.var_usages.add(first_ident.value)
             else:
                 self.errors.append(
                     CheckError(
@@ -358,6 +412,8 @@ class MethodBodyChecker:
 
         var_token = self._advance()
         self.local_vars.add(var_token.value)
+        # Track loop variable assignment (but mark as used since loop vars are implicitly used)
+        self.var_usages.add(var_token.value)
 
         # Expect =
         if not self._expect(TokenType.ASSIGN, "Expected '=' in for statement"):
@@ -441,6 +497,56 @@ class MethodBodyChecker:
         self._advance()  # consume 'default'
         self._parse_required_block("default")
 
+    def _check_constant_condition(self, context: str) -> None:
+        """Check if condition is a constant (True, False, number).
+
+        Args:
+            context: Where this condition appears (for error message)
+        """
+        # Only warn for 'if', not 'while' (constant while is common pattern)
+        if context != "if":
+            return
+
+        # Check if next token is a constant
+        if self._check(TokenType.TRUE):
+            self.errors.append(
+                CheckError(
+                    self._current().line,
+                    self._current().col,
+                    "MS-W028",
+                    "Condition is always true; 'else' branch will never execute",
+                )
+            )
+        elif self._check(TokenType.FALSE):
+            self.errors.append(
+                CheckError(
+                    self._current().line,
+                    self._current().col,
+                    "MS-W028",
+                    "Condition is always false; 'if' body will never execute",
+                )
+            )
+        elif self._check(TokenType.NUMBER):
+            value = self._current().value
+            if value == "0":
+                self.errors.append(
+                    CheckError(
+                        self._current().line,
+                        self._current().col,
+                        "MS-W028",
+                        "Condition is always false (0); 'if' body will never execute",
+                    )
+                )
+            else:
+                self.errors.append(
+                    CheckError(
+                        self._current().line,
+                        self._current().col,
+                        "MS-W028",
+                        f"Condition is always true ({value}); 'else' branch will never execute",
+                    )
+                )
+
     def _parse_return(self) -> None:
         """Parse return statement."""
         self._advance()  # consume 'return'
@@ -452,15 +558,28 @@ class MethodBodyChecker:
 
         self._expect(TokenType.SEMICOLON, "Expected ';' after return statement")
 
+        # Mark that we've seen a return for unreachable code detection
+        self.return_seen = True
+
     def _parse_block(self) -> None:
         """Parse a block { statements }."""
         self._advance()  # consume '{'
+
+        # Save and reset return tracking for this block
+        outer_return_seen = self.return_seen
+        outer_unreachable_warned = self.unreachable_warned
+        self.return_seen = False
+        self.unreachable_warned = False
 
         while not self._check(TokenType.RBRACE, TokenType.EOF):
             self._parse_statement()
             self._skip_comments()
 
         self._expect(TokenType.RBRACE, "Expected '}' to close block")
+
+        # Restore outer block's tracking
+        self.return_seen = outer_return_seen
+        self.unreachable_warned = outer_unreachable_warned
 
     def _parse_required_block(self, context: str) -> bool:
         """Parse a required block, reporting error if missing."""
@@ -480,7 +599,10 @@ class MethodBodyChecker:
 
     def _parse_expression_statement(self) -> None:
         """Parse expression statement (assignment or function call)."""
+        # At statement level, `x = y;` is assignment. Inside expressions, it's comparison.
+        self.in_statement_context = True
         self._parse_expression()
+        self.in_statement_context = False
         self._skip_comments()
 
         # Expect semicolon
@@ -541,9 +663,50 @@ class MethodBodyChecker:
             # Tokenizer always produces EOF as last token, so pos+1 < len is always true.
             if self.pos + 1 < len(self.tokens):  # pragma: no branch
                 next_tok = self.tokens[self.pos + 1]
-                if next_tok.type == TokenType.ASSIGN:
+                # Only treat as assignment if we're at statement level
+                # Inside expressions (if, while, etc.), = is comparison
+                if next_tok.type == TokenType.ASSIGN and self.in_statement_context:
                     # Pre-register this variable as defined
-                    self.local_vars.add(self._current().value)
+                    var_name = self._current().value
+                    var_token = self._current()
+
+                    # Check for variable shadowing (local shadows parameter)
+                    if (
+                        var_name in self.defined_vars
+                        and var_name not in self.local_vars
+                    ):
+                        self.errors.append(
+                            CheckError(
+                                var_token.line,
+                                var_token.col,
+                                "MS-W033",
+                                f"Variable '{var_name}' shadows a parameter",
+                            )
+                        )
+
+                    self.local_vars.add(var_name)
+                    # Track assignment location for unused variable warning
+                    if var_name not in self.var_assignments:
+                        self.var_assignments[var_name] = var_token
+
+                    # Check for self-assignment: x = x;
+                    # Peek: pos is at IDENT, pos+1 is =, pos+2 would be RHS
+                    if self.pos + 3 < len(self.tokens):
+                        rhs_tok = self.tokens[self.pos + 2]
+                        after_rhs = self.tokens[self.pos + 3]
+                        if (
+                            rhs_tok.type == TokenType.IDENTIFIER
+                            and rhs_tok.value == var_name
+                            and after_rhs.type == TokenType.SEMICOLON
+                        ):
+                            self.errors.append(
+                                CheckError(
+                                    var_token.line,
+                                    var_token.col,
+                                    "MS-W029",
+                                    f"Self-assignment '{var_name} = {var_name}' has no effect",
+                                )
+                            )
 
         # Parse left side
         self._parse_or_expr()
@@ -587,7 +750,11 @@ class MethodBodyChecker:
 
     def _parse_comparison(self) -> None:
         """Parse comparison expression."""
+        # Track position before LHS for comparison-to-self detection
+        lhs_start = self.pos
         self._parse_additive()
+        lhs_end = self.pos
+
         while self._check(
             TokenType.ASSIGN,
             TokenType.NEQ,
@@ -596,8 +763,41 @@ class MethodBodyChecker:
             TokenType.LTE,
             TokenType.GTE,
         ):
-            self._advance()
+            op_token = self._advance()
+            rhs_start = self.pos
             self._parse_additive()
+            rhs_end = self.pos
+
+            # Check for comparison to self: simple IDENT op IDENT
+            if lhs_end - lhs_start == 1 and rhs_end - rhs_start == 1:
+                lhs_tok = self.tokens[lhs_start]
+                rhs_tok = self.tokens[rhs_start]
+                if (
+                    lhs_tok.type == TokenType.IDENTIFIER
+                    and rhs_tok.type == TokenType.IDENTIFIER
+                    and lhs_tok.value == rhs_tok.value
+                ):
+                    if op_token.type == TokenType.ASSIGN:
+                        self.errors.append(
+                            CheckError(
+                                op_token.line,
+                                op_token.col,
+                                "MS-W032",
+                                f"Comparison '{lhs_tok.value} = {rhs_tok.value}' is always true",
+                            )
+                        )
+                    elif op_token.type == TokenType.NEQ:
+                        self.errors.append(
+                            CheckError(
+                                op_token.line,
+                                op_token.col,
+                                "MS-W032",
+                                f"Comparison '{lhs_tok.value} != {rhs_tok.value}' is always false",
+                            )
+                        )
+
+            # Update for next iteration
+            lhs_start, lhs_end = rhs_start, rhs_end
 
     def _parse_additive(self) -> None:
         """Parse additive expression (+, -, &)."""
@@ -621,7 +821,7 @@ class MethodBodyChecker:
         """Parse multiplicative expression (*, /, %)."""
         self._parse_unary()
         while self._check(TokenType.STAR, TokenType.SLASH, TokenType.PERCENT):
-            self._advance()
+            op_token = self._advance()
             self._skip_comments()
             if self._check(TokenType.SEMICOLON, TokenType.RPAREN, TokenType.EOF):
                 self.errors.append(
@@ -633,6 +833,20 @@ class MethodBodyChecker:
                     )
                 )
                 return
+            # Check for division/modulo by zero
+            if op_token.type in (TokenType.SLASH, TokenType.PERCENT):
+                if self._check(TokenType.NUMBER) and self._current().value == "0":
+                    op_name = (
+                        "Division" if op_token.type == TokenType.SLASH else "Modulo"
+                    )
+                    self.errors.append(
+                        CheckError(
+                            self._current().line,
+                            self._current().col,
+                            "MS-W031",
+                            f"{op_name} by zero",
+                        )
+                    )
             self._parse_unary()
 
     def _parse_unary(self) -> None:
@@ -997,6 +1211,17 @@ class MethodBodyChecker:
         elif self._check(TokenType.IDENTIFIER):
             token = self._advance()
             var_name = token.value
+
+            # Track variable usage (read)
+            # We mark as used UNLESS this is the very first token of an assignment
+            # (detected by checking if var_name was just added to var_assignments)
+            just_assigned = (
+                var_name in self.var_assignments
+                and self.var_assignments[var_name] == token
+            )
+            if not just_assigned:
+                self.var_usages.add(var_name)
+
             # Check if variable is defined
             if (
                 var_name not in self.defined_vars
@@ -1101,3 +1326,8 @@ def check_method_body(
     errors.extend(checker.check())
 
     return errors
+
+
+# Division/modulo by zero will be checked in binary operators
+# Comparison to self will be checked in comparison operators
+# These are inserted during expression parsing

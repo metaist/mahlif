@@ -27,6 +27,8 @@ class LintConfig:
     ignore: set[str] = field(default_factory=set)
     fixable: set[str] = field(default_factory=set)
     unfixable: set[str] = field(default_factory=set)
+    error: set[str] = field(default_factory=set)  # warnings to treat as errors
+    strict: bool = False  # treat all warnings as errors
 
 
 @dataclass
@@ -153,5 +155,13 @@ def _parse_lint_config(data: dict[str, Any]) -> LintConfig:
     unfixable = data.get("unfixable", [])
     if isinstance(unfixable, list):
         config.unfixable = {str(code) for code in unfixable if code}
+
+    error = data.get("error", [])
+    if isinstance(error, list):
+        config.error = {str(code) for code in error if code}
+
+    strict = data.get("strict", False)
+    if isinstance(strict, bool):
+        config.strict = strict
 
     return config
