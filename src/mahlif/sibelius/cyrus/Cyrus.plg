@@ -146,24 +146,7 @@ actualOnset = ExtractIpaOnset(ipaBWork);
 if (OnsetMatches(actualOnset, expectedIpa)) {
 	return 'SKIP';
 }
-unitsToMove = CalculateUnitsToMove(ipaBWork, expectedIpa);
-if (unitsToMove = 0) {
-	return 'SKIP';
-}
-if (unitsToMove < 0) {
-	return 'UNRE';
-}
-toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
-remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
-newIpaA = ipaA & toMove;
-newIpaB = remaining;
-if (hasStress) {
-	newIpaB = GetStressMarker() & newIpaB;
-}
-ipaObjA.Text = newIpaA;
-ipaObjB.Text = newIpaB;
-beat = (pos / 256) + 1;
-return 'CHNGBar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': \"' & ipaA & '-' & ipaB & '\" -> \"' & newIpaA & '-' & newIpaB & '\"' & Chr(10);
+return 'UNRE';
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
