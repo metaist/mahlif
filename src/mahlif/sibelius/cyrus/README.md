@@ -12,44 +12,82 @@ The plugin compares Cyrillic and IPA syllable boundaries and moves IPA consonant
 
 **Example**: `nɑ̟-ˈt͡ʃʲnoj` → `nɑ̟t͡ʃʲ-ˈnoj` (moves `t͡ʃʲ` to match Cyrillic `ноч-ной`)
 
-## Building
+---
+
+## Installation
+
+First, [install Mahlif](../../README.md#installation) if you haven't already.
+
+Then install the Cyrus plugin:
+
+```bash
+uv run mahlif sibelius install Cyrus
+```
+
+Reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > select Cyrus > **Unload** then **Load**
+
+## Usage
+
+1. Open your score in Sibelius
+2. Run **Plug-ins > Other > Cyrus**
+3. The plugin will process all staves with lyrics
+4. Save the report when prompted
+5. Review the report for any unresolved cases
+
+### Converting Report Encoding
+
+Sibelius saves files as UTF-16. To convert to UTF-8 for easier viewing:
+
+```bash
+uv run mahlif encoding utf8 cyrus_report.txt
+```
+
+This converts the file in place. Use `-o output.txt` to save to a different file.
+
+---
+
+## Report Format
+
+The report shows:
+
+- **CHNG**: Changes made (before → after IPA with Cyrillic comparison)
+- **UNRE**: Unresolved cases that need manual review
+
+Location format: `p4 [B] Bar 8, Beat 1` = page 4, section B, bar 8, beat 1
+
+Example:
+```
+CHNG p4 [B] Bar 8, Beat 1, Tatyana: nɑ̟-ˈt͡ʃʲnoj -> nɑ̟t͡ʃʲ-ˈnoj (cyr: ноч-ной)
+UNRE p10 [B] Bar 36, Beat 1, Onegin: jɛ-ˈvo (cyr: е-го, expected: g)
+```
+
+---
+
+## Building from Source
+
+For development:
 
 ```bash
 uv run mahlif sibelius build --hardlink --source src/mahlif/sibelius/cyrus/ Cyrus
 ```
 
-Then reload in Sibelius: File > Plug-ins > Edit Plug-ins > Unload/Reload
-
-## Report Output
-
-The plugin generates a report with:
-
-- **CHNG**: Changes made (shows before/after IPA and Cyrillic)
-- **UNRE**: Unresolved cases that need manual review
-- **Stats**: Counts of changes, skipped, and unresolved
-
-Location format: `p4 [B] Bar 8` = page 4, section B, bar 8
+Then reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > Unload/Reload
 
 ---
 
 ## Customization Guide
 
-### EASY: Consonant Mappings (~lines 205-228)
+### EASY: Consonant Mappings
 
-Single Cyrillic consonant to IPA mapping:
+Single Cyrillic consonant to IPA mapping in `MapSingleCyrillicConsonant`:
 
 ```manuscript
-if (c = 'п') { return 'p'; }
-if (c = 'б') { return 'b'; }
-if (c = 'т') { return 't'; }
 if (c = 'щ') { return 'ʃ'; }  // Change this if different IPA is used
 ```
 
-To edit: Find `MapSingleCyrillicConsonant` function, add/modify `if` statements.
+### EASY: Special Cluster Overrides
 
-### EASY: Special Cluster Overrides (~lines 189-191)
-
-Multi-consonant clusters that map to a single IPA sound:
+Multi-consonant clusters that map to a single IPA sound in `MapCyrillicToIpa`:
 
 ```manuscript
 if (cyrOnset = 'сч' or cyrOnset = 'зч' or cyrOnset = 'жч') {
@@ -57,78 +95,54 @@ if (cyrOnset = 'сч' or cyrOnset = 'зч' or cyrOnset = 'жч') {
 }
 ```
 
-To add new clusters: Add `or cyrOnset = 'XX'` conditions in `MapCyrillicToIpa`.
+### EASY: Vowel Lists
 
-### EASY: Vowel Lists (~lines 441-460)
-
-**Cyrillic vowels** - used to find consonant onset:
+**Cyrillic vowels** in `GetCyrillicVowels`:
 ```manuscript
-GetCyrillicVowels "() {
 return 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
-}"
 ```
 
-**IPA vowels** - used to find consonant onset:
+**IPA vowels** in `GetIpaVowels`:
 ```manuscript
-GetIpaVowels "() {
 return 'ɑʌɐeɛɪiouaæɨ';
-}"
 ```
 
-**Palatalizing vowels** - Cyrillic vowels that carry initial `j`:
+**Palatalizing vowels** in `GetPalatalizingVowels`:
 ```manuscript
-GetPalatalizingVowels "() {
 return 'яеёюЯЕЁЮ';
-}"
 ```
 
-To add a vowel: Just add the character to the string.
+### EASY: Diacritics
 
-### EASY: Diacritics (~line 467)
-
-Characters treated as modifiers attached to the previous consonant:
-
+Characters treated as modifiers in `IsDiacritic`:
 ```manuscript
-IsDiacritic "(c) {
 diacritics = 'ʲːˑ̟̃';
-return CharInString(c, diacritics);
-}"
 ```
 
-To add a diacritic: Add the character to the `diacritics` string.
+### EASY: IPA Normalization
 
-### EASY: IPA Normalization (~lines 305-315)
-
-Characters that should be treated as equivalent during matching:
-
+Character equivalences in `NormalizeIpaForMatching`:
 ```manuscript
 if (c = 'ɫ') { result = result & 'l'; }  // dark L = light L
 if (c = 'ɡ') { result = result & 'g'; }  // IPA g = ASCII g
 ```
 
-To add equivalences: Add new `if` blocks in `NormalizeIpaForMatching`.
+### MEDIUM: Skip Conditions
 
-### MEDIUM: Skip Conditions (~line 221)
-
-Conditions to skip processing (don't move consonants):
-
+Add conditions in `ProcessSyllableBoundary` after the `OnsetMatches` check:
 ```manuscript
-// Skip jotated vowels (j belongs to vowel, not consonant)
 if (StartsWithPalatalizingVowel(cyrB) and IsJotatedVowelOnset(ipaBWork)) {
     return 'SKIP';
 }
 ```
 
-To add new skip conditions: Add `if (...) { return 'SKIP'; }` blocks in `ProcessSyllableBoundary` after the `OnsetMatches` check.
-
 ### HARD: Core Algorithm
 
 These require understanding the full algorithm:
-
-- **ExtractOneConsonantUnit**: Groups consonant + tie bar + diacritics as atomic unit
-- **ExtractIpaOnset**: Extracts all consonant units before first vowel
-- **CalculateUnitsToMove**: Finds how many units to move to match expected onset
-- **ProcessSyllableBoundary**: Main logic flow
+- `ExtractOneConsonantUnit`: Groups consonant + tie bar + diacritics as atomic unit
+- `ExtractIpaOnset`: Extracts all consonant units before first vowel
+- `CalculateUnitsToMove`: Finds how many units to move to match expected onset
+- `ProcessSyllableBoundary`: Main logic flow
 
 ---
 
@@ -143,7 +157,6 @@ These require understanding the full algorithm:
 ## Lyric Style IDs
 
 The plugin looks for these Sibelius style IDs:
-
 - Verse 1 (Cyrillic): `text.staff.space.hypen.lyrics.verse1`
 - Verse 2 (IPA): `text.staff.space.hypen.lyrics.verse2`
 
@@ -151,12 +164,16 @@ The plugin looks for these Sibelius style IDs:
 
 ## Troubleshooting
 
-**Plugin doesn't appear in menu**: Check for syntax errors. Use `uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg`
-
-**Runtime error**: Check the Sibelius trace window for the error location. Common issues:
-- Accessing property that doesn't exist (e.g., `.Text` vs `.MarkAsText`)
-- For loop with negative end value
+**Plugin doesn't appear in menu**: Check for syntax errors:
+```bash
+uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
+```
 
 **Progress bar stuck at 0**: This is a Sibelius UI quirk. The plugin is running; switch windows and back to see updates.
 
 **Too many/few changes**: Check the vowel lists and consonant mappings match your transcription conventions.
+
+**Report has strange characters**: Convert encoding:
+```bash
+uv run mahlif encoding utf8 cyrus_report.txt
+```
