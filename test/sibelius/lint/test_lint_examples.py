@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from mahlif.sibelius.lint import lint
+from mahlif.sibelius.manuscript.lint import lint
 
 
 EXAMPLES_DIR = Path(__file__).parent / "examples"

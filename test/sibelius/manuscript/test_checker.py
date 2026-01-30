@@ -347,3 +347,22 @@ def test_tokenizer_token_repr() -> None:
     assert "IDENTIFIER" in repr(token)
     assert "foo" in repr(token)
     assert "1:5" in repr(token)
+
+
+def test_lte_operator() -> None:
+    """Test less-than-or-equal operator."""
+    errors = check_method_body("if (x <= 5) { y = 1; }", parameters=["x", "y"])
+    assert errors == []
+
+
+def test_gte_operator() -> None:
+    """Test greater-than-or-equal operator."""
+    errors = check_method_body("if (x >= 5) { y = 1; }", parameters=["x", "y"])
+    assert errors == []
+
+
+def test_unknown_character() -> None:
+    """Test that unknown characters generate errors."""
+    # Backtick is not valid in ManuScript
+    errors = check_method_body("x = `test`;", parameters=["x"])
+    assert any(e.code == "MS-E031" for e in errors)

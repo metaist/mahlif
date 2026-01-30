@@ -15,7 +15,7 @@ from mahlif.sibelius.build import get_sibelius_plugin_dir
 from mahlif.sibelius.build import main as build_main
 from mahlif.sibelius.build import resolve_plugins
 from mahlif.sibelius.cli import main as sibelius_main
-from mahlif.sibelius.lint import fix_trailing_whitespace
+from mahlif.sibelius.manuscript.lint import fix_trailing_whitespace
 
 
 # =============================================================================
@@ -742,7 +742,7 @@ def test_fix_trailing_whitespace_no_change(tmp_path: Path) -> None:
 
 def test_read_plugin_utf16be_no_bom(tmp_path: Path) -> None:
     """Test reading UTF-16 BE file without BOM."""
-    from mahlif.sibelius.lint import read_plugin
+    from mahlif.sibelius.manuscript.lint import read_plugin
 
     plg = tmp_path / "test.plg"
     # UTF-16 BE without BOM - first byte is null

@@ -211,9 +211,9 @@ def run_command(args: argparse.Namespace) -> int:
     elif args.sibelius_command == "check":
         from mahlif.config import load_config
         from mahlif.sibelius.build import find_plugin_sources
-        from mahlif.sibelius.lint import fix_trailing_whitespace
-        from mahlif.sibelius.lint import lint
-        from mahlif.sibelius.lint import read_plugin
+        from mahlif.sibelius.manuscript.lint import fix_trailing_whitespace
+        from mahlif.sibelius.manuscript.lint import lint
+        from mahlif.sibelius.manuscript.lint import read_plugin
 
         # Load config file
         config = load_config()

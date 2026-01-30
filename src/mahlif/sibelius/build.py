@@ -16,8 +16,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from mahlif.sibelius.lint import lint
-from mahlif.sibelius.lint import read_plugin
+from mahlif.sibelius.manuscript.lint import lint
+from mahlif.sibelius.manuscript.lint import read_plugin
 
 
 def get_sibelius_plugin_dir() -> Path | None:

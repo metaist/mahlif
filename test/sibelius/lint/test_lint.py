@@ -9,17 +9,17 @@ from unittest.mock import patch
 
 import pytest
 
-from mahlif.sibelius.lint import LintError
-from mahlif.sibelius.lint import lint
-from mahlif.sibelius.lint import lint_braces
-from mahlif.sibelius.lint import lint_common_issues
-from mahlif.sibelius.lint import lint_method_calls
-from mahlif.sibelius.lint import lint_methods
-from mahlif.sibelius.lint import lint_plugin_structure
-from mahlif.sibelius.lint import lint_strings
-from mahlif.sibelius.lint import main as lint_main
-from mahlif.sibelius.lint import read_plugin
-from mahlif.sibelius.lint import parse_inline_directives
+from mahlif.sibelius.manuscript.lint import LintError
+from mahlif.sibelius.manuscript.lint import lint
+from mahlif.sibelius.manuscript.lint import lint_braces
+from mahlif.sibelius.manuscript.lint import lint_common_issues
+from mahlif.sibelius.manuscript.lint import lint_method_calls
+from mahlif.sibelius.manuscript.lint import lint_methods
+from mahlif.sibelius.manuscript.lint import lint_plugin_structure
+from mahlif.sibelius.manuscript.lint import lint_strings
+from mahlif.sibelius.manuscript.lint import main as lint_main
+from mahlif.sibelius.manuscript.lint import read_plugin
+from mahlif.sibelius.manuscript.lint import parse_inline_directives
 
 
 def test_lint_error_str() -> None:
@@ -452,7 +452,7 @@ line 3"""
 
 def test_lint_respects_noqa(tmp_path: Path) -> None:
     """Test lint() respects noqa comments."""
-    from mahlif.sibelius.lint import lint
+    from mahlif.sibelius.manuscript.lint import lint
 
     plg = tmp_path / "test.plg"
     plg.write_text(
@@ -483,7 +483,7 @@ def test_lint_respects_disable_region(tmp_path: Path) -> None:
 
 def test_lint_can_ignore_inline(tmp_path: Path) -> None:
     """Test lint() can ignore inline directives with respect_inline flag."""
-    from mahlif.sibelius.lint import lint
+    from mahlif.sibelius.manuscript.lint import lint
 
     plg = tmp_path / "test.plg"
     # Missing Initialize - triggers W010
