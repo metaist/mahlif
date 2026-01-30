@@ -16,7 +16,7 @@ The plugin compares Cyrillic and IPA syllable boundaries and moves IPA consonant
 
 ## Installation
 
-First, [install Mahlif](../../README.md#installation) if you haven't already.
+First, [install Mahlif](https://docs.metaist.com/mahlif/#install) if you haven't already.
 
 Then install the Cyrus plugin:
 
