@@ -19,26 +19,25 @@ from pathlib import Path
 
 
 def _load_builtin_globals() -> set[str]:
-    """Load built-in globals from constants.json."""
-    json_path = Path(__file__).parent / "constants.json"
+    """Load built-in globals from lang.json."""
+    json_path = Path(__file__).parent / "lang.json"
     globals_set: set[str] = set()
 
     if json_path.exists():
         with open(json_path) as f:
             data = json.load(f)
 
-        # Add global objects
-        for name in data.get("global_objects", {}):
+        # Add object type names (Sibelius, Self, etc.)
+        for name in data.get("objects", {}):
             globals_set.add(name)
 
         # Add built-in functions
         for name in data.get("builtin_functions", {}):
             globals_set.add(name)
 
-        # Add all constants from all categories
-        for category in data.get("categories", {}).values():
-            for name in category.get("constants", {}):
-                globals_set.add(name)
+        # Add all constants
+        for name in data.get("constants", {}):
+            globals_set.add(name)
 
     # Fallback if JSON not found or incomplete
     if not globals_set:

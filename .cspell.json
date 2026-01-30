@@ -66,6 +66,7 @@
     "mypy",
     "noch",
     "nojekyll",
+    "noqa",
     "notehead",
     "noteheads",
     "noterest",
@@ -91,10 +92,12 @@
     "pythonversion",
     "rastral",
     "Rastral",
+    "redef",
     "rehearsalmark",
     "salzedo",
     "scordatura",
     "screencapture",
+    "Semihemidemisemiquaver",
     "setuptools",
     "shortfermata",
     "Sibelius",
@@ -116,7 +119,6 @@
     "Тестовая",
     "Чайковский",
     "מַחֲלִיף",
-    "redef",
-    "noqa"
+    "Multirest"
   ]
 }

@@ -1,0 +1,5695 @@
+{
+  "builtin_functions": {
+    "Abs": {
+      "params": [
+        "number"
+      ],
+      "returns": "int"
+    },
+    "Asc": {
+      "params": [
+        "char"
+      ],
+      "returns": "int"
+    },
+    "CharAt": {
+      "params": [
+        "string",
+        "index"
+      ],
+      "returns": "string"
+    },
+    "Chr": {
+      "params": [
+        "code"
+      ],
+      "returns": "string"
+    },
+    "CreateArray": {
+      "params": [],
+      "returns": "Array"
+    },
+    "CreateDictionary": {
+      "params": [],
+      "returns": "Dictionary"
+    },
+    "CreateHash": {
+      "params": [],
+      "returns": "Hash"
+    },
+    "CreateSparseArray": {
+      "params": [],
+      "returns": "SparseArray"
+    },
+    "IsObject": {
+      "params": [
+        "value"
+      ],
+      "returns": "boolean"
+    },
+    "JoinStrings": {
+      "params": [
+        "array",
+        "separator"
+      ],
+      "returns": "string"
+    },
+    "Length": {
+      "params": [
+        "string"
+      ],
+      "returns": "int"
+    },
+    "Max": {
+      "params": [
+        "a",
+        "b"
+      ],
+      "returns": "number"
+    },
+    "Min": {
+      "params": [
+        "a",
+        "b"
+      ],
+      "returns": "number"
+    },
+    "RandomNumber": {
+      "params": [],
+      "returns": "int"
+    },
+    "RandomSeed": {
+      "params": [
+        "seed"
+      ],
+      "returns": "void"
+    },
+    "Round": {
+      "params": [
+        "number"
+      ],
+      "returns": "int"
+    },
+    "RoundDown": {
+      "params": [
+        "number"
+      ],
+      "returns": "int"
+    },
+    "RoundUp": {
+      "params": [
+        "number"
+      ],
+      "returns": "int"
+    },
+    "SplitString": {
+      "params": [
+        "string",
+        "separator"
+      ],
+      "returns": "array"
+    },
+    "StopPlugin": {
+      "params": [],
+      "returns": "void"
+    },
+    "Substring": {
+      "params": [
+        "string",
+        "start",
+        "length?"
+      ],
+      "returns": "string"
+    },
+    "Trace": {
+      "params": [
+        "message"
+      ],
+      "returns": "void"
+    },
+    "TypeOf": {
+      "params": [
+        "object"
+      ],
+      "returns": "string"
+    }
+  },
+  "constants": {
+    "AccentArtic": 5,
+    "AccidentalSymbols": "256",
+    "AccordionSymbols": "496",
+    "AllStyles": "ALLSTYLES",
+    "Alto": "clef.alto",
+    "Arpeggio": "line.staff.arpeggio.down",
+    "Arrow": "line.staff.arrow.black.right",
+    "ArrowDownNoteStyle": 13,
+    "ArrowUpNoteStyle": 14,
+    "ArticulationSymbols": "208",
+    "BackSlashedNoteStyle": 12,
+    "BarNumberFormatNormal": 0,
+    "BarNumberFormatNumberLetterLower": 1,
+    "BarNumberFormatNumberLetterUpper": 2,
+    "Bass": "clef.bass",
+    "Beam": "line.staff.beam",
+    "BeatNoteStyle": 4,
+    "BeatWithoutStemNoteStyle": 3,
+    "BeaterPercussionSymbols": "128",
+    "BlackAndWhiteDiamondNoteStyle": 6,
+    "Box": "line.staff.box",
+    "BracketBrace": 1,
+    "BracketFull": 0,
+    "BracketSub": 2,
+    "Bracketed": "line.staff.slur.up.bracketed",
+    "BracketedAcc": "3",
+    "BracketedTrillSymbol": "33",
+    "BreakSymbols": "464",
+    "Breve": 2048,
+    "BreveBarRest": "1",
+    "CaesuraSymbol": "249",
+    "CautionaryAcc": "2",
+    "Chord": "text.staff.space.fretnumbers",
+    "ChromaticPercussionSymbols": "64",
+    "ClefSymbols": "416",
+    "Clefs": "CLEFS",
+    "CodaSymbol": "2",
+    "CommaSymbol": "247",
+    "Common": "text.staff.symbol.common",
+    "Composer": "text.blankpage.composer",
+    "ConductorSymbols": "400",
+    "ContinueBeam": 3,
+    "Crescendo": "line.staff.hairpin.crescendo",
+    "CrossNoteStyle": 1,
+    "CrossOrDiamondNoteStyle": 5,
+    "Crotchet": 256,
+    "CueGraceNoteSize": "3",
+    "CueNoteStyle": 10,
+    "CueSize": "1",
+    "Custom1Artic": 0,
+    "Custom2Artic": 11,
+    "Custom3Artic": 15,
+    "CustomChordNames": "CUSTOMCHORDNAMES",
+    "Dashed": "line.staff.hairpin.crescendo.dashed",
+    "Dedication": "text.blankpage.dedication",
+    "Default": 7,
+    "DefaultPartAppearance": "DEFAULTPARTAPPEARANCE",
+    "Demisemiquaver": 32,
+    "DiamondNoteStyle": 2,
+    "Dictionary": "DICTIONARY",
+    "Diminuendo": "line.staff.hairpin.diminuendo",
+    "DocumentSetupUnitsInches": "1",
+    "DocumentSetupUnitsPoints": "2",
+    "DocumentSetupUnitsmm": "0",
+    "Dotted": "line.staff.hairpin.crescendo.dotted",
+    "DottedBreve": 3072,
+    "DottedCrotchet": 384,
+    "DottedEighth": 192,
+    "DottedHalf": 768,
+    "DottedMinim": 768,
+    "DottedQuarter": 384,
+    "DottedQuaver": 192,
+    "DottedSemiquaver": 96,
+    "DottedSixteenth": 96,
+    "DottedWhole": 1536,
+    "DoubleSharp": 2,
+    "DoubleTremolosBetweenStems": "1",
+    "DoubleTremolosOuterTremoloTouchingStems": "2",
+    "DoubleTremolosTouchingStems": "0",
+    "DownBowArtic": 10,
+    "DrumPercussionSymbols": "80",
+    "Eighth": 128,
+    "EndOfPage": 4,
+    "EndOfSystem": 2,
+    "EndOfSystemOrPage": 6,
+    "EndOfWord": 1,
+    "EndsMultirest": "2",
+    "EveryNthBar": "2",
+    "EverySystem": "0",
+    "Expression": "text.staff.expression",
+    "ExtraSmallSize": "3",
+    "False": 0,
+    "FeatheredBeamAccel": "1",
+    "FeatheredBeamNone": "0",
+    "FeatheredBeamRit": "2",
+    "Fingering": "text.staff.space.fingering",
+    "Footnote": "text.staff.footnote",
+    "FourBarRepeat": "4",
+    "GeneralSymbols": "16",
+    "Glissando": "line.staff.gliss.wavy",
+    "GraceNoteSize": "2",
+    "Guitar": "line.staff.harmonics",
+    "GuitarSymbols": "176",
+    "Half": 512,
+    "HalfMuted": 1,
+    "HandbellSymbols": "528",
+    "HarmonicArtic": 7,
+    "Hauptstimme": "line.staff.hauptstimme",
+    "HeadlessNoteStyle": 7,
+    "HeelOneSymbol": "52",
+    "HeelTwoSymbol": "53",
+    "Hemidemisemiquaver": 16,
+    "HiddenAcc": "1",
+    "House": "HOUSE",
+    "Instrument": "text.instrumentname",
+    "InstrumentNamesFull": "0",
+    "InstrumentNamesNone": "2",
+    "InstrumentNamesShort": "1",
+    "InstrumentsAndEnsembles": "INSTRUMENTSANDENSEMBLES",
+    "Interval2xAugmented": "7",
+    "Interval2xDiminished": "3",
+    "Interval3xAugmented": "8",
+    "Interval3xDiminished": "2",
+    "Interval4xAugmented": "9",
+    "Interval4xDiminished": "1",
+    "Interval5xAugmented": "10",
+    "Interval5xDiminished": "0",
+    "IntervalAugmented": "6",
+    "IntervalDiatonic": "\u20131",
+    "IntervalDiminished": "4",
+    "IntervalMajor": "5",
+    "IntervalMinor": "4",
+    "IntervalPerfect": "5",
+    "InvertedMordentSymbol": "37",
+    "InvertedTriangleNoteStyle": 15,
+    "InvertedTripleMordentSymbol": "42",
+    "InvertedTurnSymbol": "39",
+    "KeyboardSymbols": "48",
+    "LiftPedalSymbol": "51",
+    "Line": "line.staff.plain",
+    "Lines": "LINES",
+    "Long": 4096,
+    "Lyrics": "text.staff.space.hypen.lyrics.chorus",
+    "MarcatoArtic": 6,
+    "MediumSize": "1",
+    "MetallicPercussionSymbols": "96",
+    "Metronome": "text.system.metronome",
+    "MidMultirest": "3",
+    "MiddleOfPage": 3,
+    "MiddleOfSystem": 1,
+    "MiddleOfWord": 0,
+    "Minim": 512,
+    "MiscellaneousSymbols": "544",
+    "Molto": "line.system.tempo.accel.molto",
+    "MordentSymbol": "36",
+    "Multirests": "text.staff.multirests.tacet",
+    "MusicRestartsAfterXPages": "1",
+    "MusicRestartsOnNextLeftPage": "2",
+    "MusicRestartsOnNextRightPage": "3",
+    "Muted": 0,
+    "Nashville": "text.staff.space.nashvillechords",
+    "Natural": 0,
+    "Nebenstimme": "line.staff.nebenstimme",
+    "NoBarNumbers": "1",
+    "NoBeam": 1,
+    "NoMultirest": "0",
+    "NoPageBreak": "0",
+    "NormalAcc": "0",
+    "NormalNoteStyle": 0,
+    "NormalSize": "0",
+    "NotEndOfSystem": 5,
+    "NotMuted": 2,
+    "NoteSymbols": "288",
+    "NoteheadSymbols": "320",
+    "Noteheads": "NOTEHEADS",
+    "Null": "clef.null",
+    "OctaveSymbols": "448",
+    "OneBarRepeat": "2",
+    "OrientationLandscape": "1",
+    "OrientationPortrait": "0",
+    "OrnamentSymbols": "32",
+    "OtherPercussionSymbols": "112",
+    "PageMarginsDifferent": "2",
+    "PageMarginsMirrored": "1",
+    "PageMarginsSame": "0",
+    "PageNumberFormatLetterLower": "3",
+    "PageNumberFormatNormal": "0",
+    "PageNumberFormatRomanLower": "2",
+    "PageNumberFormatRomanUpper": "1",
+    "PageNumberHideAll": "2",
+    "PageNumberHideFirst": "1",
+    "PageNumberShowAll": "0",
+    "PageSize10x13": "17",
+    "PageSize9_5x12_5": "16",
+    "PageSizeA3": "6",
+    "PageSizeA4": "4",
+    "PageSizeA5": "2",
+    "PageSizeB4": "5",
+    "PageSizeB5": "3",
+    "PageSizeConcert": "13",
+    "PageSizeCustom": "18",
+    "PageSizeExecutive": "11",
+    "PageSizeFolio": "14",
+    "PageSizeHymn": "9",
+    "PageSizeLegal": "15",
+    "PageSizeLetter": "0",
+    "PageSizeOctavo": "10",
+    "PageSizeQuarto": "12",
+    "PageSizeStatement": "8",
+    "PageSizeTabloid": "1",
+    "PageSizeUSBand": "7",
+    "PauseArtic": 13,
+    "Pedal": "line.staff.pedal",
+    "PedalPSymbol": "49",
+    "PedalSymbol": "48",
+    "PedalUpSymbol": "50",
+    "Percussion": "clef.percussion",
+    "PercussionTechniqueSymbols": "160",
+    "PlusArtic": 8,
+    "Portamento": "line.staff.port.straight",
+    "Quarter": 256,
+    "Quaver": 128,
+    "Rehearsal": "text.system.rehearsalmarks",
+    "Repeat": "line.system.repeat.open",
+    "RepeatBarSymbol": "6",
+    "RepeatBeatSymbol": "5",
+    "RepeatSymbols": "0",
+    "RepeatTwoBarsSymbol": "7",
+    "RestSymbols": "368",
+    "ReversedTurnSymbol": "40",
+    "Rules": "ENGRAVINGRULES",
+    "ScaleType7thArpeggio": "21",
+    "ScaleTypeAlteredDominant": "12",
+    "ScaleTypeAugmentedArpeggio": "19",
+    "ScaleTypeDiminished7thArpeggio": "23",
+    "ScaleTypeDiminishedWholeHalf": "11",
+    "ScaleTypeDominantBebop": "16",
+    "ScaleTypeDorian": "4",
+    "ScaleTypeHarmonicMinor": "2",
+    "ScaleTypeLocrian": "8",
+    "ScaleTypeLocrianSharp2": "13",
+    "ScaleTypeLydian": "6",
+    "ScaleTypeLydianFlat7": "14",
+    "ScaleTypeLydianSharp5": "17",
+    "ScaleTypeMajor": "0",
+    "ScaleTypeMajor7thArpeggio": "20",
+    "ScaleTypeMajorBebop": "15",
+    "ScaleTypeMajorPentatonic": "24",
+    "ScaleTypeMelodicMinor": "3",
+    "ScaleTypeMin7Flat5Arpeggio": "22",
+    "ScaleTypeMinor": "1",
+    "ScaleTypeMinorPentatonic": "25",
+    "ScaleTypeMixolydian": "7",
+    "ScaleTypeOther": "26",
+    "ScaleTypePhrygian": "5",
+    "ScaleTypePhrygianDominant": "18",
+    "ScaleTypeWholeTone": "9",
+    "ScalrTypeDiminishedHalfWhole": "10",
+    "SegnoSymbol": "1",
+    "Semibreve": 1024,
+    "Semiquaver": 64,
+    "ShapedNote1NoteStyle": 16,
+    "ShapedNote2NoteStyle": 17,
+    "ShapedNote3NoteStyle": 18,
+    "ShapedNote4StemDownNoteStyle": 23,
+    "ShapedNote4StemUpNoteStyle": 19,
+    "ShapedNote5NoteStyle": 20,
+    "ShapedNote6NoteStyle": 21,
+    "ShapedNote7NoteStyle": 22,
+    "Sharp": 1,
+    "SilentNoteStyle": 9,
+    "SingleBeam": 4,
+    "Sixteenth": 64,
+    "SixtyFourth": 16,
+    "SlashedNoteStyle": 11,
+    "SmallSize": "2",
+    "Soprano": "clef.soprano",
+    "Space": 32,
+    "SpacingRule": "SPACINGRULE",
+    "Special": "text.staff.symbol.special",
+    "SpecialBarlineBetweenStaves": "6",
+    "SpecialBarlineDashed": "2",
+    "SpecialBarlineDotted": "10",
+    "SpecialBarlineDouble": "3",
+    "SpecialBarlineEndRepeat": "1",
+    "SpecialBarlineFinal": "4",
+    "SpecialBarlineInvisible": "5",
+    "SpecialBarlineNormal": "7",
+    "SpecialBarlineShort": "9",
+    "SpecialBarlineStartRepeat": "0",
+    "SpecialBarlineThick": "12",
+    "SpecialBarlineTick": "8",
+    "SpecialBarlineTriple": "11",
+    "SpecialPageBreak": 8,
+    "SquarePauseArtic": 12,
+    "StaccatissimoArtic": 2,
+    "StaccatoArtic": 1,
+    "StaffHeight": 128,
+    "StartBeam": 2,
+    "StartsMultirest": "1",
+    "StemlessNoteStyle": 8,
+    "String": "line.staff.string.below.8",
+    "Tab": "clef.tab",
+    "Tablature": "text.staff.tab.numbers",
+    "Technique": "text.staff.technique",
+    "TechniqueSymbols": "480",
+    "Tempo": "text.system.tempo",
+    "Tenor": "clef.tenor",
+    "TenutoArtic": 4,
+    "Text": "TEXT",
+    "ThickCaesuraSymbol": "250",
+    "ThirtySecond": 32,
+    "TickSymbol": "248",
+    "Tie": "line.staff.tie",
+    "Time": "text.system.timesig.normal",
+    "Timecode": "text.system.timecode",
+    "Title": "text.system.page_aligned.title",
+    "ToeOneSymbol": "54",
+    "ToeTwoSymbol": "55",
+    "Treble": "clef.treble",
+    "TriPauseArtic": 14,
+    "Trill": "line.staff.trill",
+    "TrillSymbol": "32",
+    "TripleMordentSymbol": "41",
+    "True": 1,
+    "Tuplet": "line.staff.tuplet",
+    "TupletBracketAuto": "2",
+    "TupletBracketOff": "0",
+    "TupletBracketOn": "1",
+    "TupletLeft": "1",
+    "TupletLeftRight": "2",
+    "TupletLeftRightNote": "3",
+    "TupletNoNumber": "0",
+    "TurnSymbol": "38",
+    "TwoBarRepeat": "3",
+    "UpBowArtic": 9,
+    "Vertical": "line.staff.vertical",
+    "Vibrato": "line.staff.vibrato",
+    "WedgeArtic": 3,
+    "Whole": 1024,
+    "WholeBarRest": "0",
+    "Wide": "line.system.dashed.wide"
+  },
+  "objects": {
+    "Accessibility": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "AnnotationItem": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "Bar": {
+      "description": "",
+      "methods": {
+        "AddBarNumber": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 1,
+              "params": [
+                "new bar number",
+                "format",
+                "extra_text",
+                "prepend",
+                "skip this bar?"
+              ]
+            }
+          ]
+        },
+        "AddChordSymbolFromPitches": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "position",
+                "pitches",
+                "instrument style?"
+              ]
+            }
+          ]
+        },
+        "AddClef": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "pos",
+                "concert pitch clef",
+                "transposed pitch clef?"
+              ]
+            }
+          ]
+        },
+        "AddComment": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 2,
+              "params": [
+                "sr",
+                "text",
+                "color",
+                "maximized?"
+              ]
+            }
+          ]
+        },
+        "AddCommentWithName": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 3,
+              "params": [
+                "sr",
+                "text",
+                "username",
+                "color",
+                "maximized?"
+              ]
+            }
+          ]
+        },
+        "AddGraphic": {
+          "signatures": [
+            {
+              "max_params": 6,
+              "min_params": 2,
+              "params": [
+                "file name",
+                "pos",
+                "below staff",
+                "x displacement",
+                "y displacement",
+                "size ratio?"
+              ]
+            }
+          ]
+        },
+        "AddGraphicToBlankPage": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 4,
+              "params": [
+                "file name",
+                "nth page",
+                "x offset",
+                "y offset",
+                "size ratio?"
+              ]
+            }
+          ]
+        },
+        "AddGuitarFrame": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 2,
+              "params": [
+                "position",
+                "chord name",
+                "instrument style",
+                "fingerings?"
+              ]
+            }
+          ]
+        },
+        "AddKeySignature": {
+          "signatures": [
+            {
+              "max_params": 6,
+              "min_params": 3,
+              "params": [
+                "pos",
+                "num sharps",
+                "major key",
+                "add double barline",
+                "hidden",
+                "one staff only?"
+              ]
+            }
+          ]
+        },
+        "AddLine": {
+          "signatures": [
+            {
+              "max_params": 7,
+              "min_params": 3,
+              "params": [
+                "pos",
+                "duration",
+                "line style",
+                "dx",
+                "dy",
+                "voicenumber",
+                "hidden?"
+              ]
+            }
+          ]
+        },
+        "AddLiveTempoTapPoint": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "position"
+              ]
+            }
+          ]
+        },
+        "AddLyric": {
+          "signatures": [
+            {
+              "max_params": 6,
+              "min_params": 3,
+              "params": [
+                "position",
+                "duration",
+                "text",
+                "syllable type",
+                "number of notes?",
+                "voicenum?"
+              ]
+            }
+          ]
+        },
+        "AddNote": {
+          "signatures": [
+            {
+              "max_params": 7,
+              "min_params": 6,
+              "params": [
+                "pos",
+                "sounding pitch",
+                "duration",
+                "tied",
+                "voice",
+                "diatonic pitch",
+                "string number?"
+              ]
+            }
+          ]
+        },
+        "AddPageNumber": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "blank page offset?"
+              ]
+            }
+          ]
+        },
+        "AddPageNumberAtStartOfBar": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "AddSpecialBarline": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "barline type",
+                "pos?"
+              ]
+            }
+          ]
+        },
+        "AddSymbol": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "pos",
+                "symbol index or name"
+              ]
+            }
+          ]
+        },
+        "AddText": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 3,
+              "params": [
+                "pos",
+                "text",
+                "style",
+                "voicenum?"
+              ]
+            }
+          ]
+        },
+        "AddTextToBlankPage": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 5,
+              "params": [
+                "xPos",
+                "yPos",
+                "text",
+                "style",
+                "pageOffset"
+              ]
+            }
+          ]
+        },
+        "AddTimeSignature": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 4,
+              "params": [
+                "top",
+                "bottom",
+                "allow cautionary",
+                "rewrite music",
+                "use symbol?"
+              ]
+            }
+          ]
+        },
+        "AddTimeSignatureReturnObject": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 4,
+              "params": [
+                "top",
+                "bottom",
+                "allow cautionary",
+                "rewrite music",
+                "use symbol?"
+              ]
+            }
+          ]
+        },
+        "AddTuplet": {
+          "signatures": [
+            {
+              "max_params": 8,
+              "min_params": 5,
+              "params": [
+                "pos",
+                "voice",
+                "left",
+                "right",
+                "unit",
+                "style",
+                "bracket",
+                "fullDuration?"
+              ]
+            }
+          ]
+        },
+        "Clear": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "voice number?"
+              ]
+            }
+          ]
+        },
+        "ClearNotesAndModifiers": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "voice number?"
+              ]
+            }
+          ]
+        },
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "DeletePageNumber": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "blank page offset?"
+              ]
+            }
+          ]
+        },
+        "GetClefAt": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "pos"
+              ]
+            }
+          ]
+        },
+        "GetInstrumentTypeAt": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "pos"
+              ]
+            }
+          ]
+        },
+        "GetKeySignatureAt": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "pos"
+              ]
+            }
+          ]
+        },
+        "GetPageNumber": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "blank page offset?"
+              ]
+            }
+          ]
+        },
+        "InsertBarRest": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "voice number",
+                "rest type?"
+              ]
+            }
+          ]
+        },
+        "NthBarObject": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "RemoveLiveTempoTapPoint": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "position"
+              ]
+            }
+          ]
+        },
+        "ResetSpaceAroundBar": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "above",
+                "below"
+              ]
+            }
+          ]
+        },
+        "Respace": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        }
+      },
+      "properties": [
+        "BarNumber",
+        "BarObjectCount",
+        "BreakType",
+        "ExternalBarNumber",
+        "ExternalBarNumberString",
+        "GapAfter",
+        "GapBefore",
+        "InMultirest",
+        "Length",
+        "MusicRestartsOnPage",
+        "NthBarInSystem",
+        "NumBlankPages",
+        "NumBlankPagesBefore",
+        "OnHiddenStave",
+        "OnNthPage",
+        "OnNthPageExternal",
+        "OnNthSystem",
+        "ParentStaff",
+        "SectionEnd",
+        "Selected",
+        "SpecialPageBreakType"
+      ]
+    },
+    "BarObject": {
+      "description": "Contents",
+      "methods": {
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Deselect": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "FreezeMagneticLayoutPositions": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetIsInVoice": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "voicenum"
+              ]
+            }
+          ]
+        },
+        "GetPlayedOnNthPass": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "NextItem": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "voice",
+                "item type?"
+              ]
+            }
+          ]
+        },
+        "PreviousItem": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "voice",
+                "item type?"
+              ]
+            }
+          ]
+        },
+        "RemoveVoice": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "voicenum"
+              ]
+            }
+          ]
+        },
+        "ResetDesign": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ResetPosition": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "horizontal",
+                "vertical?"
+              ]
+            }
+          ]
+        },
+        "Select": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "SetAllVoices": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "SetPlayedOnNthPass": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "n",
+                "do play"
+              ]
+            }
+          ]
+        },
+        "SetVoice": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "voicenum",
+                "clear other voices?"
+              ]
+            }
+          ]
+        },
+        "ShowInAll": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ShowInParts": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ShowInScore": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "TimeOnNthPass": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "CanBeInMultipleVoices",
+        "Color",
+        "ColorAlpha",
+        "ColorRed",
+        "ColorGreen",
+        "ColorBlue",
+        "CueSize",
+        "CurrentTempo",
+        "DrawOrder",
+        "Dx",
+        "Dy",
+        "HasCustomDrawOrder",
+        "Hidden",
+        "OnNthBlankPage",
+        "ParentBar",
+        "Position",
+        "Selected",
+        "Time",
+        "Type",
+        "UsesMagneticLayout",
+        "UsesMagneticLayoutSettingOverridden",
+        "VoiceNumber",
+        "Voices"
+      ]
+    },
+    "BarRest": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "PauseType"
+      ]
+    },
+    "Barline": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "BottomStave",
+        "BottomStaveNum"
+      ]
+    },
+    "Barlines": {
+      "description": "",
+      "methods": {
+        "AddBarline": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "top staff number",
+                "bottom staff number"
+              ]
+            }
+          ]
+        },
+        "ClearAll": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "DeleteNthBarline": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "index"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "Bracket": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "BottomStave",
+        "BottomStaveNum",
+        "BracketType",
+        "TopStave"
+      ]
+    },
+    "Clef": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "ClefStyle",
+        "ConcertClefStyleId",
+        "ConcertClefStyle",
+        "StyleId"
+      ]
+    },
+    "Comment": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Maximized",
+        "Text",
+        "TextWithFormatting",
+        "TextWithFormattingAsString",
+        "TimeStamp"
+      ]
+    },
+    "Component": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "ComponentList": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "Contents": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "Data": {
+      "description": "Variables whose value is remembered between running the plug-in. You can only store strings in these variables, so they\u2019re useful for things like user-visible strings that can be displayed when the plug-in runs. For a more sophisticated approach to global variables, ManuScript provides custom user properties for all objects\u2014see \"Edit Plug-ins\" on page xvi. Example: Test plug-in",
+      "methods": {
+        "AddToPluginsMenu": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "\"menu text\"",
+                "\"function name\""
+              ]
+            }
+          ]
+        },
+        "Asc": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "CharAt": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "expression",
+                "position"
+              ]
+            }
+          ]
+        },
+        "Chr": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "Cmd": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "command name"
+              ]
+            }
+          ]
+        },
+        "CreateArray": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "CreateHash": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ExitPlugin": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetInterpreterOption": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "optionName"
+              ]
+            }
+          ]
+        },
+        "GetValidationError": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "object"
+              ]
+            }
+          ]
+        },
+        "InterpreterOptionExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "optionName"
+              ]
+            }
+          ]
+        },
+        "IsObject": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "IsValid": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "object"
+              ]
+            }
+          ]
+        },
+        "JoinStrings": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "expression",
+                "delimiter"
+              ]
+            }
+          ]
+        },
+        "Length": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "Round": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "RoundDown": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "RoundUp": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "SetInterpreterOption": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "optionName",
+                "optionValue?"
+              ]
+            }
+          ]
+        },
+        "SplitString": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 1,
+              "params": [
+                "expression",
+                "delimiter?",
+                "trimEmpty?"
+              ]
+            }
+          ]
+        },
+        "StopPlugin": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "message?"
+              ]
+            }
+          ]
+        },
+        "Substring": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "expression",
+                "start",
+                "length?"
+              ]
+            }
+          ]
+        },
+        "Trace": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "expression"
+              ]
+            }
+          ]
+        },
+        "ValidationChecking": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "enable",
+                "object1",
+                "object2?",
+                "...?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Loops",
+        "Arithmetic",
+        "Objects",
+        "Indirection",
+        "Dictionary",
+        "Buttons",
+        "Undo",
+        "Miscellaneous",
+        "Reference",
+        "Syntax",
+        "Block",
+        "While",
+        "Switch",
+        "Expressions",
+        "Self",
+        "Identifier",
+        "Operators"
+      ]
+    },
+    "DateTime": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Seconds",
+        "Minutes",
+        "Hours",
+        "DayOfMonth",
+        "Month",
+        "Year",
+        "NthDayOfWeek",
+        "NthDayOfYear",
+        "LongDate",
+        "ShortDate",
+        "LongDateAndTime",
+        "ShortDateAndTime",
+        "TimeWithSeconds",
+        "TimeWithoutSeconds"
+      ]
+    },
+    "Dialogs": {
+      "description": "The layout of any special dialogs you design for your plug-in. Data Variables whose value is remembered between running the plug-in. You can only store strings in these variables, so they\u2019re useful for things like user-visible strings that can be displayed when the plug-in runs. For a more sophisticated approach to global variables, ManuScript provides custom user properties for all objects\u2014see \"Edit Plug-ins\" on page xvi. Example: Test plug-in",
+      "methods": {},
+      "properties": []
+    },
+    "Dictionary": {
+      "description": "Contents",
+      "methods": {
+        "CallMethod": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 4,
+              "params": [
+                "methodname",
+                "param1",
+                "param2",
+                "...paramN"
+              ]
+            }
+          ]
+        },
+        "GetMethodNames": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetPropertyNames": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "MethodExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "methodname"
+              ]
+            }
+          ]
+        },
+        "PropertyExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "propertyname"
+              ]
+            }
+          ]
+        },
+        "SetMethod": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "methodname",
+                "Self",
+                "method"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "DocumentSetup": {
+      "description": "",
+      "methods": {
+        "CreateDefaultParts": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "CreatePartFromStaff": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff"
+              ]
+            }
+          ]
+        },
+        "DeletePart": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "dynamic part"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "AboveTopStaveGap",
+        "AboveTopStaveGapAfterFirstPage",
+        "BelowBottomStaveGap",
+        "BelowBottomStaveGapAfterFirstPage",
+        "FirstPageHasUniqueVerticalStaveMargins",
+        "Orientation",
+        "PageHeight",
+        "PageSize",
+        "PageWidth",
+        "MarginType",
+        "PageBottomMargin",
+        "PageLeftMargin",
+        "PageRightMargin",
+        "PageTopMargin",
+        "RightPageLeftMargin",
+        "RightPageRightMargin",
+        "StaffLeftMarginFullNames",
+        "StaffLeftMarginNoNames",
+        "StaffLeftMarginShortNames",
+        "StaffSize",
+        "Units",
+        "UnitsInDocumentSetupDialog",
+        "DynamicPartCollection"
+      ]
+    },
+    "DynamicPart": {
+      "description": "",
+      "methods": {
+        "AddStaffToPart": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff"
+              ]
+            }
+          ]
+        },
+        "DeleteStaffFromPart": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff"
+              ]
+            }
+          ]
+        },
+        "IncludesStaff": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "IsFullScore",
+        "IsScoreSubset",
+        "IsSelectedInPartsWindow",
+        "StaveCount"
+      ]
+    },
+    "DynamicPartCollection": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "EngravingRules": {
+      "description": "",
+      "methods": {
+        "BarNumberFrequency": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "BarNumberFrequencyCategory",
+                "customFrequency?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "AdjustTranspositionIfKeySigWraps",
+        "BarlineJoinSystemEnd",
+        "BarlineSingleStaves",
+        "BeamThickness",
+        "BarlineWidth",
+        "CautionaryNaturalsInKeySignatures",
+        "CueNoteScale",
+        "DashedBarlineGap",
+        "DashedBarlineLength",
+        "DashedBarlineWidth",
+        "DottedBarlineGap",
+        "DottedBarlineWidth",
+        "DoubleBarlineSeparation",
+        "DoubleBarlineWidth",
+        "DoubleTremoloStyle",
+        "ExtraSpacesAboveForSystemObjectPositions",
+        "ExtraSpacesBelowVocalStaves",
+        "ExtraSpaceBetweenGroupsOfStaves",
+        "FinalBarlineSeparation",
+        "FinalBarlineThinWidth",
+        "FinalBarlineWidth",
+        "GraceNoteScale",
+        "InstrumentNamesFirstSystem",
+        "InstrumentNamesNewSections",
+        "InstrumentNamesSubsequentSystems",
+        "JustifyGrandStaveInstruments",
+        "JustifyMultiStaveInstruments",
+        "LegerLineThickness",
+        "RepeatBarlineAllDots",
+        "RepeatBarlineDoubleThick",
+        "RepeatBarlineWings",
+        "RespellRemoteKeysInTransposingScore",
+        "ShowNameOfPrevailingInstrumentChangeAtStartOfSystems",
+        "SlurMiddleThickness",
+        "SlurOutlineWidth",
+        "SmallStaffSizeScale",
+        "SpacesBetweenStaves",
+        "SpacesBetweenSystems",
+        "StaffJustificationPercentage",
+        "StaffLineWidth",
+        "StemThickness",
+        "ThickBarlineWidth"
+      ]
+    },
+    "File": {
+      "description": "",
+      "methods": {
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Rename": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "newFileName"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "CreationDate",
+        "CreationDateAndTime",
+        "ModificationDate",
+        "Name",
+        "NameWithExt",
+        "NameNoPath",
+        "Path",
+        "Type"
+      ]
+    },
+    "Folder": {
+      "description": "",
+      "methods": {
+        "FileCount": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "Type"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "FileCount",
+        "FileCountAllTypes"
+      ]
+    },
+    "GuitarFrame": {
+      "description": "",
+      "methods": {
+        "CopyOutSuffixes": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetChromaticPitchesOfChordInClosePosition": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "consider root"
+              ]
+            }
+          ]
+        },
+        "GetEndStringForNthBarre": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "barreNum"
+              ]
+            }
+          ]
+        },
+        "GetPositionOfFingerForNthBarre": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "barreNum"
+              ]
+            }
+          ]
+        },
+        "GetPositionOfFingerOnNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "stringNum"
+              ]
+            }
+          ]
+        },
+        "GetStartStringForNthBarre": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "barreNum"
+              ]
+            }
+          ]
+        },
+        "IsNthStringPartOfBarre": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "stringNum"
+              ]
+            }
+          ]
+        },
+        "NthStringHasClosedMarkingAtNut": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "nth string"
+              ]
+            }
+          ]
+        },
+        "NthStringHasOpenMarkingAtNut": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "nth string"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "BassAsString",
+        "ChordNameAsStyledString",
+        "ChordNameAsPlainText",
+        "ChromaticRoot",
+        "ChromaticBass",
+        "DiatonicRoot",
+        "DiatonicBass",
+        "Fingerings",
+        "FrameIsVisible",
+        "Horizontal",
+        "LowestVisibleFret",
+        "NumBarresInChord",
+        "NumberOfFrets",
+        "NumberOfStrings",
+        "NumPitchesInClosePosition",
+        "Recognized",
+        "RootAsString",
+        "ScaleFactor",
+        "ShowFingerings",
+        "SuffixText",
+        "TextIsVisible",
+        "TransposingChromaticRoot",
+        "TransposingChromaticBass",
+        "TransposingDiatonicRoot",
+        "TransposingDiatonicBass",
+        "TransposingRootAsString",
+        "TransposingBassAsString"
+      ]
+    },
+    "GuitarScaleDiagram": {
+      "description": "",
+      "methods": {
+        "GetDotFingeringsOnNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "nth string"
+              ]
+            }
+          ]
+        },
+        "GetDotSymbolsOnNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "nth string"
+              ]
+            }
+          ]
+        },
+        "GetPitchOfNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "stringNum"
+              ]
+            }
+          ]
+        },
+        "GetPitchesOfDotsOnNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "nth string"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Fingerings",
+        "Horizontal",
+        "LowestVisibleFret",
+        "NumberOfFrets",
+        "NumberOfStrings",
+        "Root",
+        "ScaleFactor",
+        "ScaleType"
+      ]
+    },
+    "HitPoint": {
+      "description": "Contents",
+      "methods": {},
+      "properties": [
+        "Bar",
+        "Label",
+        "Position"
+      ]
+    },
+    "HitPointList": {
+      "description": "",
+      "methods": {
+        "Clear": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "CreateHitPoint": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "timeMs",
+                "label"
+              ]
+            }
+          ]
+        },
+        "Remove": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "index"
+              ]
+            }
+          ]
+        },
+        "ShiftTimes": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "timeMs"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "InitialKeySignature": {
+      "description": "Returns the KeySignature object at the start of this staff (read only). IsSystemStaff Returns True for a SystemStaff (read only). Text and SystemTextItem Derived from a BarObject. For system text (such as text belonging to the system staff, retrieved with for each on the SystemStaff object), the type of text objects is SystemTextItem, not Text.",
+      "methods": {},
+      "properties": []
+    },
+    "InstrumentChange": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "FullInstrumentName",
+        "FullInstrumentNameWithFormatting",
+        "FullStaffName",
+        "FullStaffNameWithFormatting",
+        "ShortInstrumentName",
+        "ShortInstrumentNameWithFormatting",
+        "ShortStaffName",
+        "ShortStaffNameWithFormatting",
+        "StyleIdword"
+      ]
+    },
+    "InstrumentType": {
+      "description": "",
+      "methods": {
+        "Clone": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "PitchOfNthString": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "string num"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Balance",
+        "Category",
+        "ChromaticTransposition",
+        "ChromaticTranspositionInScore",
+        "ComfortableRangeHigh",
+        "ComfortableRangeLow",
+        "ConcertClefStyleId",
+        "DefaultSoundId",
+        "DiatonicTransposition",
+        "DiatonicTranspositionInScore",
+        "DialogName",
+        "FullName",
+        "HasBracket",
+        "HasKeySignatureOrTuning",
+        "InstrumentTypeForChordDiagrams",
+        "IsVocal",
+        "NumStaveLines",
+        "NumStrings",
+        "OtherClefStyleId",
+        "Pan",
+        "ProfessionalRangeHigh",
+        "ProfessionalRangeLow",
+        "ShortName",
+        "StyleId"
+      ]
+    },
+    "InstrumentTypeList": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "IsSystemStaff": {
+      "description": "Returns True for a SystemStaff (read only). Text and SystemTextItem Derived from a BarObject. For system text (such as text belonging to the system staff, retrieved with for each on the SystemStaff object), the type of text objects is SystemTextItem, not Text.",
+      "methods": {},
+      "properties": [
+        "EraseBackground",
+        "EraseBackgroundOverridden",
+        "InitialFontName",
+        "InitialFontSize",
+        "JumpAtEndOfBar",
+        "StyleAsText",
+        "StyleId",
+        "Text",
+        "TextWithFormatting"
+      ]
+    },
+    "KeySignature": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "AsText",
+        "IsOneStaffOnly"
+      ]
+    },
+    "Label": {
+      "description": "The label of this TreeNode. NumChildren The number of child TreeNodes belonging to this TreeNode object. Tuplet Derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "Line": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Duration",
+        "EndBarNumber",
+        "EndPosition",
+        "RhDx",
+        "RhDy"
+      ]
+    },
+    "LyricItem": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Duration",
+        "NumNotes",
+        "StyleAsText",
+        "StyleId",
+        "SyllableType"
+      ]
+    },
+    "Major": {
+      "description": "True if this key signature is a major key (read only). Sharps The number of sharps (positive) or flats (negative) in this key signature (read only). Line Anything you can create from the Create > Line dialog is a Line object, such as CrescendoLine, DiminuendoLine, and so on. These objects are derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "MarkAsText": {
+      "description": "The textual representation of this rehearsal mark as drawn in the score. This is determined by the House Style > Engraving Rules options, and can take various forms (numerical or alphabetical). Score You can obtain the Score object by way of the Sibelius object, for example: score = Sibelius.ActiveScore; A Score contains one System Staff and one or more Staff objects. for each variable in returns each staff in the score or the current dynamic part in turn (not the system staff). for each type variable in returns the objects in the score in chronological order, from the top staff to the bottom staff (for simultaneous objects) and then from left to right (again, not including the system staff).",
+      "methods": {},
+      "properties": []
+    },
+    "Name": {
+      "description": "The name of the component (read only). DateTime This object returns information about the current date and time.",
+      "methods": {},
+      "properties": []
+    },
+    "Note": {
+      "description": "",
+      "methods": {
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Transpose": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "degree",
+                "interval type",
+                "keep double accs?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Accidental",
+        "AccidentalStyle",
+        "Bracketed",
+        "Color",
+        "ColorAlpha",
+        "ColorRed",
+        "ColorGreen",
+        "ColorBlue",
+        "DiatonicPitch",
+        "IsAccidentalVisible",
+        "Hidden",
+        "LvTie",
+        "Name",
+        "NoteStyle",
+        "NoteStyleName",
+        "OriginalDeltaSr",
+        "OriginalDuration",
+        "OriginalVelocity",
+        "ParentNoteRest",
+        "Pitch",
+        "Slide",
+        "SlideStyleId",
+        "StringNum",
+        "Tied",
+        "TiedInto",
+        "TieIntoStyle",
+        "TieStyle",
+        "WrittenAccidental",
+        "WrittenDiatonicPitch",
+        "WrittenName",
+        "WrittenPitch",
+        "UseOriginalDeltaSrForPlayback",
+        "UseOriginalDurationForPlayback",
+        "UseOriginalVelocityForPlayback"
+      ]
+    },
+    "NoteRest": {
+      "description": "",
+      "methods": {
+        "AddNote": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "pitch",
+                "tied",
+                "diatonic pitch",
+                "string number?"
+              ]
+            }
+          ]
+        },
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "FlipStem": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetArticulation": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "articulation number"
+              ]
+            }
+          ]
+        },
+        "RemoveNote": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "note"
+              ]
+            }
+          ]
+        },
+        "SetArticulation": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "articulation number",
+                "set"
+              ]
+            }
+          ]
+        },
+        "Transpose": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "degree",
+                "interval type",
+                "keep double accs?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "ArpeggioDx",
+        "ArpeggioType",
+        "ArpeggioTopDy",
+        "ArpeggioBottomDy",
+        "ArpeggioHidden",
+        "Articulations",
+        "Beam",
+        "CrossStaff",
+        "DoubleTremolos",
+        "Duration",
+        "FallDx",
+        "FallType",
+        "FeatheredBeamType",
+        "GraceNote",
+        "HasStemlet",
+        "Highest",
+        "IsAcciaccatura",
+        "IsAppoggiatura",
+        "Lowest",
+        "NoteCount",
+        "ParentTupletIfAny",
+        "PositionInTuplet",
+        "RestPosition",
+        "ScoopDx",
+        "ScoopType",
+        "StemFlipped",
+        "StemletType",
+        "Stemweight"
+      ]
+    },
+    "NumChildren": {
+      "description": "Returns the number of unique barlines in the score (read only). Brackets and Braces Accessed from a Score object. Describes the brackets (which might be brackets, sub-brackets or braces) present in the score. for each bracket in iterates through all the brackets in the list. Array access [int n] returns the nth bracket in the list, or null if the bracket does not exist.",
+      "methods": {
+        "AddBracket": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "type",
+                "top staff number",
+                "bottom staff number"
+              ]
+            }
+          ]
+        },
+        "ClearAll": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "DeleteNthBracket": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "NumComments": {
+      "description": "Returns the number of comments in the version (read only). StartDate Returns a DateTime object representing the version\u2019s start date (read only). VersionComment Accessed using Version objects.",
+      "methods": {},
+      "properties": []
+    },
+    "PageNumberChange": {
+      "description": "",
+      "methods": {
+        "SetFormatChangeOnly": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "format change only"
+              ]
+            }
+          ]
+        },
+        "SetHideOrShow": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "page number visibility"
+              ]
+            }
+          ]
+        },
+        "SetPageNumber": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "page number"
+              ]
+            }
+          ]
+        },
+        "SetPageNumberFormat": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "format"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "PluginList",
+        "BarNumber",
+        "HideOrShow",
+        "PageNumber",
+        "PageNumberAsString",
+        "PageNumberBlankPageOffset"
+      ]
+    },
+    "PageNumberFormat": {
+      "description": "Returns one of four Page number format global constants describing the format of the page number change; see \"Global Constants\" on page clxxxi (read only). PluginList An array that is obtained from Sibelius.Plugins. It can be used in a for each loop or as an array with the [n] operator to access each Plugin object.",
+      "methods": {},
+      "properties": []
+    },
+    "ParentScore": {
+      "description": "Returns the Score object containing this dynamic part (read only). EngravingRules Accessed using the Score object. Corresponds to selected settings in the House Style > Engraving Rules dialog. 4 Object Reference",
+      "methods": {},
+      "properties": []
+    },
+    "Plugin": {
+      "description": "",
+      "methods": {
+        "DataExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "data"
+              ]
+            }
+          ]
+        },
+        "DialogExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "dialog"
+              ]
+            }
+          ]
+        },
+        "MethodExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "method"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "File"
+      ]
+    },
+    "PluginList": {
+      "description": "An array that is obtained from Sibelius.Plugins. It can be used in a for each loop or as an array with the [n] operator to access each Plugin object.",
+      "methods": {
+        "Contains": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "pluginName"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "RehearsalMark": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Mark"
+      ]
+    },
+    "RestType": {
+      "description": "Returns the type of bar rest with one of the constants WholeBarRest (0), BreveBarRest (1), OneBarRepeat (2), TwoBarRepeat (3), FourBarRepeat (4) (read only). To create a bar rest of a particular type, use bar.InsertBarRest() (see above). Bracket Accessed from a BracketsAndBraces object.",
+      "methods": {},
+      "properties": []
+    },
+    "Score": {
+      "description": "",
+      "methods": {
+        "AddBars": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "ApplyStyle": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "style file",
+                "\"style\"",
+                "\"style\"?"
+              ]
+            }
+          ]
+        },
+        "ClefStyleId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "clef style name"
+              ]
+            }
+          ]
+        },
+        "CreateInstrument": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "style ID",
+                "change names?",
+                "\"full name\"?",
+                "\"short name\"?"
+              ]
+            }
+          ]
+        },
+        "CreateInstrumentAtBottom": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "style ID",
+                "change names?",
+                "\"full name\"?",
+                "\"short name\"?"
+              ]
+            }
+          ]
+        },
+        "CreateInstrumentAtTop": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "style ID",
+                "change names?",
+                "\"full name\"?",
+                "\"short name\"?"
+              ]
+            }
+          ]
+        },
+        "CreateInstrumentReturnStave": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "style ID",
+                "change names?",
+                "\"full name\"?",
+                "\"short name\"?"
+              ]
+            }
+          ]
+        },
+        "ExportHouseStyle": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "ExportPartsAsPDF": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "single file",
+                "part IDs",
+                "include score?"
+              ]
+            }
+          ]
+        },
+        "ExportScoreAsPDF": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "ExtractParts": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "show_dialogs",
+                "parts path",
+                "open parts?"
+              ]
+            }
+          ]
+        },
+        "FreezeMagneticLayoutPositions": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetLocationTime": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 1,
+              "params": [
+                "bar number",
+                "position",
+                "pass?"
+              ]
+            }
+          ]
+        },
+        "GetVersions": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            },
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "HideEmptyStaves": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 4,
+              "params": [
+                "startStaveNum",
+                "endStaveNum",
+                "startBarNum",
+                "endBarNum"
+              ]
+            }
+          ]
+        },
+        "InsertBars": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "n",
+                "barNum",
+                "length?"
+              ]
+            }
+          ]
+        },
+        "InternalPageNumToExternalPageNum": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "pagenum"
+              ]
+            }
+          ]
+        },
+        "IsScoreSubset": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "LineStyleId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "line style name"
+              ]
+            }
+          ]
+        },
+        "NoteStyleIndex": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "notehead style name"
+              ]
+            }
+          ]
+        },
+        "NthStaff": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff index from 1"
+              ]
+            }
+          ]
+        },
+        "PlayLiveTempo": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "play"
+              ]
+            }
+          ]
+        },
+        "RemoveAllHighlights": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "RemoveVideo": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "RenameTextStyle": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "\"old name\"",
+                "\"new name\""
+              ]
+            }
+          ]
+        },
+        "Save": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "SaveAs": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 2,
+              "params": [
+                "filename",
+                "type",
+                "use_defaults?",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsAudio": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "include all staves",
+                "play from start",
+                "bit depth",
+                "sample rate?"
+              ]
+            }
+          ]
+        },
+        "SaveAsCompressedAudio": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "include all staves",
+                "play from start",
+                "bit rate",
+                "sample rate?"
+              ]
+            }
+          ]
+        },
+        "SaveAsEarlierVersion": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "versionIdentifier",
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius2": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius2020_1": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            },
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius3": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius4": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius5": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius6": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius7": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius7_5": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius8": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius8_5": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveAsSibelius8_6": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SaveCopyAs": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "foldername?"
+              ]
+            }
+          ]
+        },
+        "SetPlaybackPos": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "bar number",
+                "sr"
+              ]
+            }
+          ]
+        },
+        "ShowEmptyStaves": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 4,
+              "params": [
+                "startStaveNum",
+                "endStaveNum",
+                "startBarNum",
+                "endBarNum"
+              ]
+            }
+          ]
+        },
+        "StaveTypeId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "stave type name"
+              ]
+            }
+          ]
+        },
+        "SymbolExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "symbol"
+              ]
+            }
+          ]
+        },
+        "SymbolIndex": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "symbol name"
+              ]
+            }
+          ]
+        },
+        "SystemCount": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "page num"
+              ]
+            }
+          ]
+        },
+        "TextStyleId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "text style name"
+              ]
+            }
+          ]
+        },
+        "ViewLiveTempo": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "view"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Arranger",
+        "Artist",
+        "AutoOptimizeEnabled",
+        "Barlines",
+        "BarPlaybackOrder",
+        "BarPlaybackOrderString",
+        "BracketsAndBraces",
+        "Composer",
+        "ComposerDates",
+        "Copyist",
+        "Copyright",
+        "CurrentDynamicPart",
+        "CurrentPlaybackPosBar",
+        "CurrentPlaybackPosSr",
+        "Dedication",
+        "DocumentSetup",
+        "DynamicParts",
+        "EditingLocked",
+        "EnableScorchPrinting",
+        "EngravingRules",
+        "FileName",
+        "FocusOnStaves",
+        "HitPoints",
+        "InstrumentChanges",
+        "InstrumentTypes",
+        "IsDynamicPart",
+        "LiveMode",
+        "Lyricist",
+        "MagneticLayoutEnabled",
+        "MainMusicFontName",
+        "MainTextFontName",
+        "MusicTextFontName",
+        "NumberOfPrintCopies",
+        "OpusNumber",
+        "OriginalProgramVersion",
+        "OtherInformation",
+        "PageCount",
+        "PartName",
+        "Publisher",
+        "Redraw",
+        "ScoreDuration",
+        "ScoreEndTime",
+        "ScoreHeight",
+        "ScoreStartTime",
+        "ScoreWidth",
+        "Selection",
+        "ShowMultiRests",
+        "StaffCount",
+        "StaffHeight",
+        "Subtitle",
+        "SystemCount",
+        "SystemObjectPositions",
+        "System",
+        "SystemStaff",
+        "Title",
+        "TransposingScore",
+        "UsingManualBarPlayOrder"
+      ]
+    },
+    "ScoreDescription": {
+      "description": "Returns true if Sibelius\u2019s built-in score description functionality is enabled (read/write). AnnotationItem Represents an annotation. Has no methods or variables but might be referenced in other functions, such as for filtering.",
+      "methods": {},
+      "properties": []
+    },
+    "Selection": {
+      "description": "",
+      "methods": {
+        "Clear": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ClipboardContainsData": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "clipboard Id?"
+              ]
+            }
+          ]
+        },
+        "Copy": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "clipboard Id?"
+              ]
+            }
+          ]
+        },
+        "Delete": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "remove staves?"
+              ]
+            }
+          ]
+        },
+        "ExcludeStaff": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff number"
+              ]
+            }
+          ]
+        },
+        "HideSelectedEmptyStaves": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "IncludeStaff": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staff number"
+              ]
+            }
+          ]
+        },
+        "Paste": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "clipboard Id",
+                "reset positions?"
+              ]
+            }
+          ]
+        },
+        "PasteToPosition": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 3,
+              "params": [
+                "stave num",
+                "bar num",
+                "position",
+                "clipboard Id",
+                "reset positions?"
+              ]
+            }
+          ]
+        },
+        "RestoreSelection": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "SelectSystemPassage": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 1,
+              "params": [
+                "start barNum",
+                "end barNum",
+                "start pos",
+                "end pos?"
+              ]
+            }
+          ]
+        },
+        "StoreCurrentSelection": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Transpose": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 2,
+              "params": [
+                "degree",
+                "interval type",
+                "keep double accs",
+                "transpose keys?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "BottomStaff",
+        "FirstBarNumber",
+        "FirstBarNumberString",
+        "FirstBarSr",
+        "IsPassage",
+        "IsSystemPassage",
+        "LastBarNumber",
+        "LastBarNumberString",
+        "LastBarSr",
+        "TopStaff"
+      ]
+    },
+    "Sharps": {
+      "description": "The number of sharps (positive) or flats (negative) in this key signature (read only). Line Anything you can create from the Create > Line dialog is a Line object, such as CrescendoLine, DiminuendoLine, and so on. These objects are derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "ShowFingerings": {
+      "description": "Set to True if the fingerings string should be displayed, False otherwise (read only). 4 Object Reference HitPointList Retrievable as the HitPoints variable of a score. It can be used in a for each loop or as an array with the [n] operator\u2014this gives access to a HitPoint object. The HitPoint objects are stored in time order, so be careful if you remove or modify the time of the objects inside a loop. If you want to change the times of all the hit points by the same value then use the ShiftTimes function.",
+      "methods": {},
+      "properties": []
+    },
+    "Sibelius": {
+      "description": "",
+      "methods": {
+        "AppendLineToFile": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "filename",
+                "text",
+                "use_unicode?"
+              ]
+            }
+          ]
+        },
+        "AppendLineToRTFFile": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "filename",
+                "text"
+              ]
+            }
+          ]
+        },
+        "AppendTextFile": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "filename",
+                "text",
+                "use_unicode?"
+              ]
+            }
+          ]
+        },
+        "CalculateDegree": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "source pitch",
+                "dest pitch",
+                "upward interval"
+              ]
+            }
+          ]
+        },
+        "CalculateInterval": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "source pitch",
+                "dest pitch",
+                "upward interval"
+              ]
+            }
+          ]
+        },
+        "Close": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "show dialogs"
+              ]
+            }
+          ]
+        },
+        "CloseAllWindows": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "show dialogs"
+              ]
+            }
+          ]
+        },
+        "CloseAllWindowsForScore": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "score",
+                "showDialogs"
+              ]
+            }
+          ]
+        },
+        "CloseDialog": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "dialogName",
+                "pluginName",
+                "returnValue"
+              ]
+            }
+          ]
+        },
+        "CloseWindow": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "show dialogs"
+              ]
+            }
+          ]
+        },
+        "CommandExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "CommandID"
+              ]
+            }
+          ]
+        },
+        "CreateFolder": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "foldername"
+              ]
+            }
+          ]
+        },
+        "CreateProgressDialog": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "caption",
+                "min value",
+                "max value"
+              ]
+            }
+          ]
+        },
+        "CreateRTFFile": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "CreateTextFile": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "DestroyProgressDialog": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "EarlierVersionIdFromName": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "versionName"
+              ]
+            }
+          ]
+        },
+        "EnableControlById": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 4,
+              "params": [
+                "plugin",
+                "dialog",
+                "controlID",
+                "enable"
+              ]
+            }
+          ]
+        },
+        "EnableNthControl": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "nth control",
+                "enable"
+              ]
+            }
+          ]
+        },
+        "Execute": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "CommandID"
+              ]
+            }
+          ]
+        },
+        "FileExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "FindCommandId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "Command Name"
+              ]
+            }
+          ]
+        },
+        "FindCommandName": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "Id"
+              ]
+            }
+          ]
+        },
+        "FindStyleId": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "Style Name"
+              ]
+            }
+          ]
+        },
+        "FolderExists": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "foldername"
+              ]
+            }
+          ]
+        },
+        "GetDocumentsFolder": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetElapsedCentiSeconds": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "timer number"
+              ]
+            }
+          ]
+        },
+        "GetElapsedMilliSeconds": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "timer number"
+              ]
+            }
+          ]
+        },
+        "GetElapsedSeconds": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "timer number"
+              ]
+            }
+          ]
+        },
+        "GetFile": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "file path"
+              ]
+            }
+          ]
+        },
+        "GetFolder": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "file path"
+              ]
+            }
+          ]
+        },
+        "GetListOfCommandNamesInCategory": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "Localized Command Category Name"
+              ]
+            }
+          ]
+        },
+        "GetNotesForChord": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "chord name"
+              ]
+            }
+          ]
+        },
+        "GetNotesForGuitarChord": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "chord name"
+              ]
+            }
+          ]
+        },
+        "GetScoresFolder": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetSyllabifier": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetUserApplicationDataFolder": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GetUserSibeliusFolder": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GoToEnd": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "GoToStart": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "IsDynamicPartOpen": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "dynamic part"
+              ]
+            }
+          ]
+        },
+        "IsFontFamilyInstalled": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "font name"
+              ]
+            }
+          ]
+        },
+        "LaunchApplication": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 1,
+              "params": [
+                "path",
+                "parameters",
+                "hide?"
+              ]
+            }
+          ]
+        },
+        "LiveTempoTap": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "MakeSafeFileName": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "MessageBox": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "string"
+              ]
+            }
+          ]
+        },
+        "MoveActiveViewToBar": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "bar number",
+                "position?"
+              ]
+            }
+          ]
+        },
+        "MoveActiveViewToSelection": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "start of selection?"
+              ]
+            }
+          ]
+        },
+        "New": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "manuscript paper?"
+              ]
+            }
+          ]
+        },
+        "NthScore": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "score index from 0"
+              ]
+            }
+          ]
+        },
+        "Open": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "filename",
+                "quiet?"
+              ]
+            }
+          ]
+        },
+        "Play": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "PlayFromSelection": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "PlayFromStart": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "PrependScreenreaderText": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "string"
+              ]
+            }
+          ]
+        },
+        "Print": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 1,
+              "params": [
+                "number of copies",
+                "dynamic part",
+                "showdialog?"
+              ]
+            }
+          ]
+        },
+        "PrintAllDynamicParts": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "score?"
+              ]
+            }
+          ]
+        },
+        "RandomNumber": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "RandomSeed": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "start number"
+              ]
+            }
+          ]
+        },
+        "RandomSeedTime": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ReadTextFile": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "filename"
+              ]
+            }
+          ]
+        },
+        "RefreshDialog": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "ResetStopWatch": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "timer number"
+              ]
+            }
+          ]
+        },
+        "ScreenreaderText": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "string"
+              ]
+            }
+          ]
+        },
+        "SelectFolder": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "caption?"
+              ]
+            }
+          ]
+        },
+        "SetCurrentScoreViewType": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "view type"
+              ]
+            }
+          ]
+        },
+        "SetFocusToControl": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "pluginName",
+                "dialogName",
+                "controlID"
+              ]
+            }
+          ]
+        },
+        "ShowDialog": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "dialogName",
+                "pluginName"
+              ]
+            }
+          ]
+        },
+        "ShowDynamicPart": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "dynamic part",
+                "newWindow?"
+              ]
+            }
+          ]
+        },
+        "ShowTraceWindow": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "StartLiveTempoRecording": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Stop": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "StopLiveTempoRecording": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "UpdateProgressDialog": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "progress pos",
+                "status message"
+              ]
+            }
+          ]
+        },
+        "YesNoMessageBox": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "string"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "ActiveScore",
+        "ApplicationLanguage",
+        "ApplicationLanguageIsoString",
+        "AvailableCommands",
+        "CommandCategories",
+        "CurrentTime",
+        "CurrentDateShort",
+        "CurrentDateLong",
+        "CurrentDate",
+        "EarlierVersionNames",
+        "FontFamilies",
+        "HouseStyles",
+        "LocalizedApplicationLanguage",
+        "ManuscriptPapers",
+        "OSVersionString",
+        "PathSeparator",
+        "Plugins",
+        "Playing",
+        "ProgramVersion",
+        "ScoreCount",
+        "SuppressDefaultScreenreaderText",
+        "ViewAnnotations",
+        "ViewAttachmentLines",
+        "ViewBarNumbers",
+        "ViewComments",
+        "ViewHandles",
+        "ViewHiddenObjects",
+        "ViewHighlights",
+        "ViewLayoutMarks",
+        "ViewNoteVelocities",
+        "ViewNoteColors",
+        "Description",
+        "Value",
+        "ViewPageMargins",
+        "ViewPlaybackLine"
+      ]
+    },
+    "SingleTremolos": {
+      "description": "Gives the number of tremolo strokes on the stem of this note, in the range \u20131 (for \u201cz on stem\u201d) to 7. Means nothing for rests (read/write). 4 Object Reference Note Only found in NoteRests. Correspond to individual noteheads.",
+      "methods": {},
+      "properties": []
+    },
+    "Size": {
+      "description": "The draw size of the symbol, corresponding to the four available options in the Symbols dialog in Sibelius. The four available values are NormalSize, CueSize, GraceNoteSize and CueGraceNoteSize, all defined as global constants (read/write). SystemObjectPositions Accessed from a Score object. Corresponds to the settings in House Style > System Object Positions.",
+      "methods": {},
+      "properties": []
+    },
+    "SoundInfo": {
+      "description": "",
+      "methods": {
+        "Clone": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "CreateAt": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 0,
+              "params": [
+                "barNumber?",
+                "position?",
+                "nthRepeat?"
+              ]
+            }
+          ]
+        },
+        "MoveTo": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 0,
+              "params": [
+                "barNumber?",
+                "position?",
+                "nthRepeat?"
+              ]
+            }
+          ]
+        },
+        "MoveToNext": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "MoveToPrevious": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        }
+      },
+      "properties": [
+        "ActualSoundId",
+        "BarNum",
+        "IsDrumStave",
+        "NthRepeat",
+        "NumTimesBarPlayed",
+        "PatchName",
+        "Position",
+        "RequestedSoundId",
+        "SoundChangeIndex"
+      ]
+    },
+    "SoundSetName": {
+      "description": "Returns the name of the sound set in use at the current location (read only). StaveNum Returns the 1-based stave number (read only) SparseArray To create a sparse array, use the built-in method CreateSparseArray(a1,a2,a3,a4...an). for each allows you to iterate over the contents of a sparse array.",
+      "methods": {},
+      "properties": []
+    },
+    "SparseArray": {
+      "description": "",
+      "methods": {
+        "Concat": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "array1",
+                "array2 ... arrayN"
+              ]
+            }
+          ]
+        },
+        "Join": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "separator?"
+              ]
+            }
+          ]
+        },
+        "Pop": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Push": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "value1",
+                "value2",
+                "value3 ... valueN"
+              ]
+            }
+          ]
+        },
+        "Reverse": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "Slice": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "start",
+                "end?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Length",
+        "ValidIndices"
+      ]
+    },
+    "SpecialBarline": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "BarlineType",
+        "BarlineInternalType"
+      ]
+    },
+    "SplitMultirest": {
+      "description": "When True, a multirest intersecting the bar in question is split (read/write). Time The time at which the bar starts in the score in milliseconds (read only). Barline Accessed from a Barlines object.",
+      "methods": {},
+      "properties": []
+    },
+    "Staff": {
+      "description": "",
+      "methods": {
+        "AddClef": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 2,
+              "params": [
+                "pos",
+                "concert pitch clef",
+                "transposed pitch clef?"
+              ]
+            }
+          ]
+        },
+        "AddLine": {
+          "signatures": [
+            {
+              "max_params": 7,
+              "min_params": 3,
+              "params": [
+                "pos",
+                "duration",
+                "line style",
+                "dx?",
+                "dy?",
+                "voicenumber?",
+                "hidden?"
+              ]
+            }
+          ]
+        },
+        "AddNote": {
+          "signatures": [
+            {
+              "max_params": 7,
+              "min_params": 6,
+              "params": [
+                "pos",
+                "sounding pitch",
+                "duration",
+                "tied",
+                "voice",
+                "diatonic pitch",
+                "string number?"
+              ]
+            }
+          ]
+        },
+        "AddStaffAbove": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 4,
+              "params": [
+                "ossia",
+                "start bar number",
+                "end bar number",
+                "start pos",
+                "end pos?"
+              ]
+            }
+          ]
+        },
+        "AddStaffBelow": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 4,
+              "params": [
+                "ossia",
+                "start bar number",
+                "end bar number",
+                "start pos",
+                "end pos?"
+              ]
+            }
+          ]
+        },
+        "AddSymbol": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "pos",
+                "symbol index or name"
+              ]
+            }
+          ]
+        },
+        "CurrentKeySignature": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "bar number"
+              ]
+            }
+          ]
+        },
+        "NthBar": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "ResetSpaceAroundStaff": {
+          "signatures": [
+            {
+              "max_params": 4,
+              "min_params": 2,
+              "params": [
+                "above",
+                "below",
+                "from bar",
+                "to bar?"
+              ]
+            }
+          ]
+        },
+        "ScaleFactorChange": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 3,
+              "params": [
+                "StaveScaleFactor",
+                "startBarNum",
+                "endBarNum"
+              ]
+            }
+          ]
+        },
+        "SetSound": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "styleID",
+                "set SoundStage?"
+              ]
+            }
+          ]
+        },
+        "SetSoundID": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "soundID"
+              ]
+            }
+          ]
+        },
+        "SoundIDAtPosition": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 0,
+              "params": [
+                "bar number?",
+                "position?",
+                "nth repeat?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "BankHigh",
+        "BankLow",
+        "BarCount",
+        "BarNumber",
+        "Channel",
+        "Distance",
+        "FullInstrumentName",
+        "FullInstrumentNameWithFormatting",
+        "FullStaffName",
+        "FullStaffNameWithFormatting",
+        "NumStavesInSameInstrument",
+        "InitialClefStyle",
+        "InitialClefStyleId",
+        "InitialInstrumentType",
+        "InitialKeySignature",
+        "InitialStyleId",
+        "InstrumentName",
+        "IsSystemStaff",
+        "IsVocalStaff",
+        "MuteMode",
+        "Pan",
+        "ParentScore",
+        "ShortInstrumentName",
+        "ShortInstrumentNameWithFormatting",
+        "ShortStaffName",
+        "ShortStaffNameWithFormatting",
+        "ShowInFocusOnStaves",
+        "Solo",
+        "SoundIdOverrideIfAny",
+        "Small",
+        "StaffNum"
+      ]
+    },
+    "StartDate": {
+      "description": "Returns a DateTime object representing the version\u2019s start date (read only). VersionComment Accessed using Version objects.",
+      "methods": {},
+      "properties": []
+    },
+    "StaveNum": {
+      "description": "Returns the 1-based stave number (read only) SparseArray To create a sparse array, use the built-in method CreateSparseArray(a1,a2,a3,a4...an). for each allows you to iterate over the contents of a sparse array.",
+      "methods": {},
+      "properties": []
+    },
+    "StyleAsText": {
+      "description": "The name of the line style associated with this line (read only). LyricItem Derived from a BarObject",
+      "methods": {},
+      "properties": []
+    },
+    "StyleId": {
+      "description": "The identifier of the line style associated with this line (read only). StyleAsText The name of the line style associated with this line (read only). LyricItem Derived from a BarObject",
+      "methods": {},
+      "properties": []
+    },
+    "SyllabifiedString": {
+      "description": "Returns the resultant hyphenated string generated by calling the Syllabify method (read only). 4 Object Reference SymbolItem and SystemSymbolItem Derived from a BarObject. For system symbols (such as symbols belonging to the system staff, retrieved with for each on the SystemStaff object), the type of symbol objects is SystemSymbolItem, not SymbolItem.",
+      "methods": {},
+      "properties": [
+        "Index"
+      ]
+    },
+    "Syllabifier": {
+      "description": "",
+      "methods": {
+        "AbbreviateUsingApostrophe": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "useApostrophe"
+              ]
+            }
+          ]
+        },
+        "GetNthSyllable": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "NthSyllableEndsWord": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "Syllabify": {
+          "signatures": [
+            {
+              "max_params": 3,
+              "min_params": 1,
+              "params": [
+                "textToSyllabify",
+                "language",
+                "abbreviate = False?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "AbbreviateUsingApostrophe",
+        "AvailableLanguageIds",
+        "AvailableLanguages",
+        "NumberOfSyllables"
+      ]
+    },
+    "SystemObjectPositions": {
+      "description": "",
+      "methods": {
+        "Clear": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 0,
+              "params": [
+                "removeBelowBottomStaff?"
+              ]
+            }
+          ]
+        },
+        "GetNthStaffShowsSystemObjects": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "staffNum"
+              ]
+            }
+          ]
+        },
+        "SetNthStaffShowsSystemObjects": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 2,
+              "params": [
+                "staffNum",
+                "show"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "NumStavesShowingSystemObjects",
+        "ShowSystemObjectsBelowBottomStaff",
+        "Objects",
+        "IsALine"
+      ]
+    },
+    "SystemStaff": {
+      "description": "",
+      "methods": {
+        "CurrentKeySignature": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "bar number"
+              ]
+            }
+          ]
+        },
+        "CurrentTimeSignature": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "bar number"
+              ]
+            }
+          ]
+        },
+        "NthBar": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "BarCount"
+      ]
+    },
+    "Text": {
+      "description": "The text as a string (read/write). NoteRest Derived from a BarObject. A NoteRest contains Note objects, stored in order of increasing diatonic pitch. For each variable it returns the notes in the NoteRest.",
+      "methods": {},
+      "properties": []
+    },
+    "TextLabel": {
+      "description": "Returns the text that appears above the staff containing the instrument change in the score (read only). InstrumentTypeList Contains a list of InstrumentType objects common to a given score. for each type variable in returns each instrument type in the list, in alphabetical order by the instrument type\u2019s style ID. Array access [int n] returns the nth instrument type, in the same order as using a for each iterator, or null if the instrument type does not exist.",
+      "methods": {},
+      "properties": []
+    },
+    "TextWithFormattingAsString": {
+      "description": "The text including any changes of font or style (read only). TimeSignature Derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "TieMiddleThickness": {
+      "description": "Returns or sets the thickness of the middle of ties in spaces, from the Ties 1 page (read/write). TieOutlineWidth Returns or sets the thickness of tie ends in spaces, from the Ties 1 page (read/write). File Retrievable using for each on a folder.",
+      "methods": {},
+      "properties": []
+    },
+    "TieOutlineWidth": {
+      "description": "Returns or sets the thickness of tie ends in spaces, from the Ties 1 page (read/write). File Retrievable using for each on a folder.",
+      "methods": {},
+      "properties": []
+    },
+    "Time": {
+      "description": "The time at which the bar starts in the score in milliseconds (read only). Barline Accessed from a Barlines object.",
+      "methods": {},
+      "properties": []
+    },
+    "TimeSignature": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "AllowCautionary",
+        "Denominator",
+        "Numerator"
+      ]
+    },
+    "TopStave": {
+      "description": "Returns the Staff object at which the barline starts, relative to the current part. TopStaveNum Returns the number of the top staff included in the barline, relative to the current part. BarObject BarObjects include Clef, Line, NoteRest, and Text objects. All the methods and variables below apply to all specific types of BarObject\u2014they are listed here instead of separately for each type. (To objectoriented programmers, the NoteRest, Clef, and those types are derived from the base class BarObject.)",
+      "methods": {},
+      "properties": []
+    },
+    "TopStaveNum": {
+      "description": "Returns the number of the top staff included in the barline, relative to the current part. BarObject BarObjects include Clef, Line, NoteRest, and Text objects. All the methods and variables below apply to all specific types of BarObject\u2014they are listed here instead of separately for each type. (To objectoriented programmers, the NoteRest, Clef, and those types are derived from the base class BarObject.)",
+      "methods": {},
+      "properties": []
+    },
+    "TransposingClefStyle": {
+      "description": "The transposing score name of this clef (read only). TransposingClefStyleId The transposing score identifier of the style of this clef (read only). Comment Derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "TransposingClefStyleId": {
+      "description": "The transposing score identifier of the style of this clef (read only). Comment Derived from a BarObject.",
+      "methods": {},
+      "properties": []
+    },
+    "TreeNode": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "Tuplet": {
+      "description": "",
+      "methods": {
+        "AddNestedTuplet": {
+          "signatures": [
+            {
+              "max_params": 7,
+              "min_params": 4,
+              "params": [
+                "posInTuplet",
+                "left",
+                "right",
+                "unit",
+                "style",
+                "bracket",
+                "fullDuration?"
+              ]
+            }
+          ]
+        },
+        "AddNote": {
+          "signatures": [
+            {
+              "max_params": 6,
+              "min_params": 3,
+              "params": [
+                "posInTuplet",
+                "pitch",
+                "duration",
+                "tied",
+                "diatonic pitch",
+                "string number?"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": [
+        "Bracket",
+        "FullDuration",
+        "Left",
+        "ParentTupletIfAny",
+        "PlayedDuration",
+        "PositionInTuplet",
+        "Right",
+        "Style",
+        "Text"
+      ]
+    },
+    "Type": {
+      "description": "A string giving the name of the type of the object; Folder for folder objects (read only). GuitarFrame Derived from a BarObject. This refers to chord symbols as created by Create > Chord Symbol, whether or not they show a guitar chord diagram (guitar frame), but is called GuitarFrame in ManuScript for historical reasons.",
+      "methods": {},
+      "properties": []
+    },
+    "Unit": {
+      "description": "The unit used for the tuplet, for example 256 for a triplet of quarter notes (read only). 4 Object Reference Utils Sibelius installs a plug-in called utils.plg that contains a set of useful and common methods that can be called directly by other plug-ins. It is not intended to be run as a plug-in in its own right, so does not appear in the Plug-ins menu.",
+      "methods": {},
+      "properties": []
+    },
+    "UserName": {
+      "description": "Returns the username of the user who created or last edited the comment (read only) ComponentList An array that is obtained from Sibelius.HouseStyles or Sibelius.ManuscriptPapers. It can be used in a for each loop or as an array with the [n] operator to access each Component object:",
+      "methods": {},
+      "properties": []
+    },
+    "Utils": {
+      "description": "",
+      "methods": {},
+      "properties": []
+    },
+    "Version": {
+      "description": "",
+      "methods": {
+        "AddComment": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "text"
+              ]
+            }
+          ]
+        },
+        "Close": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        },
+        "DeleteNthComment": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "GetNthComment": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "OpenAndReturnScore": {
+          "signatures": [
+            {
+              "max_params": 0,
+              "min_params": 0,
+              "params": []
+            }
+          ]
+        }
+      },
+      "properties": [
+        "EndDate",
+        "Name"
+      ]
+    },
+    "VersionComment": {
+      "description": "",
+      "methods": {},
+      "properties": [
+        "Commands",
+        "Measurements",
+        "Breaks",
+        "Accidentals",
+        "Articulations",
+        "Contents",
+        "Symbols",
+        "Tuplets",
+        "SingleTremolos",
+        "Index",
+        "Introduction",
+        "Rationale",
+        "Convention",
+        "Action",
+        "Resources",
+        "Text",
+        "TimeStamp",
+        "UserName",
+        "CommandID",
+        "Accent",
+        "Acciaccatura",
+        "Annotate",
+        "Appoggiatura",
+        "Arpeggio",
+        "Arrange",
+        "Brace",
+        "Bracket",
+        "Cascade",
+        "Clef",
+        "Color",
+        "Comment",
+        "Compare",
+        "Copy",
+        "Highlight",
+        "Cut",
+        "Delete",
+        "Doit",
+        "Downbow",
+        "Duplet",
+        "Exit",
+        "Fall",
+        "Find",
+        "Flat",
+        "Flip",
+        "Fretboard",
+        "Graphic",
+        "Ideas",
+        "Import",
+        "Keyboard",
+        "Keypad",
+        "Line",
+        "Long",
+        "Marcato",
+        "Mixer",
+        "Natural",
+        "Navigator",
+        "New",
+        "Nonuplet",
+        "Octopus",
+        "Open",
+        "Panorama",
+        "Paste",
+        "Performance",
+        "Stop",
+        "Plop",
+        "Preferences",
+        "Print",
+        "Quadruplet",
+        "Quintuplet",
+        "Redo",
+        "Repeat",
+        "Repeats",
+        "Replay",
+        "Rest",
+        "Rewind",
+        "Save",
+        "Scoop",
+        "Septuplet",
+        "Sextuplet",
+        "Sharp",
+        "Handles",
+        "Highlights",
+        "Inspector",
+        "Slide",
+        "Staccatissimo",
+        "Staccato",
+        "Stemlet",
+        "Symbol",
+        "Tenuto",
+        "Tie",
+        "Timeline",
+        "Loop",
+        "Transport",
+        "Transpose",
+        "Triplet",
+        "Tuplet",
+        "Undo",
+        "Upbow",
+        "Video",
+        "Wedge",
+        "Zoom",
+        "Space",
+        "StaffHeight",
+        "Breve",
+        "DottedBreve",
+        "DottedWhole",
+        "Engraving",
+        "Rules",
+        "House",
+        "Dictionary",
+        "SpacingRule",
+        "CustomChordNames",
+        "Lines",
+        "DefaultPartAppearance",
+        "Noteheads",
+        "InstrumentsAndEnsembles",
+        "Clefs",
+        "AllStyles",
+        "BarNumberFormatNormal",
+        "BarNumberFormatNumberLetterLower",
+        "BarNumberFormatNumberLetterUpper",
+        "Instrument",
+        "Time",
+        "Metronome",
+        "Expression",
+        "Multirests",
+        "Chord",
+        "Composer",
+        "Footnote",
+        "Copyright",
+        "Dedication",
+        "Footer",
+        "Worksheet",
+        "Header",
+        "Fingering",
+        "Lyrics",
+        "Lyricist",
+        "Page",
+        "Subtitle",
+        "Title",
+        "Nashville",
+        "Common",
+        "Rehearsal",
+        "Tempo",
+        "Special",
+        "Timecode",
+        "Percussion",
+        "Tablature",
+        "Technique",
+        "Bracketed",
+        "Dashed",
+        "Arrow",
+        "String",
+        "Beam",
+        "Box",
+        "Vertical",
+        "Trill",
+        "Glissando",
+        "Vibrato",
+        "Guitar",
+        "Wide",
+        "Crescendo",
+        "Dotted",
+        "Diminuendo",
+        "Molto",
+        "Hauptstimme",
+        "Nebenstimme",
+        "Pedal",
+        "Portamento",
+        "Alto",
+        "Bass",
+        "Tenor",
+        "Treble",
+        "Null",
+        "Soprano",
+        "Tab",
+        "Flugelhorn",
+        "Ophicleide",
+        "Brass",
+        "Serpent",
+        "Trombone",
+        "Tuba",
+        "Applause",
+        "Birdsong",
+        "Helicopter",
+        "Sampler",
+        "Seashore",
+        "Tape",
+        "Telephone",
+        "Theremin",
+        "Dulcimer",
+        "Kora",
+        "Qanoon",
+        "Santoor",
+        "Zither",
+        "Accordion",
+        "Bandoneon",
+        "Celesta",
+        "Clavichord",
+        "Harmonium",
+        "Harpsichord",
+        "Keyboards",
+        "Melodeon",
+        "Piano",
+        "Synthesizer",
+        "Solo",
+        "Almglocken",
+        "Chimes",
+        "Cimbalom",
+        "Crotales",
+        "Glockenspiel",
+        "Handbells",
+        "Harp",
+        "Kalimba",
+        "Vibraphone",
+        "Xylophone",
+        "Gyil",
+        "Xylorimba",
+        "Altus",
+        "Baritone",
+        "Bassus",
+        "Cantus",
+        "Choir",
+        "Contralto",
+        "Countertenor",
+        "Mean",
+        "Quintus",
+        "Secundus",
+        "Voice",
+        "Contrabass",
+        "Sarangi",
+        "Strings",
+        "Viola",
+        "Violoncello",
+        "Anvil",
+        "Castanets",
+        "Berimbau",
+        "Cymbals",
+        "Tabla",
+        "Udu",
+        "Maracas",
+        "Patsch",
+        "Stamp",
+        "Tambourine",
+        "Triangle",
+        "Whip",
+        "Whistle",
+        "Bagpipes",
+        "Bassoon",
+        "Contrabassoon",
+        "Didgeridoo",
+        "Duduk",
+        "Flageolet",
+        "Flute",
+        "Bansuri",
+        "Harmonica",
+        "Heckelphone",
+        "Mey",
+        "Nai",
+        "Oboe",
+        "Ocarina",
+        "Panpipes",
+        "Piccolo",
+        "Woodwind",
+        "Shakuhachi",
+        "NoBeam",
+        "StartBeam",
+        "ContinueBeam",
+        "SingleBeam",
+        "BracketFull",
+        "BracketBrace",
+        "BracketSub",
+        "MiddleOfSystem",
+        "EndOfSystem",
+        "MiddleOfPage",
+        "EndOfPage",
+        "NotEndOfSystem",
+        "EndOfSystemOrPage",
+        "Default",
+        "SpecialPageBreak",
+        "DoubleSharp",
+        "DoubleFlat",
+        "QuarterSharp",
+        "ThreeQuarterSharp",
+        "QuarterFlat",
+        "ThreeQuarterFlat",
+        "NormalNoteStyle",
+        "BackSlashedNoteStyle",
+        "CrossNoteStyle",
+        "ArrowDownNoteStyle",
+        "DiamondNoteStyle",
+        "ArrowUpNoteStyle",
+        "BeatWithoutStemNoteStyle",
+        "InvertedTriangleNoteStyle",
+        "BeatNoteStyle",
+        "ShapedNote1NoteStyle",
+        "CrossOrDiamondNoteStyle",
+        "ShapedNote2NoteStyle",
+        "BlackAndWhiteDiamondNoteStyle",
+        "ShapedNote3NoteStyle",
+        "HeadlessNoteStyle",
+        "ShapedNote4StemUpNoteStyle",
+        "StemlessNoteStyle",
+        "ShapedNote4StemDownNoteStyle",
+        "SilentNoteStyle",
+        "ShapedNote5NoteStyle",
+        "CueNoteStyle",
+        "ShapedNote6NoteStyle",
+        "SlashedNoteStyle",
+        "ShapedNote7NoteStyle",
+        "Muted",
+        "HalfMuted",
+        "NotMuted",
+        "Custom3Artic",
+        "TriPauseArtic",
+        "PauseArtic",
+        "SquarePauseArtic",
+        "Custom2Artic",
+        "DownBowArtic",
+        "UpBowArtic",
+        "PlusArtic",
+        "HarmonicArtic",
+        "MarcatoArtic",
+        "AccentArtic",
+        "TenutoArtic",
+        "WedgeArtic",
+        "StaccatissimoArtic",
+        "StaccatoArtic",
+        "Custom1Artic",
+        "MiddleOfWord",
+        "EndOfWord",
+        "NormalAcc",
+        "HiddenAcc",
+        "CautionaryAcc",
+        "BracketedAcc",
+        "CommonTimeString",
+        "AllaBreveTimeString",
+        "SegnoSymbol",
+        "CodaSymbol",
+        "RepeatBeatSymbol",
+        "RepeatBarSymbol",
+        "RepeatTwoBarsSymbol",
+        "TrillSymbol",
+        "BracketedTrillSymbol",
+        "MordentSymbol",
+        "InvertedMordentSymbol",
+        "TurnSymbol",
+        "InvertedTurnSymbol",
+        "ReversedTurnSymbol",
+        "TripleMordentSymbol",
+        "InvertedTripleMordentSymbol",
+        "PedalSymbol",
+        "PedalPSymbol",
+        "PedalUpSymbol",
+        "LiftPedalSymbol",
+        "HeelOneSymbol",
+        "HeelTwoSymbol",
+        "ToeOneSymbol",
+        "ToeTwoSymbol",
+        "CommaSymbol",
+        "TickSymbol",
+        "CaesuraSymbol",
+        "ThickCaesuraSymbol",
+        "RepeatSymbols",
+        "GeneralSymbols",
+        "OrnamentSymbols",
+        "KeyboardSymbols",
+        "ChromaticPercussionSymbols",
+        "DrumPercussionSymbols",
+        "MetallicPercussionSymbols",
+        "OtherPercussionSymbols",
+        "BeaterPercussionSymbols",
+        "PercussionTechniqueSymbols",
+        "GuitarSymbols",
+        "ArticulationSymbols",
+        "AccidentalSymbols",
+        "NoteSymbols",
+        "NoteheadSymbols",
+        "RestSymbols",
+        "ConductorSymbols",
+        "ClefSymbols",
+        "OctaveSymbols",
+        "BreakSymbols",
+        "TechniqueSymbols",
+        "AccordionSymbols",
+        "HandbellSymbols",
+        "MiscellaneousSymbols",
+        "NormalSize",
+        "CueSize",
+        "GraceNoteSize",
+        "CueGraceNoteSize",
+        "NoPageBreak",
+        "MusicRestartsAfterXPages",
+        "MusicRestartsOnNextLeftPage",
+        "MusicRestartsOnNextRightPage",
+        "IntervalDiatonic",
+        "Interval5xDiminished",
+        "Interval4xDiminished",
+        "Interval3xDiminished",
+        "Interval2xDiminished",
+        "IntervalDiminished",
+        "IntervalMinor",
+        "IntervalMajor",
+        "IntervalPerfect",
+        "IntervalAugmented",
+        "Interval2xAugmented",
+        "Interval3xAugmented",
+        "Interval4xAugmented",
+        "Interval5xAugmented",
+        "NoMultirest",
+        "StartsMultirest",
+        "EndsMultirest",
+        "MidMultirest",
+        "PageNumberShowAll",
+        "PageNumberHideFirst",
+        "PageNumberHideAll",
+        "PageNumberFormatNormal",
+        "PageNumberFormatRomanUpper",
+        "PageNumberFormatRomanLower",
+        "PageNumberFormatLetterLower",
+        "SpecialBarlineStartRepeat",
+        "SpecialBarlineEndRepeat",
+        "SpecialBarlineDashed",
+        "SpecialBarlineDouble",
+        "SpecialBarlineFinal",
+        "SpecialBarlineInvisible",
+        "SpecialBarlineBetweenStaves",
+        "SpecialBarlineNormal",
+        "SpecialBarlineTick",
+        "SpecialBarlineShort",
+        "SpecialBarlineDotted",
+        "SpecialBarlineTriple",
+        "SpecialBarlineThick",
+        "WholeBarRest",
+        "BreveBarRest",
+        "OneBarRepeat",
+        "TwoBarRepeat",
+        "FourBarRepeat",
+        "ScaleTypeMajor",
+        "ScaleTypeMinor",
+        "ScaleTypeHarmonicMinor",
+        "ScaleTypeMelodicMinor",
+        "ScaleTypeDorian",
+        "ScaleTypePhrygian",
+        "ScaleTypeLydian",
+        "ScaleTypeMixolydian",
+        "ScaleTypeLocrian",
+        "ScaleTypeWholeTone",
+        "ScalrTypeDiminishedHalfWhole",
+        "ScaleTypeDiminishedWholeHalf",
+        "ScaleTypeAlteredDominant",
+        "ScaleTypeLocrianSharp2",
+        "ScaleTypeLydianFlat7",
+        "ScaleTypeMajorBebop",
+        "ScaleTypeDominantBebop",
+        "ScaleTypeLydianSharp5",
+        "ScaleTypePhrygianDominant",
+        "ScaleTypeAugmentedArpeggio",
+        "ScaleTypeMajor7thArpeggio",
+        "ScaleType7thArpeggio",
+        "ScaleTypeMin7Flat5Arpeggio",
+        "ScaleTypeDiminished7thArpeggio",
+        "ScaleTypeMajorPentatonic",
+        "ScaleTypeMinorPentatonic",
+        "ScaleTypeOther",
+        "FeatheredBeamNone",
+        "FeatheredBeamAccel",
+        "FeatheredBeamRit",
+        "DocumentSetupUnitsmm",
+        "DocumentSetupUnitsInches",
+        "DocumentSetupUnitsPoints",
+        "OrientationPortrait",
+        "OrientationLandscape",
+        "PageSizeLetter",
+        "PageSizeTabloid",
+        "PageSizeA5",
+        "PageSizeB5",
+        "PageSizeA4",
+        "PageSizeB4",
+        "PageSizeA3",
+        "PageSizeUSBand",
+        "PageSizeStatement",
+        "PageSizeHymn",
+        "PageSizeOctavo",
+        "PageSizeExecutive",
+        "PageSizeQuarto",
+        "PageSizeConcert",
+        "PageSizeFolio",
+        "PageSizeLegal",
+        "PageSize9_5x12_5",
+        "PageSize10x13",
+        "PageSizeCustom",
+        "PageMarginsSame",
+        "PageMarginsMirrored",
+        "PageMarginsDifferent",
+        "MediumSize",
+        "SmallSize",
+        "ExtraSmallSize",
+        "TupletNoNumber",
+        "TupletLeft",
+        "TupletLeftRight",
+        "TupletLeftRightNote",
+        "TupletBracketOff",
+        "TupletBracketOn",
+        "TupletBracketAuto",
+        "DoubleTremolosTouchingStems",
+        "DoubleTremolosBetweenStems",
+        "DoubleTremolosOuterTremoloTouchingStems",
+        "EverySystem",
+        "NoBarNumbers",
+        "EveryNthBar",
+        "InstrumentNamesFull",
+        "InstrumentNamesShort",
+        "InstrumentNamesNone",
+        "InstrumentChange",
+        "IncludeScoreSubsetsInDynamicPartCollection",
+        "TreatSingleCharacterAsString",
+        "SupportHalfSemitonePitchValues"
+      ]
+    },
+    "VersionHistory": {
+      "description": "",
+      "methods": {
+        "AddVersion": {
+          "signatures": [
+            {
+              "max_params": 2,
+              "min_params": 1,
+              "params": [
+                "name",
+                "comment?"
+              ]
+            }
+          ]
+        },
+        "DeleteNthVersion": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        },
+        "GetNthVersion": {
+          "signatures": [
+            {
+              "max_params": 1,
+              "min_params": 1,
+              "params": [
+                "n"
+              ]
+            }
+          ]
+        }
+      },
+      "properties": []
+    },
+    "ViewReplayMarker": {
+      "description": "Is True if View > Invisibles > Replay Line is enabled (read/write). SoundInfo The SoundInfo object contains information about the playback of a given staff. To get the SoundInfo object for a staff, use for example: staff = Sibelius.ActivateScore.NthStaff(1); soundinfo = staff.SoundInfoAtPosition(1,0,0); The SoundInfo object can be moved around the staff once you have created it, and it returns information about the sound IDs in use throughout the staff.",
+      "methods": {},
+      "properties": []
+    },
+    "VisibleComponents": {
+      "description": "The visible parts of the chord symbol, that is whether it displays a text chord symbol only (TextOnly), a guitar chord diagram only (FrameOnly), both a text chord symbol and a guitar chord diagram (FrameAndText), or whether or not the chord symbol shows a guitar chord diagram based on the type of instrument to which it is attached (InstrumentDependent) (read/write). 4 Object Reference GuitarScaleDiagram Derived from a BarObject. This refers to guitar scale diagrams as created by Create > Guitar Scale Diagram.",
+      "methods": {},
+      "properties": []
+    },
+    "Volume": {
+      "description": "The overall MIDI volume of this staff, corresponding to its fader in the Mixer. Permissible values are 0\u2013 127 (read/write). Syllabifier Acts as a wrapper around Sibelius\u2019s internal Syllabification engine, exposing its functionality to ManuScript. 4 Object Reference",
+      "methods": {},
+      "properties": []
+    },
+    "YearOfComposition": {
+      "description": "Value of Year of composition from File > Score Info (read/write). Selection for each variable in returns every BarObject (which is an object within a bar) in the selection. for each type variable in produces each object of type in the selection. Note that if the selection is a system selection (which is surrounded by a double purple box in Sibelius) then objects in the system staff are returned in such a loop.",
+      "methods": {},
+      "properties": []
+    }
+  },
+  "source": "ManuScript Language.pdf",
+  "version": "1.0"
+}

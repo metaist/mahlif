@@ -62,12 +62,15 @@ def lint_methods(content: str) -> list[LintError]:
 
 
 def _load_method_signatures() -> dict[str, tuple[int, int]]:
-    """Load method signatures from JSON file.
+    """Load method signatures from lang.json.
+
+    For methods that exist on multiple objects with different signatures,
+    we use the most permissive range (min of mins, max of maxes).
 
     Returns:
         Dict mapping method name to (min_params, max_params)
     """
-    json_path = Path(__file__).parent.parent / "manuscript" / "api.json"
+    json_path = Path(__file__).parent.parent / "manuscript" / "lang.json"
     if not json_path.exists():
         return {}
 
@@ -75,12 +78,28 @@ def _load_method_signatures() -> dict[str, tuple[int, int]]:
         data = json.load(f)
 
     signatures: dict[str, tuple[int, int]] = {}
-    for name, info in data.get("methods", {}).items():
-        signatures[name] = (info["min_params"], info["max_params"])
 
-    # Manual overrides for methods with multiple signatures or special cases
-    signatures["AddNote"] = (1, 7)  # Bar or NoteRest context
-    signatures["CreateSparseArray"] = (0, 99)  # Variadic
+    # Collect signatures from all objects
+    for obj_info in data.get("objects", {}).values():
+        for method_name, method_info in obj_info.get("methods", {}).items():
+            for sig in method_info.get("signatures", []):
+                min_p = sig.get("min_params", 0)
+                max_p = sig.get("max_params", 0)
+                if method_name not in signatures:
+                    signatures[method_name] = (min_p, max_p)
+                else:
+                    # Use most permissive range
+                    old_min, old_max = signatures[method_name]
+                    signatures[method_name] = (min(old_min, min_p), max(old_max, max_p))
+
+    # Also add built-in functions
+    for func_name, func_info in data.get("builtin_functions", {}).items():
+        params = func_info.get("params", [])
+        required = len([p for p in params if not str(p).endswith("?")])
+        signatures[func_name] = (required, len(params))
+
+    # Manual overrides for variadic functions
+    signatures["CreateSparseArray"] = (0, 99)
 
     return signatures
 
