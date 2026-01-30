@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 from unittest.mock import patch
 
+import pytest
 
 from mahlif.sibelius.manuscript.ast import Parser, Tokenizer, MethodDef
 from mahlif.sibelius.manuscript.extract import extract_constants
@@ -283,3 +284,104 @@ def test_extract_params_no_parens() -> None:
     parser = Parser(tokens)
     result = parser._extract_params("no parens here")
     assert result == []
+
+
+# =============================================================================
+# Section header heuristic tests
+# =============================================================================
+
+
+def test_is_section_header_with_spaces_and_roman() -> None:
+    """Test section header detection with spaces and Roman numeral."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    # cspell:ignore clxxxi clxxxii
+    assert _is_section_header("Truth Values", ["", "clxxxi", ""])
+    assert _is_section_header("Bar Number Formats", ["clxxxii"])
+
+
+def test_is_section_header_values_pattern() -> None:
+    """Test section header detection with 'Values' pattern."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert _is_section_header("InMultirest Values", [])
+    assert _is_section_header("Units Values", [])
+
+
+def test_is_section_header_types_pattern() -> None:
+    """Test section header detection with 'Types' pattern."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert _is_section_header("Instrument Types", [])
+    assert _is_section_header("Bracket Types", [])
+
+
+def test_is_section_header_chapter() -> None:
+    """Test chapter header detection."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert _is_section_header("7 Global Constants", [])
+
+
+def test_is_section_header_no_match() -> None:
+    """Test that 'Contents' alone (no spaces, no pattern) is not a header."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    # Single word without matching pattern is not a header
+    assert not _is_section_header("Contents", [])
+
+
+def test_is_section_header_not_constant() -> None:
+    """Test that single PascalCase words are not headers."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert not _is_section_header("True", [])
+    assert not _is_section_header("Quarter", [])
+    assert not _is_section_header("MiddleOfWord", [])
+
+
+def test_is_section_header_empty() -> None:
+    """Test empty/short lines are not headers."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert not _is_section_header("", [])
+    assert not _is_section_header("ab", [])
+
+
+def test_is_section_header_long_description() -> None:
+    """Test long lines (descriptions) are not headers."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    long_text = "This is a long description that explains something about the API"
+    assert not _is_section_header(long_text, [])
+
+
+# =============================================================================
+# Main function test
+# =============================================================================
+
+
+def test_extract_main_minimal(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test main() with minimal input."""
+    import sys
+    from io import StringIO
+    from mahlif.sibelius.manuscript.extract import main
+
+    # Minimal input that produces valid JSON
+    minimal_input = "\n" * 10001 + "Truth Values\nTrue\n\n1\n\nIndex\n"
+    monkeypatch.setattr(sys, "stdin", StringIO(minimal_input))
+
+    # Capture stdout
+    captured = StringIO()
+    monkeypatch.setattr(sys, "stdout", captured)
+
+    result = main()
+    assert result == 0
+
+    # Check output is valid JSON
+    import json
+
+    output = json.loads(captured.getvalue())
+    assert "objects" in output
+    assert "constants" in output
+    assert "builtin_functions" in output

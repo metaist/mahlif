@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
+
 from mahlif.sibelius.manuscript.checker import BUILTIN_GLOBALS
 from mahlif.sibelius.manuscript.checker import check_method_body
 
@@ -720,4 +724,105 @@ def test_switch_empty_body() -> None:
     """Test switch with empty body (no cases)."""
     errors = check_method_body("switch (x) { }", parameters=VARS)
     # Empty switch is actually valid (just does nothing)
+    assert errors == []
+
+
+# =============================================================================
+# Module initialization tests
+# =============================================================================
+
+
+def test_missing_lang_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test error when lang.json is missing."""
+    from mahlif.sibelius.manuscript import checker
+
+    # Point to non-existent file
+    fake_path = tmp_path / "nonexistent.json"
+    monkeypatch.setattr(checker, "LANG_JSON_PATH", fake_path)
+
+    with pytest.raises(FileNotFoundError, match="Required language data file"):
+        checker._load_builtin_globals()
+
+
+# =============================================================================
+# More error branch coverage
+# =============================================================================
+
+
+def test_unexpected_rbrace() -> None:
+    """Test standalone closing brace generates error."""
+    errors = check_method_body("x = 1; } y = 2;", parameters=VARS)
+    assert any(e.code == "MS-E001" for e in errors)
+
+
+def test_eof_in_statement() -> None:
+    """Test EOF encountered during parsing (no trailing semicolon)."""
+    errors = check_method_body("x = 1", parameters=VARS)
+    # Should parse successfully - semicolon is optional at end
+    assert errors == []
+
+
+def test_for_each_identifier_no_in() -> None:
+    """Test for each with identifier but missing 'in' - different from type case."""
+    # "for each item { }" - item is identifier, followed by { not 'in'
+    errors = check_method_body("for each item { }", parameters=VARS)
+    # Should get an error about missing 'in'
+    assert any("in" in e.message.lower() for e in errors)
+
+
+def test_deeply_nested_for_each() -> None:
+    """Test nested for each loops."""
+    code = """
+    for each outer in list1 {
+        for each inner in list2 {
+            x = outer + inner;
+        }
+    }
+    """
+    errors = check_method_body(code, parameters=["list1", "list2", "x"])
+    assert errors == []
+
+
+def test_for_loop_with_step() -> None:
+    """Test for loop - step is handled as expression."""
+    errors = check_method_body("for i = 1 to 10 { x = i; }", parameters=VARS)
+    assert errors == []
+
+
+def test_multiple_errors_in_one_body() -> None:
+    """Test that multiple errors are collected."""
+    code = """
+    x = ;
+    y = undefined1;
+    z = undefined2;
+    """
+    errors = check_method_body(code, parameters=["x", "y", "z"])
+    assert len(errors) >= 2  # At least the undefined vars
+
+
+def test_method_call_on_result() -> None:
+    """Test method call on returned value."""
+    errors = check_method_body("x = GetObject().DoSomething();", parameters=VARS)
+    assert errors == []
+
+
+def test_assignment_chain() -> None:
+    """Test chained assignment."""
+    errors = check_method_body("x = y = 1;", parameters=VARS)
+    # ManuScript supports chained assignment
+    assert errors == []
+
+
+def test_return_in_if() -> None:
+    """Test return inside if block."""
+    errors = check_method_body("if (x) { return y; }", parameters=VARS)
+    assert errors == []
+
+
+def test_break_like_pattern() -> None:
+    """Test pattern that might look like break."""
+    # ManuScript doesn't have break, but test parsing
+    errors = check_method_body(
+        "for i = 1 to 10 { if (i > 5) { i = 100; } }", parameters=VARS
+    )
     assert errors == []

@@ -17,37 +17,37 @@ from .tokenizer import TokenType
 import json
 from pathlib import Path
 
+LANG_JSON_PATH = Path(__file__).parent / "lang.json"
+
 
 def _load_builtin_globals() -> set[str]:
-    """Load built-in globals from lang.json."""
-    json_path = Path(__file__).parent / "lang.json"
+    """Load built-in globals from lang.json.
+
+    Raises:
+        FileNotFoundError: If lang.json is missing
+    """
+    if not LANG_JSON_PATH.exists():
+        raise FileNotFoundError(
+            f"Required language data file not found: {LANG_JSON_PATH}\n"
+            "Run: pdftotext 'ManuScript Language.pdf' - | python extract.py > lang.json"
+        )
+
+    with open(LANG_JSON_PATH) as f:
+        data = json.load(f)
+
     globals_set: set[str] = set()
 
-    if json_path.exists():
-        with open(json_path) as f:
-            data = json.load(f)
+    # Add object type names (Sibelius, Self, etc.)
+    for name in data.get("objects", {}):
+        globals_set.add(name)
 
-        # Add object type names (Sibelius, Self, etc.)
-        for name in data.get("objects", {}):
-            globals_set.add(name)
+    # Add built-in functions
+    for name in data.get("builtin_functions", {}):
+        globals_set.add(name)
 
-        # Add built-in functions
-        for name in data.get("builtin_functions", {}):
-            globals_set.add(name)
-
-        # Add all constants
-        for name in data.get("constants", {}):
-            globals_set.add(name)
-
-    # Fallback if JSON not found or incomplete
-    if not globals_set:
-        globals_set = {
-            "Sibelius",
-            "Self",
-            "CreateSparseArray",
-            "True",
-            "False",
-        }
+    # Add all constants
+    for name in data.get("constants", {}):
+        globals_set.add(name)
 
     return globals_set
 
@@ -143,7 +143,17 @@ class MethodBodyChecker:
         elif self._check(TokenType.LBRACE):
             self._parse_block()
         elif self._check(TokenType.RBRACE):
-            # Unexpected closing brace - let caller handle
+            # Unexpected closing brace - report error and skip
+            token = self._current()
+            self.errors.append(
+                CheckError(
+                    token.line,
+                    token.col,
+                    "MS-E001",
+                    "Unexpected '}'",
+                )
+            )
+            self._advance()
             return
         elif self._check(TokenType.SEMICOLON):
             # Empty statement

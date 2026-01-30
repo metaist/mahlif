@@ -30,52 +30,50 @@ import re
 import sys
 from dataclasses import dataclass, field
 
-# Section headers to skip when parsing constants
-CONSTANT_SECTION_HEADERS: set[str] = {
-    "Truth Values",
-    "Measurements",
-    "Positions and Durations",
-    "Style Names",
-    "Bar Number Formats",
-    "Text Styles",
-    "Line Styles",
-    "Clef Styles",
-    "Instrument Types",
-    "Beam Options",
-    "Bracket Types",
-    "Breaks",
-    "Accidentals",
-    "Note Style Names",
-    "MuteMode Constants",
-    "Articulations",
-    "SyllableTypes for LyricItems",
-    "Accidental Styles",
-    "Time Signature Strings",
-    "Symbols",
-    "Special Page Break Types",
-    "Interval Types",
-    "InMultirest Values",
-    "Page Number Visibility Values",
-    "Page Number Format Values",
-    "Special Barlines",
-    "Bar Rest Type Values",
-    "GuitarScaleDiagram Type Values",
-    "FeatheredBeamType Values",
-    "Units Values",
-    "Orientation Values",
-    "PageSize Values",
-    "MarginType Values",
-    "StaffScaleFactor Values",
-    "Tuplets",
-    "SingleTremolos",
-    "DoubleTremolo Values",
-    "BarNumberFrequencyCategory Values",
-    "Instrument Name Values",
-    "Types of Objects in a Bar",
-    "Interpreter Options",
-    "7 Global Constants",
-    "Contents",
-}
+
+def _is_section_header(line: str, next_lines: list[str]) -> bool:
+    """Check if a line is a section header in the constants chapter.
+
+    Section headers in the PDF follow the pattern:
+    - Line contains multiple words (not a single PascalCase constant name)
+    - Often followed by a Roman numeral page number
+    - Contains spaces (constant names don't have spaces)
+
+    Args:
+        line: The line to check
+        next_lines: The next few lines (for context)
+
+    Returns:
+        True if this looks like a section header
+    """
+    # Must have content
+    if not line or len(line) < 3:
+        return False
+
+    # Single PascalCase word is likely a constant, not a header
+    if re.match(r"^[A-Z][a-zA-Z0-9_]+$", line):
+        return False
+
+    # Contains spaces = likely a header like "Truth Values" or "Bar Number Formats"
+    if " " in line:
+        # But skip long descriptions (> 60 chars is probably prose)
+        if len(line) > 60:
+            return False
+        # Check if followed by Roman numeral (page number)
+        for next_line in next_lines[:3]:
+            if re.match(r"^[clxvi]+$", next_line.strip()):
+                return True
+        # Or it's a known pattern like "X Values" or "X Types"
+        if re.search(
+            r"\b(Values|Types|Styles|Names|Options|Constants|Formats)\b", line
+        ):
+            return True
+
+    # Chapter header
+    if line.startswith("7 Global Constants"):
+        return True
+
+    return False
 
 
 @dataclass
@@ -298,7 +296,9 @@ def extract_constants(lines: list[str]) -> dict[str, int | str]:
             i += 1
             continue
 
-        if text in CONSTANT_SECTION_HEADERS:
+        # Skip section headers (detected by heuristic)
+        next_lines = [lines[j] if j < end_idx else "" for j in range(i + 1, i + 5)]
+        if _is_section_header(text, next_lines):
             i += 1
             continue
 
