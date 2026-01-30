@@ -1,392 +1,199 @@
 {
 	Initialize "() {
-AddToPluginsMenu(_PluginMenuName, 'Run');
+AddToPluginsMenu('Cyrus', 'Run');
 }"
-	_PluginMenuName "Cyrus: IPA Syllable Fixer"
 	Run "() {
-// Cyrus: Fix IPA syllabification to match Cyrillic syllable boundaries
-// For the Bärenreiter Onegin edition
-//
-// This plugin reads lyrics on three lines:
-//   Line 1 (verse1): Cyrillic original
-//   Line 2 (verse2): IPA transcription
-//   Line 3 (verse3): German translation
-//
-// It adjusts IPA syllable boundaries to match the Cyrillic,
-// moving consonants from the onset of syllable B to the coda of syllable A.
-
-if (Sibelius.ProgramVersion < 7000) {
-	Sibelius.MessageBox('This plugin requires Sibelius 7 or later.');
-	return False;
-}
-
+Sibelius.MessageBox('Cyrus v4 - with ProcessScore');
 score = Sibelius.ActiveScore;
 if (null = score) {
 	Sibelius.MessageBox('No score is open.');
 	return False;
 }
-
-// Show dialog to get bar range and staff selection
 result = ShowOptionsDialog(score);
 if (result = null) {
-	return False; // User cancelled
+	return False;
 }
-
 startBar = result[0];
 endBar = result[1];
 selectedStaves = result[2];
-
-// Process the score
 report = ProcessScore(score, startBar, endBar, selectedStaves);
-
-// Show results
-if (report = '') {
-	Sibelius.MessageBox('No changes were made.');
-} else {
-	// For long reports, write to a text file
-	lines = CountLines(report);
-	if (lines > 30) {
-		file = Sibelius.SelectFileToSave('Save Cyrus Report', '', '', 'txt', '', 'Text File');
-		if (file != '') {
-			Sibelius.CreateTextFile(file);
-			Sibelius.AppendTextFile(file, report, True);
-			Sibelius.MessageBox('Changes made: ' & lines & Chr(10) & 'Report saved to: ' & file);
-		} else {
-			Sibelius.MessageBox(report);
-		}
-	} else {
-		Sibelius.MessageBox(report);
-	}
-}
-
+Sibelius.MessageBox(report);
 return True;
-}"
-	ShowOptionsDialog "(score) {
-// Build list of staves that have lyrics
-stavesWithLyrics = CreateSparseArray();
-staveNames = CreateSparseArray();
-idx = 0;
-
-for each staff in score {
-	hasLyrics = False;
-	barCount = score.SystemStaff.BarCount;
-	// Check first 20 bars for lyrics
-	checkBars = 20;
-	if (barCount < checkBars) {
-		checkBars = barCount;
-	}
-	for barNum = 1 to checkBars + 1 {
-		bar = staff.NthBar(barNum);
-		for each obj in bar {
-			if (obj.Type = 'LyricItem') {
-				hasLyrics = True;
-			}
-		}
-		if (hasLyrics) {
-			// Break out of bar loop
-			barNum = checkBars + 1;
-		}
-	}
-	if (hasLyrics) {
-		stavesWithLyrics[idx] = staff.StaffNum;
-		staveNames[idx] = staff.InstrumentName;
-		idx = idx + 1;
-	}
-}
-
-if (idx = 0) {
-	Sibelius.MessageBox('No staves with lyrics found in the first 20 bars.');
-	return null;
-}
-
-// Build dialog
-Sibelius.CreateProgressDialog('Cyrus: IPA Syllable Fixer', 0, 0);
-Sibelius.DestroyProgressDialog();
-
-// Simple dialog: bar range
-barCount = score.SystemStaff.BarCount;
-
-startBar = Sibelius.InputBox('Start bar (1 for beginning):', '1');
-if (startBar = '') {
-	return null;
-}
-startBar = 0 + startBar; // Convert to number
-
-endBar = Sibelius.InputBox('End bar (' & barCount & ' for end, or 0 for entire score):', '0');
-if (endBar = '') {
-	return null;
-}
-endBar = 0 + endBar;
-if (endBar = 0) {
-	endBar = barCount;
-}
-
-// Staff selection
-staffList = '';
-for i = 0 to idx {
-	staffList = staffList & stavesWithLyrics[i] & ': ' & staveNames[i] & Chr(10);
-}
-
-staffInput = Sibelius.InputBox('Staves with lyrics:' & Chr(10) & staffList & Chr(10) & 'Enter staff numbers (comma-separated), or 0 for all:', '0');
-if (staffInput = '') {
-	return null;
-}
-
-// Parse staff selection
-selectedStaves = CreateSparseArray();
-if (staffInput = '0') {
-	// All staves with lyrics
-	for i = 0 to idx {
-		selectedStaves[i] = stavesWithLyrics[i];
-	}
-} else {
-	// Parse comma-separated list
-	// Simple parser: look for numbers
-	selIdx = 0;
-	numStr = '';
-	for i = 0 to Length(staffInput) {
-		c = Substring(staffInput, i, 1);
-		if (c = ',' or c = ' ') {
-			if (numStr != '') {
-				selectedStaves[selIdx] = 0 + numStr;
-				selIdx = selIdx + 1;
-				numStr = '';
-			}
-		} else {
-			numStr = numStr & c;
-		}
-	}
-	if (numStr != '') {
-		selectedStaves[selIdx] = 0 + numStr;
-	}
-}
-
-result = CreateSparseArray();
-result[0] = startBar;
-result[1] = endBar;
-result[2] = selectedStaves;
-return result;
 }"
 	ProcessScore "(score, startBar, endBar, selectedStaves) {
 report = '';
 changeCount = 0;
-
+skippedCount = 0;
+boundariesChecked = 0;
+numStaves = 0;
+for i = 0 to 100 {
+	if (selectedStaves[i] = null) {
+		i = 100;
+	} else {
+		numStaves = numStaves + 1;
+	}
+}
+totalBars = (endBar - startBar + 1) * numStaves;
 Sibelius.CreateProgressDialog('Processing...', 0, 100);
-
-totalBars = endBar - startBar + 1;
 barsDone = 0;
-
 for each staff in score {
-	// Check if this staff is selected
 	isSelected = False;
 	for i = 0 to 100 {
 		if (selectedStaves[i] = null) {
-			i = 100; // Break
+			i = 100;
 		} else {
 			if (selectedStaves[i] = staff.StaffNum) {
 				isSelected = True;
-				i = 100; // Break
+				i = 100;
 			}
 		}
 	}
-
 	if (isSelected) {
 		staffName = staff.InstrumentName;
-
 		for barNum = startBar to endBar + 1 {
 			pct = (barsDone * 100) / totalBars;
-			Sibelius.UpdateProgressDialog(pct, 'Bar ' & barNum & ' of ' & endBar);
-
+			Sibelius.UpdateProgressDialog(pct, staffName & ': Bar ' & barNum & ' of ' & endBar);
 			bar = staff.NthBar(barNum);
 			result = ProcessBar(bar, barNum, staffName);
-			if (result != '') {
-				report = report & result;
-				changeCount = changeCount + 1;
+			if (Length(result) >= 4) {
+				for j = 0 to Length(result) - 3 {
+					tag = Substring(result, j, 4);
+					if (tag = 'CHNG') {
+						changeCount = changeCount + 1;
+					}
+					if (tag = 'SKIP') {
+						skippedCount = skippedCount + 1;
+					}
+					if (tag = 'UNRE') {
+						boundariesChecked = boundariesChecked + 1;
+					}
+				}
 			}
+			report = report & result;
 			barsDone = barsDone + 1;
 		}
 	}
 }
-
 Sibelius.DestroyProgressDialog();
-
-if (changeCount > 0) {
-	report = 'Changes made: ' & changeCount & Chr(10) & Chr(10) & report;
-}
-
-return report;
+header = '=== Cyrus Report ===' & Chr(10);
+header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
+header = header & 'Staves: ' & numStaves & Chr(10);
+header = header & 'Skipped: ' & skippedCount & Chr(10);
+header = header & 'Unresolved: ' & boundariesChecked & Chr(10);
+header = header & 'Changes: ' & changeCount & Chr(10);
+return header;
 }"
 	ProcessBar "(bar, barNum, staffName) {
-// Collect all lyrics in this bar, grouped by position
-// We need to find pairs of Cyrillic (verse1) and IPA (verse2) at same position
-
 report = '';
-
-// First, collect all lyrics
-cyrillic = CreateSparseArray();  // position -> text
-ipa = CreateSparseArray();       // position -> LyricItem object
-ipaText = CreateSparseArray();   // position -> text
-cyrSylType = CreateSparseArray(); // position -> syllable type
-
+cyrillic = CreateSparseArray();
+ipa = CreateSparseArray();
+cyrSylType = CreateSparseArray();
 for each obj in bar {
 	if (obj.Type = 'LyricItem') {
 		pos = obj.Position;
 		style = obj.StyleId;
-
-		// Check which verse line this is
 		if (StyleIsVerse1(style)) {
 			cyrillic[pos] = obj.Text;
 			cyrSylType[pos] = obj.SyllableType;
 		} else {
 			if (StyleIsVerse2(style)) {
 				ipa[pos] = obj;
-				ipaText[pos] = obj.Text;
 			}
 		}
 	}
 }
-
-// Now find positions where we have both Cyrillic and IPA
-// and the Cyrillic syllable is not end of word (has continuation)
 positions = GetSortedPositions(cyrillic);
-
 for i = 0 to 1000 {
 	pos = positions[i];
 	if (pos = null) {
-		i = 1000; // Break
+		i = 1000;
 	} else {
 		cyrText = cyrillic[pos];
 		ipaObj = ipa[pos];
-
 		if (ipaObj != null) {
-			// We have both Cyrillic and IPA at this position
 			sylType = cyrSylType[pos];
-
-			// Only process if this is middle of word (not end)
 			if (sylType = MiddleOfWord) {
-				// Find the next syllable position
 				nextPos = positions[i + 1];
 				if (nextPos != null) {
 					nextCyrText = cyrillic[nextPos];
 					nextIpaObj = ipa[nextPos];
-
 					if (nextCyrText != null and nextIpaObj != null) {
-						// Process this syllable boundary
-						result = ProcessSyllableBoundary(
-							cyrText, ipaObj,
-							nextCyrText, nextIpaObj,
-							barNum, pos, staffName
-						);
-						if (result != '') {
-							report = report & result;
-						}
+						result = ProcessSyllableBoundary(cyrText, ipaObj, nextCyrText, nextIpaObj, barNum, pos, staffName);
+						report = report & result;
 					}
 				}
 			}
 		}
 	}
 }
-
 return report;
 }"
 	ProcessSyllableBoundary "(cyrA, ipaObjA, cyrB, ipaObjB, barNum, pos, staffName) {
-// cyrA, cyrB: Cyrillic text of syllables A and B
-// ipaObjA, ipaObjB: LyricItem objects for IPA syllables A and B
-//
-// Goal: Make IPA syllable B's onset match Cyrillic syllable B's onset
-//       by moving consonants from start of IPA-B to end of IPA-A
-
 ipaA = ipaObjA.Text;
 ipaB = ipaObjB.Text;
-
-// Extract expected IPA onset from Cyrillic B
 cyrOnset = ExtractCyrillicOnset(cyrB);
 expectedIpa = MapCyrillicToIpa(cyrOnset);
-
-// Extract actual IPA onset from IPA B (preserving stress marker)
 hasStress = False;
 ipaBWork = ipaB;
 if (Length(ipaB) > 0) {
-	firstChar = Substring(ipaB, 0, 1);
-	if (IsStressMarker(firstChar)) {
+	fc = Substring(ipaB, 0, 1);
+	if (IsStressMarker(fc)) {
 		hasStress = True;
 		ipaBWork = Substring(ipaB, 1, Length(ipaB) - 1);
 	}
 }
-
 actualOnset = ExtractIpaOnset(ipaBWork);
-
-// Check if already matches
 if (OnsetMatches(actualOnset, expectedIpa)) {
-	return ''; // Already correct
+	return 'SKIP';
 }
-
-// Calculate how many consonant units to move
 unitsToMove = CalculateUnitsToMove(ipaBWork, expectedIpa);
-
 if (unitsToMove = 0) {
-	return ''; // Nothing to move (shouldn't happen if we got here)
+	return 'SKIP';
 }
-
 if (unitsToMove < 0) {
-	// Error: couldn't figure out what to move
-	beat = (pos / 256) + 1;
-	return 'Bar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': SKIPPED (could not resolve)' & Chr(10) & '  Cyrillic: ' & cyrA & '-' & cyrB & Chr(10) & '  IPA: ' & ipaA & '-' & ipaB & Chr(10);
+	return 'UNRE';
 }
-
-// Extract the consonant units to move
 toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
 remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
-
-// Build new syllables
 newIpaA = ipaA & toMove;
 newIpaB = remaining;
 if (hasStress) {
 	newIpaB = GetStressMarker() & newIpaB;
 }
-
-// Apply the changes
 ipaObjA.Text = newIpaA;
 ipaObjB.Text = newIpaB;
-
-// Report
 beat = (pos / 256) + 1;
-return 'Bar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': \"' & ipaA & '-' & ipaB & '\" -> \"' & newIpaA & '-' & newIpaB & '\"' & Chr(10);
+return 'CHNGBar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': \"' & ipaA & '-' & ipaB & '\" -> \"' & newIpaA & '-' & newIpaB & '\"' & Chr(10);
 }"
 	ExtractCyrillicOnset "(text) {
-// Extract consonants from start until first vowel
 onset = '';
 vowels = GetCyrillicVowels();
-
-for i = 0 to Length(text) {
-	c = Substring(text, i, 1);
-	if (CharInString(c, vowels)) {
-		return onset; // Hit a vowel, stop
+if (Length(text) > 0) {
+	for i = 0 to Length(text) {
+		c = Substring(text, i, 1);
+		if (CharInString(c, vowels)) {
+			return onset;
+		}
+		onset = onset & c;
 	}
-	onset = onset & c;
 }
 return onset;
 }"
 	MapCyrillicToIpa "(cyrOnset) {
-// Map Cyrillic consonant cluster to expected IPA onset
-// Returns base IPA (without palatalization markers for matching)
-
-// Handle cluster overrides first
 if (cyrOnset = 'сч' or cyrOnset = 'зч' or cyrOnset = 'жч') {
 	return 'ʃ';
 }
-
-// Single consonant mapping (return base, ignore palatalization for matching)
 result = '';
-for i = 0 to Length(cyrOnset) {
-	c = Substring(cyrOnset, i, 1);
-	mapped = MapSingleCyrillicConsonant(c);
-	result = result & mapped;
+if (Length(cyrOnset) > 0) {
+	for i = 0 to Length(cyrOnset) {
+		c = Substring(cyrOnset, i, 1);
+		mapped = MapSingleCyrillicConsonant(c);
+		result = result & mapped;
+	}
 }
 return result;
 }"
 	MapSingleCyrillicConsonant "(c) {
-// Map single Cyrillic consonant to IPA base
 if (c = 'п') { return 'p'; }
 if (c = 'б') { return 'b'; }
 if (c = 'т') { return 't'; }
@@ -408,25 +215,19 @@ if (c = 'ц') { return 't͡s'; }
 if (c = 'й') { return 'j'; }
 if (c = 'х') { return 'x'; }
 if (c = 'л') { return 'ɫ'; }
-// Soft/hard signs - no IPA output
 if (c = 'ь') { return ''; }
 if (c = 'ъ') { return ''; }
-return ''; // Unknown
+return '';
 }"
 	ExtractIpaOnset "(text) {
-// Extract consonant units from start until first vowel
 onset = '';
 vowels = GetIpaVowels();
 i = 0;
-
 while (i < Length(text)) {
-	// Check if we've hit a vowel
 	c = Substring(text, i, 1);
 	if (CharInString(c, vowels)) {
 		return onset;
 	}
-
-	// Extract one consonant unit (may be multi-character for affricates)
 	unit = ExtractOneConsonantUnit(text, i);
 	onset = onset & unit;
 	i = i + Length(unit);
@@ -434,90 +235,62 @@ while (i < Length(text)) {
 return onset;
 }"
 	ExtractOneConsonantUnit "(text, startIdx) {
-// Extract one consonant unit starting at startIdx
-// A unit is: base consonant + optional tie bar + optional second consonant + diacritics
-// Examples: t͡ʃʲ, nʲː, ɫ, j
-
 if (startIdx >= Length(text)) {
 	return '';
 }
-
 unit = '';
 c = Substring(text, startIdx, 1);
 unit = unit & c;
-
 idx = startIdx + 1;
-
-// Check for tie bar (affricate)
 if (idx < Length(text)) {
-	next = Substring(text, idx, 1);
-	if (IsTieBar(next)) {
-		unit = unit & next;
+	nxt = Substring(text, idx, 1);
+	if (IsTieBar(nxt)) {
+		unit = unit & nxt;
 		idx = idx + 1;
-		// Get the second part of affricate
 		if (idx < Length(text)) {
-			next = Substring(text, idx, 1);
-			unit = unit & next;
+			nxt = Substring(text, idx, 1);
+			unit = unit & nxt;
 			idx = idx + 1;
 		}
 	}
 }
-
-// Collect any following diacritics (palatalization, length, etc.)
 while (idx < Length(text)) {
-	next = Substring(text, idx, 1);
-	if (IsDiacritic(next)) {
-		unit = unit & next;
+	nxt = Substring(text, idx, 1);
+	if (IsDiacritic(nxt)) {
+		unit = unit & nxt;
 		idx = idx + 1;
 	} else {
-		idx = Length(text); // Break
+		idx = Length(text);
 	}
 }
-
 return unit;
 }"
 	OnsetMatches "(actualOnset, expectedIpa) {
-// Check if actual IPA onset matches expected
-// Strip diacritics from actual for comparison
-
 if (expectedIpa = '') {
-	// Expected empty onset means IPA should start with vowel
 	return (actualOnset = '');
 }
-
-// Normalize actual onset (remove palatalization, length markers)
 normalized = NormalizeIpaForMatching(actualOnset);
-
 return (normalized = expectedIpa);
 }"
 	NormalizeIpaForMatching "(text) {
-// Remove palatalization and length markers for matching
 result = '';
-for i = 0 to Length(text) {
-	c = Substring(text, i, 1);
-	if (not(IsDiacritic(c))) {
-		result = result & c;
+if (Length(text) > 0) {
+	for i = 0 to Length(text) {
+		c = Substring(text, i, 1);
+		if (not(IsDiacritic(c))) {
+			result = result & c;
+		}
 	}
 }
 return result;
 }"
 	CalculateUnitsToMove "(ipaB, expectedIpa) {
-// Calculate how many consonant units to move from ipaB
-// to make its onset match expectedIpa
-//
-// Returns: number of units to move (0 if already matches, -1 if error)
-
 if (expectedIpa = '') {
-	// Expected empty onset - count all onset consonants
 	onset = ExtractIpaOnset(ipaB);
 	return CountConsonantUnits(onset);
 }
-
-// Count consonant units in the onset
 onset = ExtractIpaOnset(ipaB);
 totalUnits = CountConsonantUnits(onset);
-
-// Try removing units from the front until we get expected
 for unitsToRemove = 0 to totalUnits + 1 {
 	remaining = RemoveNConsonantUnits(onset, unitsToRemove);
 	normalized = NormalizeIpaForMatching(remaining);
@@ -525,13 +298,10 @@ for unitsToRemove = 0 to totalUnits + 1 {
 		return unitsToRemove;
 	}
 }
-
-// Check if the expected onset isn't even present
 if (not(StringContains(NormalizeIpaForMatching(onset), expectedIpa))) {
-	return -1; // Error: expected onset not found
+	return -1;
 }
-
-return -1; // Couldn't figure it out
+return -1;
 }"
 	CountConsonantUnits "(text) {
 count = 0;
@@ -548,59 +318,35 @@ while (idx < Length(text)) {
 return count;
 }"
 	ExtractConsonantUnits "(text, numUnits) {
-// Extract the first numUnits consonant units from text
 result = '';
 idx = 0;
-for u = 1 to numUnits + 1 {
-	if (idx < Length(text)) {
-		unit = ExtractOneConsonantUnit(text, idx);
-		result = result & unit;
-		idx = idx + Length(unit);
+if (numUnits > 0) {
+	for u = 1 to numUnits + 1 {
+		if (idx < Length(text)) {
+			unit = ExtractOneConsonantUnit(text, idx);
+			result = result & unit;
+			idx = idx + Length(unit);
+		}
 	}
 }
 return result;
 }"
 	RemoveNConsonantUnits "(text, n) {
-// Remove first n consonant units from text, return remainder
 idx = 0;
-for u = 1 to n + 1 {
-	if (idx < Length(text)) {
-		unit = ExtractOneConsonantUnit(text, idx);
-		idx = idx + Length(unit);
+if (n > 0) {
+	for u = 1 to n + 1 {
+		if (idx < Length(text)) {
+			unit = ExtractOneConsonantUnit(text, idx);
+			idx = idx + Length(unit);
+		}
 	}
 }
 return Substring(text, idx, Length(text) - idx);
-}"
-	GetSortedPositions "(arr) {
-// Get sorted list of positions (keys) from sparse array
-// Since we iterate from 0 to 4096, positions are naturally sorted
-positions = CreateSparseArray();
-count = 0;
-
-// Collect positions - check a reasonable range (4 bars worth at 256th resolution)
-for pos = 0 to 4096 {
-	if (arr[pos] != null) {
-		positions[count] = pos;
-		count = count + 1;
-	}
-}
-
-return positions;
-}"
-	StyleIsVerse1 "(styleId) {
-// Check if style is verse 1 (Cyrillic)
-return (styleId = 'text.staff.space.hypen.lyrics.verse1');
-}"
-	StyleIsVerse2 "(styleId) {
-// Check if style is verse 2 (IPA)
-return (styleId = 'text.staff.space.hypen.lyrics.verse2');
 }"
 	GetCyrillicVowels "() {
 return 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
 }"
 	GetIpaVowels "() {
-// IPA vowels for onset detection
-// Configurable - edit this string to update vowel set
 return 'ɑʌɐeɛɪiouaæ';
 }"
 	GetStressMarker "() {
@@ -610,19 +356,18 @@ return 'ˈ';
 return (c = 'ˈ');
 }"
 	IsTieBar "(c) {
-// Unicode tie bar for affricates
 return (c = '͡');
 }"
 	IsDiacritic "(c) {
-// Check if character is a diacritic that modifies a consonant
-// Includes: palatalization, length, combining marks
-diacritics = 'ʲːˑ̃';
+diacritics = 'ʲːˑ̟̃';
 return CharInString(c, diacritics);
 }"
 	CharInString "(c, str) {
-for i = 0 to Length(str) {
-	if (Substring(str, i, 1) = c) {
-		return True;
+if (Length(str) > 0) {
+	for i = 0 to Length(str) {
+		if (Substring(str, i, 1) = c) {
+			return True;
+		}
 	}
 }
 return False;
@@ -632,20 +377,67 @@ if (needle = '') {
 	return True;
 }
 needleLen = Length(needle);
-for i = 0 to Length(haystack) - needleLen + 1 {
-	if (Substring(haystack, i, needleLen) = needle) {
-		return True;
+maxIdx = Length(haystack) - needleLen + 1;
+if (maxIdx >= 0) {
+	for i = 0 to maxIdx {
+		if (Substring(haystack, i, needleLen) = needle) {
+			return True;
+		}
 	}
 }
 return False;
 }"
-	CountLines "(text) {
-count = 1;
-for i = 0 to Length(text) {
-	if (Substring(text, i, 1) = Chr(10)) {
+	GetSortedPositions "(arr) {
+positions = CreateSparseArray();
+count = 0;
+for pos = 0 to 4096 {
+	if (arr[pos] != null) {
+		positions[count] = pos;
 		count = count + 1;
 	}
 }
-return count;
+return positions;
+}"
+	StyleIsVerse1 "(styleId) {
+return (styleId = 'text.staff.space.hypen.lyrics.verse1');
+}"
+	StyleIsVerse2 "(styleId) {
+return (styleId = 'text.staff.space.hypen.lyrics.verse2');
+}"
+	ShowOptionsDialog "(score) {
+stavesWithLyrics = CreateSparseArray();
+idx = 0;
+barCount = score.SystemStaff.BarCount;
+checkBars = 200;
+if (barCount < checkBars) {
+	checkBars = barCount;
+}
+for each staff in score {
+	hasLyrics = False;
+	for barNum = 1 to checkBars + 1 {
+		bar = staff.NthBar(barNum);
+		for each obj in bar {
+			if (obj.Type = 'LyricItem') {
+				hasLyrics = True;
+			}
+		}
+		if (hasLyrics) {
+			barNum = checkBars + 1;
+		}
+	}
+	if (hasLyrics) {
+		stavesWithLyrics[idx] = staff.StaffNum;
+		idx = idx + 1;
+	}
+}
+if (idx = 0) {
+	Sibelius.MessageBox('No staves with lyrics found.');
+	return null;
+}
+result = CreateSparseArray();
+result[0] = 1;
+result[1] = barCount;
+result[2] = stavesWithLyrics;
+return result;
 }"
 }
