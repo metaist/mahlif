@@ -13,6 +13,7 @@ Run "() { }"
 ```
 
 **Expected errors:**
+
 - `MS-E010` - Plugin must start with '{'
 - `MS-E001` - Unmatched closing '}'
 
@@ -27,6 +28,7 @@ A plugin file must end with `}`.
 ```
 
 **Expected errors:**
+
 - `MS-E003` - Unclosed '{'
 - `MS-E011` - Plugin must end with '}'
 
@@ -41,6 +43,7 @@ Every plugin should have an `Initialize` method.
 ```
 
 **Expected errors:**
+
 - `MS-W010` - Missing 'Initialize' method
 
 ## Initialize Without AddToPluginsMenu
@@ -55,6 +58,7 @@ The `Initialize` method should call `AddToPluginsMenu` to add the plugin to the 
 ```
 
 **Expected errors:**
+
 - `MS-W011` - Initialize should call 'AddToPluginsMenu'
 
 ## Valid Minimal Plugin

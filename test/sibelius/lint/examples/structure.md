@@ -17,4 +17,5 @@ Double quotes inside method bodies must be escaped since the body itself is wrap
 ```
 
 **Expected errors:**
+
 - `MS-E050` - Unescaped double quote in method body

@@ -16,6 +16,7 @@ Assignment requires a value on the right side.
 ```
 
 **Expected errors:**
+
 - `MS-E048` - Unexpected token ';'
 
 ## Incomplete Binary Expression
@@ -32,6 +33,7 @@ Binary operators require operands on both sides.
 ```
 
 **Expected errors:**
+
 - `MS-E046` - Expected expression after operator
 
 ## Missing Semicolon
@@ -49,6 +51,7 @@ Statements must end with a semicolon.
 ```
 
 **Expected errors:**
+
 - `MS-E044` - Expected ';' after statement
 
 ## Missing Property Name
@@ -65,6 +68,7 @@ Property access requires a name after the dot.
 ```
 
 **Expected errors:**
+
 - `MS-E047` - Expected property or method name after '.'
 
 ## Unclosed Parenthesis in Expression
@@ -79,6 +83,7 @@ Property access requires a name after the dot.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')' after expression
 
 ## Unclosed Function Call
@@ -93,6 +98,7 @@ Property access requires a name after the dot.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')' to close function call
 
 ## Incomplete Binary Expression
@@ -109,6 +115,7 @@ Missing operand after operator.
 ```
 
 **Expected errors:**
+
 - `MS-E046` - Expected expression after operator
 
 ## Missing Property Name
@@ -126,6 +133,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E047` - Expected property name after '.'
 
 ## Unclosed Parenthesis
@@ -140,6 +148,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')'
 
 ## Unclosed Function Call
@@ -154,6 +163,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')' or ','
 
 ## Unclosed Array Index
@@ -169,6 +179,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ']'
 
 ## Unexpected Closing Brace
@@ -185,6 +196,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E001` - Unexpected '}'
 
 ## Valid Chained Method Call
@@ -230,6 +242,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E046` - Expected expression after operator
 
 ## Missing Operand After Division
@@ -244,6 +257,7 @@ Dot notation requires a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E046` - Expected expression after operator
 
 ## User Property Syntax Error
@@ -261,6 +275,7 @@ The `:` in user property syntax must be followed by a property name.
 ```
 
 **Expected errors:**
+
 - `MS-E047` - Expected property name after ':'
 
 ## Empty Expression in Call
@@ -322,4 +337,5 @@ An expression is expected but none provided.
 ```
 
 **Expected errors:**
+
 - `MS-E045` - Expected expression

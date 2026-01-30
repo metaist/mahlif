@@ -6,6 +6,8 @@ Tests for inline lint suppression directives.
 
 The `// noqa` comment suppresses errors on the same or next line.
 
+<!-- prettier-ignore-start -->
+
 ```manuscript
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
@@ -13,10 +15,13 @@ The `// noqa` comment suppresses errors on the same or next line.
 }
 ```
 
+<!-- prettier-ignore-end -->
+
 **Expected errors:**
+
 - `MS-W002` - Trailing whitespace
 
-NOTE: The line `Run "() { }" ` has trailing whitespace. Adding `// noqa: MS-W002` 
+NOTE: The line `Run "() { }" ` has trailing whitespace. Adding `// noqa: MS-W002`
 would suppress this error, but we can't test suppression in the example format
 since we're testing what errors ARE reported.
 
@@ -39,6 +44,8 @@ The `// mahlif: ignore MS-XXXX` comment works like noqa for specific codes.
 The `// mahlif: disable` and `// mahlif: enable` comments create regions
 where specific errors are suppressed.
 
+<!-- prettier-ignore-start -->
+
 ```manuscript
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
@@ -48,6 +55,8 @@ where specific errors are suppressed.
     // mahlif: enable MS-W002
 }
 ```
+
+<!-- prettier-ignore-end -->
 
 **Expected errors:**
 (none)

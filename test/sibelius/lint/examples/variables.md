@@ -16,6 +16,7 @@ Variables must be defined before use.
 ```
 
 **Expected errors:**
+
 - `MS-W020` - Variable 'y' may be undefined
 
 ## Variable Defined by Assignment

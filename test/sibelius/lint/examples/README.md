@@ -3,7 +3,7 @@
 This directory contains example ManuScript code with expected lint errors.
 Each `.md` file contains one or more test cases in the following format:
 
-~~~markdown
+````markdown
 ## Test Name
 
 Description of what this test checks.
@@ -13,13 +13,15 @@ Description of what this test checks.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '(' after 'if'
 - `MS-W002` - Trailing whitespace
 
 **Reference:** ManuScript Language Guide, page xxii
-~~~
+````
 
 The test runner (`test/test_lint_examples.py`) parses these files and:
+
 1. Extracts the code from `manuscript` code blocks
 2. Runs the linter on the code
 3. Compares actual error codes against expected codes

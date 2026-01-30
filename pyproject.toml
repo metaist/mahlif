@@ -70,6 +70,9 @@ disable_error_code = "unused-ignore"
 [tool.pyright]
 exclude = ["**/_vendor/**"]
 
+[tool.pytest.ini_options]
+addopts = "--cov=src --cov-branch --cov-report=term-missing"
+
 [tool.ds.scripts] # run dev scripts <https://github.com/metaist/ds>
 # Build
 setup = "uv sync"
@@ -85,12 +88,12 @@ clean = """
 """
 
 # Lint
-lint = ["ruff-*", "sibelius-lint", "cspell", "prettier", "xmllint", "zizmor"]
+lint = ["ruff-*", "manuscript-lint", "cspell", "prettier", "xmllint", "zizmor"]
 ruff-format = "uvx ruff format ${@:-.}"
 ruff-lint = "uvx ruff check --fix ${@:-.}"
-sibelius-lint = "uv run mahlif sibelius check --fix ${@:-}"
+manuscript-lint = "uv run mahlif manuscript check --fix ${@:-}"
 cspell = "npx -y cspell lint --unique --no-progress --gitignore --exclude '**/_vendor/**' '**/*.{py,txt,md,markdown}'"
-prettier = "npx -y prettier --write '**/*.{md,json,yaml,yml}' '!**/node_modules/**' '!**/.venv/**'"
+prettier = "npx -y prettier --log-level warn --write '**/*.{md,json,yaml,yml}' '!**/node_modules/**' '!**/.venv/**'"
 xmllint = "find test/data -name '*.xml' -exec xmllint --noout {} \\;"
 zizmor = "uvx zizmor --quiet .github"
 
@@ -113,20 +116,7 @@ mypy = """
 # Test
 test.help = "run unit tests"
 test.env = { PYTHONPATH = "src" }
-test.shell = """
-  coverage run --branch --source=src -m \
-    pytest \
-      --doctest-modules \
-      --doctest-ignore-import-errors \
-      "--ignore-glob=*/_vendor/*" \
-      "--ignore-glob=*/.venv/*" \
-      $@ src test &&
-  coverage report --omit='*/_vendor/*' -m
-"""
-
-coverage-report = "coverage html"
-coverage-serve = { shell = "uv run -m http.server 8080", cwd = "htmlcov" }
-coverage = ["coverage-*"]
+test.shell = "pytest --doctest-modules $@ src test"
 
 # Documentation
 docs = ["cog", "mkdocs build"]

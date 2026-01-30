@@ -5,6 +5,7 @@
 Space around `=`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { x=1; }"
@@ -12,6 +13,7 @@ Run "() { x=1; }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -25,6 +27,7 @@ Run "() { x=1; }"
 Space around `+`, `-`, `*`, `/`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { x=a+b*c-d/e; }"
@@ -32,6 +35,7 @@ Run "() { x=a+b*c-d/e; }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -45,6 +49,7 @@ Run "() { x=a+b*c-d/e; }"
 Space around `<`, `>`, `<=`, `>=`, `!=`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { if (x<5) { y=1; } }"
@@ -52,6 +57,7 @@ Run "() { if (x<5) { y=1; } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -67,6 +73,7 @@ Run "() { if (x<5) { y=1; } }"
 Space around `and`, `or`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { if (x and y or z) { a=1; } }"
@@ -74,6 +81,7 @@ Run "() { if (x and y or z) { a=1; } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -89,6 +97,7 @@ Run "() { if (x and y or z) { a=1; } }"
 Space after comma, not before.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { foo(a,b,c); }"
@@ -96,6 +105,7 @@ Run "() { foo(a,b,c); }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -109,6 +119,7 @@ Run "() { foo(a,b,c); }"
 Space after `if`, `while`, `for`, `switch`, `case`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { if(x){ y=1; } }"
@@ -116,6 +127,7 @@ Run "() { if(x){ y=1; } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -131,6 +143,7 @@ Run "() { if(x){ y=1; } }"
 Method calls have no space around `.`.
 
 **Input:**
+
 ```manuscript
 {
 Run "() { Sibelius . MessageBox ( 'hi' ); }"
@@ -138,6 +151,7 @@ Run "() { Sibelius . MessageBox ( 'hi' ); }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -149,6 +163,7 @@ Run "() { Sibelius . MessageBox ( 'hi' ); }"
 ## No Space Inside Parentheses
 
 **Input:**
+
 ```manuscript
 {
 Run "() { foo( a, b ); }"
@@ -156,6 +171,7 @@ Run "() { foo( a, b ); }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -167,6 +183,7 @@ Run "() { foo( a, b ); }"
 ## No Space Inside Brackets
 
 **Input:**
+
 ```manuscript
 {
 Run "() { x = arr[ 0 ]; }"
@@ -174,6 +191,7 @@ Run "() { x = arr[ 0 ]; }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {

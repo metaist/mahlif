@@ -18,6 +18,7 @@ Opening and closing braces must match in type.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')' after expression
 
 ## Unclosed Parenthesis
@@ -34,6 +35,7 @@ All opening parentheses must have matching closing parentheses.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')' after expression
 
 ## Balanced Braces

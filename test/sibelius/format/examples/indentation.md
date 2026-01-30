@@ -5,6 +5,7 @@
 Methods should be indented one level inside the plugin.
 
 **Input:**
+
 ```manuscript
 {
 Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
@@ -12,6 +13,7 @@ Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Initialize "() {
@@ -25,6 +27,7 @@ Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
 Each nested block adds one indentation level.
 
 **Input:**
+
 ```manuscript
 {
 Initialize "() { if (x) { if (y) { z = 1; } } }"
@@ -32,6 +35,7 @@ Initialize "() { if (x) { if (y) { z = 1; } } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Initialize "() {
@@ -47,6 +51,7 @@ Initialize "() { if (x) { if (y) { z = 1; } } }"
 ## For Loop Indentation
 
 **Input:**
+
 ```manuscript
 {
 Run "() { for i = 1 to 10 { x = i; } }"
@@ -54,6 +59,7 @@ Run "() { for i = 1 to 10 { x = i; } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -67,6 +73,7 @@ Run "() { for i = 1 to 10 { x = i; } }"
 ## While Loop Indentation
 
 **Input:**
+
 ```manuscript
 {
 Run "() { while (x > 0) { x = x - 1; } }"
@@ -74,6 +81,7 @@ Run "() { while (x > 0) { x = x - 1; } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
@@ -87,6 +95,7 @@ Run "() { while (x > 0) { x = x - 1; } }"
 ## Switch Statement Indentation
 
 **Input:**
+
 ```manuscript
 {
 Run "() { switch (x) { case (1) { y = 1; } default { y = 0; } } }"
@@ -94,6 +103,7 @@ Run "() { switch (x) { case (1) { y = 1; } default { y = 0; } } }"
 ```
 
 **Expected:**
+
 ```manuscript
 {
     Run "() {
