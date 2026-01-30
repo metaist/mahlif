@@ -56,6 +56,7 @@ The report shows:
 Location format: `p4 [B] Bar 8, Beat 1` = page 4, section B, bar 8, beat 1
 
 Example:
+
 ```
 CHNG p4 [B] Bar 8, Beat 1, Tatyana: nɑ̟-ˈt͡ʃʲnoj -> nɑ̟t͡ʃʲ-ˈnoj (cyr: ноч-ной)
 UNRE p10 [B] Bar 36, Beat 1, Onegin: jɛ-ˈvo (cyr: е-го, expected: g)
@@ -98,16 +99,19 @@ if (cyrOnset = 'сч' or cyrOnset = 'зч' or cyrOnset = 'жч') {
 ### EASY: Vowel Lists
 
 **Cyrillic vowels** in `GetCyrillicVowels`:
+
 ```manuscript
 return 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
 ```
 
 **IPA vowels** in `GetIpaVowels`:
+
 ```manuscript
 return 'ɑʌɐeɛɪiouaæɨ';
 ```
 
 **Palatalizing vowels** in `GetPalatalizingVowels`:
+
 ```manuscript
 return 'яеёюЯЕЁЮ';
 ```
@@ -115,6 +119,7 @@ return 'яеёюЯЕЁЮ';
 ### EASY: Diacritics
 
 Characters treated as modifiers in `IsDiacritic`:
+
 ```manuscript
 diacritics = 'ʲːˑ̟̃';
 ```
@@ -122,6 +127,7 @@ diacritics = 'ʲːˑ̟̃';
 ### EASY: IPA Normalization
 
 Character equivalences in `NormalizeIpaForMatching`:
+
 ```manuscript
 if (c = 'ɫ') { result = result & 'l'; }  // dark L = light L
 if (c = 'ɡ') { result = result & 'g'; }  // IPA g = ASCII g
@@ -130,6 +136,7 @@ if (c = 'ɡ') { result = result & 'g'; }  // IPA g = ASCII g
 ### MEDIUM: Skip Conditions
 
 Add conditions in `ProcessSyllableBoundary` after the `OnsetMatches` check:
+
 ```manuscript
 if (StartsWithPalatalizingVowel(cyrB) and IsJotatedVowelOnset(ipaBWork)) {
     return 'SKIP';
@@ -139,6 +146,7 @@ if (StartsWithPalatalizingVowel(cyrB) and IsJotatedVowelOnset(ipaBWork)) {
 ### HARD: Core Algorithm
 
 These require understanding the full algorithm:
+
 - `ExtractOneConsonantUnit`: Groups consonant + tie bar + diacritics as atomic unit
 - `ExtractIpaOnset`: Extracts all consonant units before first vowel
 - `CalculateUnitsToMove`: Finds how many units to move to match expected onset
@@ -157,6 +165,7 @@ These require understanding the full algorithm:
 ## Lyric Style IDs
 
 The plugin looks for these Sibelius style IDs:
+
 - Verse 1 (Cyrillic): `text.staff.space.hypen.lyrics.verse1`
 - Verse 2 (IPA): `text.staff.space.hypen.lyrics.verse2`
 
@@ -165,6 +174,7 @@ The plugin looks for these Sibelius style IDs:
 ## Troubleshooting
 
 **Plugin doesn't appear in menu**: Check for syntax errors:
+
 ```bash
 uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
 ```
@@ -174,6 +184,7 @@ uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
 **Too many/few changes**: Check the vowel lists and consonant mappings match your transcription conventions.
 
 **Report has strange characters**: Convert encoding:
+
 ```bash
 uv run mahlif encoding utf8 cyrus_report.txt
 ```

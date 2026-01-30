@@ -8,10 +8,10 @@ mahlif <command> [options]
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| [`convert`](#convert) | Convert between formats |
-| [`stats`](#stats) | Show score statistics |
+| Command                 | Description                |
+| ----------------------- | -------------------------- |
+| [`convert`](#convert)   | Convert between formats    |
+| [`stats`](#stats)       | Show score statistics      |
 | [`sibelius`](#sibelius) | Sibelius plugin management |
 
 ---
@@ -26,23 +26,23 @@ mahlif convert <input> <output> [options]
 
 ### Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `input` | Source file (`.mahlif.xml`) |
+| Argument | Description                      |
+| -------- | -------------------------------- |
+| `input`  | Source file (`.mahlif.xml`)      |
 | `output` | Destination file (`.ly`, `.plg`) |
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
+| Option      | Description                                   |
+| ----------- | --------------------------------------------- |
 | `--dry-run` | Show what would be done without writing files |
 
 ### Supported Conversions
 
-| From | To | Extension |
-|------|-----|-----------|
-| Mahlif XML | LilyPond | `.ly` |
-| Mahlif XML | Sibelius Plugin | `.plg` |
+| From       | To              | Extension |
+| ---------- | --------------- | --------- |
+| Mahlif XML | LilyPond        | `.ly`     |
+| Mahlif XML | Sibelius Plugin | `.plg`    |
 
 ### Examples
 
@@ -71,15 +71,15 @@ mahlif stats <file> [options]
 
 ### Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `file` | Mahlif XML file to analyze |
+| Argument | Description                |
+| -------- | -------------------------- |
+| `file`   | Mahlif XML file to analyze |
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--json` | Output as JSON |
+| Option            | Description              |
+| ----------------- | ------------------------ |
+| `--json`          | Output as JSON           |
 | `--verbose`, `-v` | Show per-staff breakdown |
 
 ### Example Output
@@ -128,13 +128,13 @@ mahlif sibelius <subcommand> [options]
 
 ### Subcommands
 
-| Subcommand | Description |
-|------------|-------------|
-| [`install`](#sibelius-install) | Install plugins to Sibelius |
-| [`build`](#sibelius-build) | Build plugins from source |
-| [`check`](#sibelius-check) | Lint ManuScript files |
-| [`list`](#sibelius-list) | List available plugins |
-| [`show-plugin-dir`](#sibelius-show-plugin-dir) | Show plugin directory |
+| Subcommand                                     | Description                 |
+| ---------------------------------------------- | --------------------------- |
+| [`install`](#sibelius-install)                 | Install plugins to Sibelius |
+| [`build`](#sibelius-build)                     | Build plugins from source   |
+| [`check`](#sibelius-check)                     | Lint ManuScript files       |
+| [`list`](#sibelius-list)                       | List available plugins      |
+| [`show-plugin-dir`](#sibelius-show-plugin-dir) | Show plugin directory       |
 
 See [Sibelius](sibelius.md) for detailed documentation.
 
@@ -150,8 +150,8 @@ mahlif sibelius install [options]
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option      | Description                                |
+| ----------- | ------------------------------------------ |
 | `--dry-run` | Show what would be done without installing |
 
 #### Examples
@@ -176,18 +176,18 @@ mahlif sibelius build [plugins...] [options]
 
 #### Arguments
 
-| Argument | Description |
-|----------|-------------|
+| Argument  | Description                                       |
+| --------- | ------------------------------------------------- |
 | `plugins` | Plugin names or paths (optional, defaults to all) |
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
-| `--install` | Install directly to Sibelius plugin directory |
-| `--hardlink` | Create hardlinks in Sibelius directory (for development) |
-| `--dry-run` | Show what would be done without writing files |
-| `--quiet`, `-q` | Suppress output |
+| Option          | Description                                              |
+| --------------- | -------------------------------------------------------- |
+| `--install`     | Install directly to Sibelius plugin directory            |
+| `--hardlink`    | Create hardlinks in Sibelius directory (for development) |
+| `--dry-run`     | Show what would be done without writing files            |
+| `--quiet`, `-q` | Suppress output                                          |
 
 #### Examples
 
@@ -217,17 +217,17 @@ mahlif sibelius check [files...] [options]
 
 #### Arguments
 
-| Argument | Description |
-|----------|-------------|
-| `files` | Files to check (optional, defaults to all source plugins) |
+| Argument | Description                                               |
+| -------- | --------------------------------------------------------- |
+| `files`  | Files to check (optional, defaults to all source plugins) |
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
-| `--fix` | Automatically fix trailing whitespace (MS-W002) |
-| `--dry-run` | Show what would be fixed without modifying files |
-| `--quiet`, `-q` | Only show errors, not warnings |
+| Option          | Description                                      |
+| --------------- | ------------------------------------------------ |
+| `--fix`         | Automatically fix trailing whitespace (MS-W002)  |
+| `--dry-run`     | Show what would be fixed without modifying files |
+| `--quiet`, `-q` | Only show errors, not warnings                   |
 
 #### Examples
 

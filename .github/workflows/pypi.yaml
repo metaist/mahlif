@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-
     permissions:
       id-token: write
       contents: read
@@ -18,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: astral-sh/setup-uv@v7

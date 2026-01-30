@@ -8,11 +8,13 @@ Bidirectional Sibelius ↔ Mahlif XML conversion.
 ## Installation
 
 ### Via CLI (recommended)
+
 ```bash
 mahlif install sibelius
 ```
 
 ### Manual Installation
+
 1. Build the plugin (converts UTF-8 to UTF-16 BE):
    ```bash
    ./build.sh
@@ -33,6 +35,7 @@ mahlif install sibelius
 ## What's Exported
 
 ### Fully Supported
+
 - Notes, rests, chords (with pitches, durations, ties)
 - Articulations (staccato, accent, fermata, etc.)
 - Dynamics (f, p, mf, mp, etc.)
@@ -48,6 +51,7 @@ mahlif install sibelius
 - Position offsets (dx, dy)
 
 ### Partially Supported
+
 - Grace notes (TODO)
 - Trills (basic support)
 - Arpeggios (basic support)
@@ -57,6 +61,7 @@ mahlif install sibelius
 - Multi-movement works (detected via final barlines + movement title text)
 
 ### Not Yet Supported
+
 - Fingerings
 - Figured bass
 - Guitar bend/slide

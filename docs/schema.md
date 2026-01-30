@@ -817,7 +817,7 @@ Piano pedal marking.
 | `start-pos` | int    | Starting position in ticks                    |
 | `end-bar`   | int    | Ending bar number                             |
 | `end-pos`   | int    | Ending position                               |
-| `line`      | bool   | Show as line (true) or Ped/* symbols (false)  |
+| `line`      | bool   | Show as line (true) or Ped/\* symbols (false) |
 
 ---
 
@@ -830,11 +830,11 @@ Fingering indication.
 <fingering pos="0" voice="1" finger="1-2" substitution="true"/>
 ```
 
-| Attribute      | Type   | Description                              |
-| -------------- | ------ | ---------------------------------------- |
+| Attribute      | Type   | Description                                                           |
+| -------------- | ------ | --------------------------------------------------------------------- |
 | `finger`       | string | Finger number(s): "1", "2", "3", "4", "5", or combinations like "1-2" |
-| `substitution` | bool   | Finger substitution (change without re-attack) |
-| `placement`    | string | "above", "below", "left", "right" (default: auto) |
+| `substitution` | bool   | Finger substitution (change without re-attack)                        |
+| `placement`    | string | "above", "below", "left", "right" (default: auto)                     |
 
 ---
 
@@ -846,9 +846,9 @@ String number for bowed strings or guitar.
 <string-indication pos="0" voice="1" string="2"/>
 ```
 
-| Attribute | Type | Description                    |
-| --------- | ---- | ------------------------------ |
-| `string`  | int  | String number (1 = highest)    |
+| Attribute | Type | Description                 |
+| --------- | ---- | --------------------------- |
+| `string`  | int  | String number (1 = highest) |
 
 ---
 
@@ -862,12 +862,12 @@ Jazz/pop chord symbol.
 <chord-symbol pos="0" root="G" kind="dominant" alterations="b9 #11"/>
 ```
 
-| Attribute     | Type   | Description                                      |
-| ------------- | ------ | ------------------------------------------------ |
-| `root`        | string | Root pitch: "C", "C#", "Db", etc.                |
-| `kind`        | string | Chord type (see below)                           |
-| `bass`        | string | Bass note if different from root (slash chord)   |
-| `alterations` | string | Space-separated: "b5", "#5", "b9", "#9", "#11", "b13" |
+| Attribute     | Type   | Description                                               |
+| ------------- | ------ | --------------------------------------------------------- |
+| `root`        | string | Root pitch: "C", "C#", "Db", etc.                         |
+| `kind`        | string | Chord type (see below)                                    |
+| `bass`        | string | Bass note if different from root (slash chord)            |
+| `alterations` | string | Space-separated: "b5", "#5", "b9", "#9", "#11", "b13"     |
 | `text`        | string | Override display text (e.g., "Cmaj7" for custom spelling) |
 
 **Kind values:** `major`, `minor`, `augmented`, `diminished`, `dominant`, `major-seventh`, `minor-seventh`, `diminished-seventh`, `augmented-seventh`, `half-diminished`, `major-minor`, `major-sixth`, `minor-sixth`, `dominant-ninth`, `major-ninth`, `minor-ninth`, `dominant-11th`, `major-11th`, `minor-11th`, `dominant-13th`, `major-13th`, `minor-13th`, `suspended-second`, `suspended-fourth`, `power`, `other`
@@ -890,8 +890,8 @@ Baroque figured bass notation.
 </figured-bass>
 ```
 
-| Child element | Attributes | Description |
-| ------------- | ---------- | ----------- |
+| Child element | Attributes                   | Description                                                                                 |
+| ------------- | ---------------------------- | ------------------------------------------------------------------------------------------- |
 | `<figure>`    | `prefix`, `suffix`, `extend` | Single figure; prefix/suffix for accidentals (#, b, ♮); extend="true" for continuation line |
 
 ---
@@ -905,12 +905,12 @@ Harmonic indication (natural or artificial).
 <harmonic pos="0" voice="1" type="artificial" base-pitch="48" sounding-pitch="72"/>
 ```
 
-| Attribute       | Type   | Description                                   |
-| --------------- | ------ | --------------------------------------------- |
-| `type`          | string | "natural" or "artificial"                     |
-| `base-pitch`    | int    | Stopped pitch for artificial harmonic         |
-| `touch-pitch`   | int    | Touch pitch for artificial harmonic           |
-| `sounding-pitch`| int    | Resulting sounding pitch                      |
+| Attribute        | Type   | Description                           |
+| ---------------- | ------ | ------------------------------------- |
+| `type`           | string | "natural" or "artificial"             |
+| `base-pitch`     | int    | Stopped pitch for artificial harmonic |
+| `touch-pitch`    | int    | Touch pitch for artificial harmonic   |
+| `sounding-pitch` | int    | Resulting sounding pitch              |
 
 ---
 
@@ -923,11 +923,11 @@ Guitar bend.
 <bend pos="0" voice="1" amount="0.5" pre-bend="true"/>
 ```
 
-| Attribute  | Type   | Description                                   |
-| ---------- | ------ | --------------------------------------------- |
-| `amount`   | float  | Bend amount in semitones (0.5 = quarter tone, 1 = half step, 2 = whole step) |
-| `pre-bend` | bool   | Bend before attack                            |
-| `release`  | bool   | Release bend back to original pitch           |
+| Attribute  | Type  | Description                                                                  |
+| ---------- | ----- | ---------------------------------------------------------------------------- |
+| `amount`   | float | Bend amount in semitones (0.5 = quarter tone, 1 = half step, 2 = whole step) |
+| `pre-bend` | bool  | Bend before attack                                                           |
+| `release`  | bool  | Release bend back to original pitch                                          |
 
 ---
 
@@ -940,8 +940,8 @@ Slide/glissando between notes.
 <slide start-bar="1" start-pos="0" end-bar="1" end-pos="256" type="legato"/>
 ```
 
-| Attribute | Type   | Description                                    |
-| --------- | ------ | ---------------------------------------------- |
+| Attribute | Type   | Description                                                                                                 |
+| --------- | ------ | ----------------------------------------------------------------------------------------------------------- |
 | `type`    | string | "shift" (position shift), "legato" (hammer/pull), "glissando" (discrete pitches), "portamento" (continuous) |
 
 ---
@@ -955,9 +955,9 @@ Breath mark.
 <breath pos="512" voice="1" type="tick"/>
 ```
 
-| Attribute | Type   | Description                            |
-| --------- | ------ | -------------------------------------- |
-| `type`    | string | "comma", "tick", "upbow", "salzedo"    |
+| Attribute | Type   | Description                         |
+| --------- | ------ | ----------------------------------- |
+| `type`    | string | "comma", "tick", "upbow", "salzedo" |
 
 ---
 
@@ -970,9 +970,9 @@ Caesura (railroad tracks).
 <caesura pos="1024" type="thick"/>
 ```
 
-| Attribute | Type   | Description                              |
-| --------- | ------ | ---------------------------------------- |
-| `type`    | string | "normal", "thick", "short", "curved"     |
+| Attribute | Type   | Description                          |
+| --------- | ------ | ------------------------------------ |
+| `type`    | string | "normal", "thick", "short", "curved" |
 
 ---
 
@@ -988,12 +988,12 @@ Cue notes (from another instrument).
 </cue>
 ```
 
-| Attribute          | Type   | Description                          |
-| ------------------ | ------ | ------------------------------------ |
-| `source-staff`     | int    | Staff number to cue from             |
-| `source-instrument`| string | Instrument name (for labeling)       |
-| `voice`            | int    | Voice in destination staff           |
-| `size`             | int    | Size percentage (default: 60)        |
+| Attribute           | Type   | Description                    |
+| ------------------- | ------ | ------------------------------ |
+| `source-staff`      | int    | Staff number to cue from       |
+| `source-instrument` | string | Instrument name (for labeling) |
+| `voice`             | int    | Voice in destination staff     |
+| `size`              | int    | Size percentage (default: 60)  |
 
 ---
 
@@ -1011,12 +1011,12 @@ Ossia passage (alternative version on separate staff).
 </ossia>
 ```
 
-| Attribute      | Type   | Description                         |
-| -------------- | ------ | ----------------------------------- |
-| `parent-staff` | int    | Staff this ossia relates to         |
-| `position`     | string | "above" or "below" parent staff     |
-| `start-bar`    | int    | Starting bar                        |
-| `end-bar`      | int    | Ending bar                          |
+| Attribute      | Type   | Description                     |
+| -------------- | ------ | ------------------------------- |
+| `parent-staff` | int    | Staff this ossia relates to     |
+| `position`     | string | "above" or "below" parent staff |
+| `start-bar`    | int    | Starting bar                    |
+| `end-bar`      | int    | Ending bar                      |
 
 ---
 
@@ -1031,9 +1031,9 @@ Repeat ending (volta bracket).
         numbers="2,3" type="discontinue"/>
 ```
 
-| Attribute | Type   | Description                                    |
-| --------- | ------ | ---------------------------------------------- |
-| `numbers` | string | Comma-separated ending numbers: "1", "2", "1,2" |
+| Attribute | Type   | Description                                                                   |
+| --------- | ------ | ----------------------------------------------------------------------------- |
+| `numbers` | string | Comma-separated ending numbers: "1", "2", "1,2"                               |
 | `type`    | string | "start" (with downward jog), "stop" (with jog), "discontinue" (no ending jog) |
 
 ---
@@ -1070,10 +1070,10 @@ Navigation instruction (D.C., D.S., etc.).
 <jump pos="1024" type="dal-segno-al-fine" target="segno1"/>
 ```
 
-| Attribute | Type   | Description                                      |
-| --------- | ------ | ------------------------------------------------ |
-| `type`    | string | See values below                                 |
-| `target`  | string | ID of segno/coda to jump to                      |
+| Attribute | Type   | Description                 |
+| --------- | ------ | --------------------------- |
+| `type`    | string | See values below            |
+| `target`  | string | ID of segno/coda to jump to |
 
 **Type values:** `da-capo`, `dal-segno`, `da-capo-al-fine`, `da-capo-al-coda`, `dal-segno-al-fine`, `dal-segno-al-coda`, `to-coda`, `fine`
 
@@ -1097,10 +1097,10 @@ Consolidated multi-measure rest.
 <multimeasure-rest start-bar="5" count="12"/>
 ```
 
-| Attribute   | Type | Description                  |
-| ----------- | ---- | ---------------------------- |
-| `start-bar` | int  | First bar of rest            |
-| `count`     | int  | Number of bars               |
+| Attribute   | Type | Description       |
+| ----------- | ---- | ----------------- |
+| `start-bar` | int  | First bar of rest |
+| `count`     | int  | Number of bars    |
 
 ---
 

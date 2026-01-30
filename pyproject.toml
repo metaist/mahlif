@@ -85,11 +85,14 @@ clean = """
 """
 
 # Lint
-lint = ["ruff-*", "sibelius-lint", "cspell"]
+lint = ["ruff-*", "sibelius-lint", "cspell", "prettier", "xmllint", "zizmor"]
 ruff-format = "uvx ruff format ${@:-.}"
 ruff-lint = "uvx ruff check --fix ${@:-.}"
 sibelius-lint = "uv run mahlif sibelius check --fix ${@:-}"
-cspell = "npx cspell lint --unique --no-progress --gitignore --exclude '**/_vendor/**' '**/*.{py,txt,md,markdown}'"
+cspell = "npx -y cspell lint --unique --no-progress --gitignore --exclude '**/_vendor/**' '**/*.{py,txt,md,markdown}'"
+prettier = "npx -y prettier --write '**/*.{md,json,yaml,yml}' '!**/node_modules/**' '!**/.venv/**'"
+xmllint = "find test/data -name '*.xml' -exec xmllint --noout {} \\;"
+zizmor = "uvx zizmor --quiet .github"
 
 # Type Check
 types = ["ty", "pyrefly", "pyright", "mypy"]

@@ -29,13 +29,13 @@ uv tool install mahlif
 
 ## Format Support
 
-| Format | Import | Export | Notes |
-|--------|--------|--------|-------|
+| Format                  | Import    | Export    | Notes                |
+| ----------------------- | --------- | --------- | -------------------- |
 | [Sibelius](sibelius.md) | ✅ Plugin | 🚧 Plugin | Export ~80% complete |
-| [LilyPond](lilypond.md) | — | ✅ CLI | ~70% features |
-| MusicXML | ❌ | ❌ | Planned |
-| Finale | ❌ | ❌ | Planned |
-| Dorico | ❌ | ❌ | Planned |
+| [LilyPond](lilypond.md) | —         | ✅ CLI    | ~70% features        |
+| MusicXML                | ❌        | ❌        | Planned              |
+| Finale                  | ❌        | ❌        | Planned              |
+| Dorico                  | ❌        | ❌        | Planned              |
 
 Current focus: **Sibelius ↔ Mahlif XML**
 

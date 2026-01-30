@@ -34,15 +34,17 @@ cog.outl("| MusicXML | ❌ | ❌ | Planned |")
 cog.outl("| Finale | ❌ | ❌ | Planned |")
 cog.outl("| Dorico | ❌ | ❌ | Planned |")
 ]]]-->
+
 ## Format Support
 
-| Format | Import | Export | Notes |
-|--------|--------|--------|-------|
+| Format   | Import    | Export    | Notes                |
+| -------- | --------- | --------- | -------------------- |
 | Sibelius | ✅ Plugin | 🚧 Plugin | Export ~80% complete |
-| LilyPond | — | ✅ CLI | ~70% features |
-| MusicXML | ❌ | ❌ | Planned |
-| Finale | ❌ | ❌ | Planned |
-| Dorico | ❌ | ❌ | Planned |
+| LilyPond | —         | ✅ CLI    | ~70% features        |
+| MusicXML | ❌        | ❌        | Planned              |
+| Finale   | ❌        | ❌        | Planned              |
+| Dorico   | ❌        | ❌        | Planned              |
+
 <!--[[[end]]]-->
 
 Current focus: **Sibelius → Mahlif XML → LilyPond → PDF**
