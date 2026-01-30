@@ -10,6 +10,8 @@ Cyrus is a Sibelius plugin that fixes IPA syllabification to match Cyrillic syll
 
 The plugin compares Cyrillic and IPA syllable boundaries and moves IPA consonants from the start of one syllable to the end of the previous syllable to match the Cyrillic syllabification.
 
+<!-- spell-checker: disable-next-line -->
+
 **Example**: `nɑ̟-ˈt͡ʃʲnoj` → `nɑ̟t͡ʃʲ-ˈnoj` (moves `t͡ʃʲ` to match Cyrillic `ноч-ной`)
 
 ---
@@ -57,10 +59,14 @@ Location format: `p4 [B] Bar 8, Beat 1` = page 4, section B, bar 8, beat 1
 
 Example:
 
+<!-- spell-checker: disable -->
+
 ```
 CHNG p4 [B] Bar 8, Beat 1, Tatyana: nɑ̟-ˈt͡ʃʲnoj -> nɑ̟t͡ʃʲ-ˈnoj (cyr: ноч-ной)
 UNRE p10 [B] Bar 36, Beat 1, Onegin: jɛ-ˈvo (cyr: е-го, expected: g)
 ```
+
+<!-- spell-checker: enable -->
 
 ---
 
@@ -98,6 +104,8 @@ if (cyrOnset = 'сч' or cyrOnset = 'зч' or cyrOnset = 'жч') {
 
 ### EASY: Vowel Lists
 
+<!-- spell-checker: disable -->
+
 **Cyrillic vowels** in `GetCyrillicVowels`:
 
 ```manuscript
@@ -123,6 +131,8 @@ Characters treated as modifiers in `IsDiacritic`:
 ```manuscript
 diacritics = 'ʲːˑ̟̃';
 ```
+
+<!-- spell-checker: enable -->
 
 ### EASY: IPA Normalization
 

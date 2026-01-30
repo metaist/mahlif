@@ -81,6 +81,7 @@
     "noterest",
     "octava",
     "octavas",
+    "oneline",
     "osascript",
     "outl",
     "pathlib",
@@ -114,6 +115,7 @@
     "staccatissimo",
     "superfences",
     "taplo",
+    "Tatyana",
     "tenuto",
     "tidx",
     "tofile",
@@ -135,5 +137,5 @@
     "Чайковский",
     "מַחֲלִיף"
   ],
-  "ignorePaths": ["src/mahlif/sibelius/cyrus/README.md"]
+  "ignorePaths": []
 }
