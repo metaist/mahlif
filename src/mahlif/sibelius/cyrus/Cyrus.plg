@@ -74,7 +74,7 @@ for each staff in score {
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report (build 11) ===' & Chr(10);
+header = '=== Cyrus Report (build 13) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -284,7 +284,20 @@ if (Length(text) > 0) {
 return result;
 }"
 	CalculateUnitsToMove "(ipaB, expectedIpa) {
-return 1;
+if (expectedIpa = '') {
+	onset = ExtractIpaOnset(ipaB);
+	return CountConsonantUnits(onset);
+}
+onset = ExtractIpaOnset(ipaB);
+totalUnits = CountConsonantUnits(onset);
+for unitsToRemove = 0 to totalUnits + 1 {
+	remaining = RemoveNConsonantUnits(onset, unitsToRemove);
+	normalized = NormalizeIpaForMatching(remaining);
+	if (normalized = expectedIpa) {
+		return unitsToRemove;
+	}
+}
+return -1;
 }"
 	CountConsonantUnits "(text) {
 count = 0;
