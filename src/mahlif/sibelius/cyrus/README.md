@@ -21,7 +21,7 @@ First, [install Mahlif](https://docs.metaist.com/mahlif/#install) if you haven't
 Then install the Cyrus plugin:
 
 ```bash
-uv run mahlif sibelius install Cyrus
+uvx mahlif sibelius install Cyrus
 ```
 
 Reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > select Cyrus > **Unload** then **Load**
@@ -39,7 +39,7 @@ Reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > select Cyrus > **Unloa
 Sibelius saves files as UTF-16. To convert to UTF-8 for easier viewing:
 
 ```bash
-uv run mahlif encoding utf8 cyrus_report.txt
+uvx mahlif encoding utf8 cyrus_report.txt
 ```
 
 This converts the file in place. Use `-o output.txt` to save to a different file.
@@ -69,7 +69,7 @@ UNRE p10 [B] Bar 36, Beat 1, Onegin: jɛ-ˈvo (cyr: е-го, expected: g)
 For development:
 
 ```bash
-uv run mahlif sibelius build --hardlink --source src/mahlif/sibelius/cyrus/ Cyrus
+uvx mahlif sibelius build --hardlink --source src/mahlif/sibelius/cyrus/ Cyrus
 ```
 
 Then reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > Unload/Reload
@@ -176,7 +176,7 @@ The plugin looks for these Sibelius style IDs:
 **Plugin doesn't appear in menu**: Check for syntax errors:
 
 ```bash
-uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
+uvx mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
 ```
 
 **Progress bar stuck at 0**: This is a Sibelius UI quirk. The plugin is running; switch windows and back to see updates.
@@ -186,5 +186,5 @@ uv run mahlif sibelius check src/mahlif/sibelius/cyrus/Cyrus.plg
 **Report has strange characters**: Convert encoding:
 
 ```bash
-uv run mahlif encoding utf8 cyrus_report.txt
+uvx mahlif encoding utf8 cyrus_report.txt
 ```
