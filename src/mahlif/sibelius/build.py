@@ -188,7 +188,18 @@ def build_plugins(
         print("Dry run - no changes will be made")
         print()
 
-    # Lint all plugins first
+    # Format all plugins first
+    if verbose:
+        print("Formatting plugins...")
+    for plg in plugins:
+        if not dry_run:
+            from mahlif.sibelius.manuscript.format import format_file_in_place
+
+            changed = format_file_in_place(plg)
+            if changed and verbose:
+                print(f"  Formatted {plg.name}")
+
+    # Lint all plugins
     if verbose:
         print("Linting plugins...")
     lint_failed = False
