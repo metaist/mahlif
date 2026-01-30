@@ -1,8 +1,46 @@
-"""Encoding utilities for Mahlif XML files."""
+"""Encoding utilities for text files.
+
+Supports detection and conversion between encodings for both
+plain text files and XML files.
+"""
 
 from __future__ import annotations
 
 from pathlib import Path
+
+# Canonical encoding names for CLI
+ENCODINGS = {
+    "utf8": "utf-8",
+    "utf-8": "utf-8",
+    "utf16": "utf-16",
+    "utf-16": "utf-16",
+    "utf16le": "utf-16-le",
+    "utf-16-le": "utf-16-le",
+    "utf16be": "utf-16-be",
+    "utf-16-be": "utf-16-be",
+    "latin1": "latin-1",
+    "latin-1": "latin-1",
+    "iso-8859-1": "latin-1",
+    "ascii": "ascii",
+}
+
+
+def normalize_encoding(encoding: str) -> str:
+    """Normalize encoding name to Python codec name.
+
+    Args:
+        encoding: Encoding name (e.g., 'utf8', 'utf-16-le')
+
+    Returns:
+        Normalized encoding name
+
+    Raises:
+        ValueError: If encoding is not recognized
+    """
+    key = encoding.lower().replace("_", "-")
+    if key not in ENCODINGS:
+        raise ValueError(f"Unknown encoding: {encoding}")
+    return ENCODINGS[key]
 
 
 def detect_encoding(path: str | Path) -> str:
@@ -91,45 +129,83 @@ def read_xml_bytes(path: str | Path) -> bytes:
         return f.read()
 
 
+def convert_encoding(
+    input_path: str | Path,
+    target_encoding: str,
+    output_path: str | Path | None = None,
+    source_encoding: str | None = None,
+) -> tuple[str, str, str]:
+    """Convert a text file to a different encoding.
+
+    Args:
+        input_path: Path to input file
+        target_encoding: Target encoding (e.g., 'utf-8', 'utf-16-le')
+        output_path: Path to output file (default: overwrite input)
+        source_encoding: Source encoding (default: auto-detect)
+
+    Returns:
+        Tuple of (output_path, source_encoding, target_encoding)
+    """
+    input_path = Path(input_path)
+    output_path = Path(output_path) if output_path else input_path
+    target_encoding = normalize_encoding(target_encoding)
+
+    # Detect or normalize source encoding
+    if source_encoding:
+        source_encoding = normalize_encoding(source_encoding)
+    else:
+        source_encoding = detect_encoding(input_path)
+
+    # Read content
+    content = input_path.read_text(encoding=source_encoding)
+
+    # Strip BOM if present
+    if content and content[0] == "\ufeff":
+        content = content[1:]
+
+    # Update XML declaration if present
+    if content.startswith("<?xml"):
+        import re
+
+        end_decl = content.find("?>")
+        if end_decl != -1:
+            decl = content[: end_decl + 2]
+            rest = content[end_decl + 2 :]
+            # Map encoding to XML-style name
+            xml_encoding = target_encoding.upper().replace("-", "")
+            if xml_encoding == "UTF8":
+                xml_encoding = "UTF-8"
+            elif xml_encoding == "UTF16":
+                xml_encoding = "UTF-16"
+            elif xml_encoding == "UTF16LE":
+                xml_encoding = "UTF-16"  # XML doesn't distinguish LE/BE
+            elif xml_encoding == "UTF16BE":
+                xml_encoding = "UTF-16"
+            new_decl = re.sub(
+                r'encoding=["\'][^"\']*["\']',
+                f'encoding="{xml_encoding}"',
+                decl,
+            )
+            content = new_decl + rest
+
+    # Write with target encoding
+    output_path.write_text(content, encoding=target_encoding)
+
+    return str(output_path), source_encoding, target_encoding
+
+
 def convert_to_utf8(
     input_path: str | Path,
     output_path: str | Path | None = None,
 ) -> str:
-    """Convert a Mahlif XML file to UTF-8 encoding.
+    """Convert a file to UTF-8 encoding.
 
     Args:
-        input_path: Path to input XML file (any encoding)
+        input_path: Path to input file (any encoding)
         output_path: Path to output file (default: overwrite input)
 
     Returns:
         Path to output file
     """
-    input_path = Path(input_path)
-    output_path = Path(output_path) if output_path else input_path
-
-    # Read with auto-detected encoding
-    content = read_xml(input_path)
-
-    # Update XML declaration to UTF-8
-    if content.startswith("<?xml"):
-        # Replace encoding in declaration
-        end_decl = content.find("?>")
-        if end_decl != -1:
-            decl = content[: end_decl + 2]
-            rest = content[end_decl + 2 :]
-
-            # Replace encoding attribute
-            import re
-
-            new_decl = re.sub(
-                r'encoding=["\'][^"\']*["\']',
-                'encoding="UTF-8"',
-                decl,
-            )
-            content = new_decl + rest
-
-    # Write as UTF-8
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    return str(output_path)
+    result_path, _, _ = convert_encoding(input_path, "utf-8", output_path)
+    return result_path

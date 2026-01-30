@@ -171,6 +171,42 @@ def cmd_convert(args: argparse.Namespace) -> int:
         return 1
 
 
+def cmd_encoding(args: argparse.Namespace) -> int:
+    """Convert file encoding.
+
+    Args:
+        args: Parsed arguments
+
+    Returns:
+        Exit code (0 for success)
+    """
+    from mahlif.encoding import convert_encoding
+
+    src = Path(args.file)
+    dest = Path(args.output) if args.output else src
+
+    if not src.exists():
+        print(f"Error: {src} not found")
+        return 1
+
+    try:
+        result_path, src_enc, dest_enc = convert_encoding(
+            src, args.target, dest, args.source
+        )
+        if src == dest:
+            print(f"Converted {src} to {dest_enc} in place (was {src_enc})")
+        else:
+            print(f"Converted {src} → {result_path} ({src_enc} → {dest_enc})")
+        return 0
+
+    except ValueError as e:
+        print(f"Error: {e}")
+        return 1
+    except Exception as e:
+        print(f"Error: {e}")
+        return 1
+
+
 def cmd_stats(args: argparse.Namespace) -> int:
     """Run stats command.
 
@@ -259,6 +295,33 @@ def main(args: list[str] | None = None) -> int:
         help="Show per-staff breakdown",
     )
 
+    # encoding
+    encoding_parser = subparsers.add_parser(
+        "encoding",
+        help="Convert file encoding",
+        description="Convert text file between encodings (utf8, utf16, utf16le, utf16be, latin1, ascii)",
+    )
+    encoding_parser.add_argument(
+        "target",
+        choices=["utf8", "utf16", "utf16le", "utf16be", "latin1", "ascii"],
+        help="Target encoding",
+    )
+    encoding_parser.add_argument("file", type=Path, help="Input file")
+    encoding_parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        default=None,
+        help="Output file (default: overwrite input)",
+    )
+    encoding_parser.add_argument(
+        "-s",
+        "--source",
+        type=str,
+        default=None,
+        help="Source encoding (default: auto-detect)",
+    )
+
     # sibelius (subcommands via sibelius.cli)
     from mahlif.sibelius.cli import add_subparsers as add_sibelius_subparsers
 
@@ -279,6 +342,8 @@ def main(args: list[str] | None = None) -> int:
         return cmd_convert(parsed)
     elif parsed.command == "stats":
         return cmd_stats(parsed)
+    elif parsed.command == "encoding":
+        return cmd_encoding(parsed)
     elif parsed.command in ("sibelius", "manuscript"):
         from mahlif.sibelius.cli import run_command
 
