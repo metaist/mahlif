@@ -3,7 +3,7 @@
         AddToPluginsMenu('Cyrus', 'Run');
     }"
     _version "() {
-        return 40;
+        return 41;
     }"
     Run "() {
         score = Sibelius.ActiveScore;
@@ -11,7 +11,7 @@
             Sibelius.MessageBox('No score is open.');
             return False;
         }
-        result = ShowOptionsDialog(score);
+        result = DetectLyricStaves(score);
         if (result = null) {
             return False;
         }
@@ -119,7 +119,7 @@
             }
         }
         Sibelius.DestroyProgressDialog();
-        header = '=== Cyrus Report (build ' & _version() & ') ===' & Chr(10);
+        header = '=== Cyrus Report (v' & _version() & ') ===' & Chr(10);
         if (cancelled) {
             return header & Chr(10) & 'Processing cancelled.';
         }
@@ -146,7 +146,7 @@
         if (filePath != '') {
             Sibelius.CreateTextFile(filePath);
             Sibelius.AppendTextFile(filePath, fullReport, True);
-            Sibelius.MessageBox('Report saved to: ' & filePath);
+            return header & Chr(10) & 'Report saved to: ' & filePath;
         }
         return header;
     }"
@@ -566,7 +566,7 @@
     StyleIsVerse2 "(styleId) {
         return(styleId = 'text.staff.space.hypen.lyrics.verse2');
     }"
-    ShowOptionsDialog "(score) {
+    DetectLyricStaves "(score) {
         stavesWithLyrics = CreateSparseArray();
         idx = 0;
         barCount = score.SystemStaff.BarCount;
