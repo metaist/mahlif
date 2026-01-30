@@ -68,13 +68,15 @@ for each staff in score {
 					}
 				}
 			}
-			report = report & result;
+			if (result != 'SKIP') {
+				report = report & result;
+			}
 			barsDone = barsDone + 1;
 		}
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report (build 16) ===' & Chr(10);
+header = '=== Cyrus Report (build 17) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -150,14 +152,15 @@ if (Length(ipaB) > 0) {
 }
 actualOnset = ExtractIpaOnset(ipaBWork);
 if (OnsetMatches(actualOnset, expectedIpa)) {
-	return 'SKIP' & Chr(10);
+	return 'SKIP';
 }
 unitsToMove = CalculateUnitsToMove(ipaBWork, expectedIpa);
 if (unitsToMove = 0) {
-	return 'SKIP' & Chr(10);
+	return 'SKIP';
 }
 if (unitsToMove < 0) {
-	return 'UNRE' & Chr(10);
+	beat = (pos / 256) + 1;
+	return 'UNRE Bar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' (cyr: ' & cyrA & '-' & cyrB & ', expected: ' & expectedIpa & ')' & Chr(10);
 }
 toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
 remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
@@ -169,7 +172,7 @@ if (hasStress) {
 ipaObjA.Text = newIpaA;
 ipaObjB.Text = newIpaB;
 beat = (pos / 256) + 1;
-return 'CHNGBar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & Chr(10);
+return 'CHNG Bar ' & barNum & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & Chr(10);
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
