@@ -504,3 +504,83 @@ When a for loop end value involves subtraction, it could become negative at runt
 
 **Expected errors:**
 - `MS-W021` - For loop end could be negative
+
+## For Loop With Guard - No Warning
+
+When a for loop with potentially negative bounds is guarded, no warning should be issued.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "(arr) {
+        if (Length(arr) >= 4) {
+            for i = 0 to Length(arr) - 3 {
+                x = i;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## For Loop With Greater-Than Guard - No Warning
+
+Guard using `>` instead of `>=`.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "(arr) {
+        if (Length(arr) > 3) {
+            for i = 0 to Length(arr) - 3 {
+                x = i;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## For Loop With Insufficient Guard - Warning
+
+Guard value is too small to prevent negative.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "(arr) {
+        if (Length(arr) >= 2) {
+            for i = 0 to Length(arr) - 3 {
+                x = i;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-W021` - Guard is insufficient (>= 2 but subtracting 3)
+
+## For Loop With Insufficient GT Guard - Warning
+
+Guard using > but value too small.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "(arr) {
+        if (Length(arr) > 1) {
+            for i = 0 to Length(arr) - 3 {
+                x = i;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-W021` - Guard is insufficient (> 1 but subtracting 3)

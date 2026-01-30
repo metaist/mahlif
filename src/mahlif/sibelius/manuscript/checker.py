@@ -5,6 +5,7 @@ This module parses tokenized method body content and checks for:
 - Control flow validation (if/while/for/switch structure)
 - Expression validation
 - Undefined variable detection
+- Undefined function/method detection
 """
 
 from __future__ import annotations
@@ -20,8 +21,13 @@ from pathlib import Path
 LANG_JSON_PATH = Path(__file__).parent / "lang.json"
 
 
-def _load_builtin_globals() -> set[str]:
-    """Load built-in globals from lang.json.
+def _load_lang_data() -> tuple[
+    set[str], set[str], dict[str, set[str]], dict[str, set[str]]
+]:
+    """Load language data from lang.json.
+
+    Returns:
+        Tuple of (builtin_globals, builtin_functions, object_methods, object_properties)
 
     Raises:
         FileNotFoundError: If lang.json is missing
@@ -36,24 +42,32 @@ def _load_builtin_globals() -> set[str]:
         data = json.load(f)
 
     globals_set: set[str] = set()
+    builtin_functions: set[str] = set()
+    object_methods: dict[str, set[str]] = {}
+    object_properties: dict[str, set[str]] = {}
 
-    # Add object type names (Sibelius, Self, etc.)
-    for name in data.get("objects", {}):
+    # Add object type names and collect their methods/properties
+    for name, obj in data.get("objects", {}).items():
         globals_set.add(name)
+        object_methods[name] = set(obj.get("methods", {}).keys())
+        object_properties[name] = set(obj.get("properties", []))
 
     # Add built-in functions
     for name in data.get("builtin_functions", {}):
         globals_set.add(name)
+        builtin_functions.add(name)
 
     # Add all constants
     for name in data.get("constants", {}):
         globals_set.add(name)
 
-    return globals_set
+    return globals_set, builtin_functions, object_methods, object_properties
 
 
 # Load at module import time
-BUILTIN_GLOBALS: set[str] = _load_builtin_globals()
+BUILTIN_GLOBALS, BUILTIN_FUNCTIONS, OBJECT_METHODS, OBJECT_PROPERTIES = (
+    _load_lang_data()
+)
 
 
 class MethodBodyChecker:
@@ -64,6 +78,7 @@ class MethodBodyChecker:
         tokens: list[Token],
         method_name: str = "",
         defined_vars: set[str] | None = None,
+        plugin_methods: set[str] | None = None,
     ) -> None:
         """Initialize checker.
 
@@ -71,6 +86,7 @@ class MethodBodyChecker:
             tokens: List of tokens from tokenizer
             method_name: Name of the method being checked
             defined_vars: Set of pre-defined variables (parameters, globals)
+            plugin_methods: Set of method names defined in the same plugin
         """
         self.tokens = tokens
         self.method_name = method_name
@@ -78,6 +94,7 @@ class MethodBodyChecker:
         self.errors: list[CheckError] = []
         self.defined_vars: set[str] = defined_vars or set()
         self.local_vars: set[str] = set()
+        self.plugin_methods: set[str] = plugin_methods or set()
 
     def check(self) -> list[CheckError]:
         """Run all checks and return errors."""
@@ -579,15 +596,43 @@ class MethodBodyChecker:
 
     def _parse_postfix(self) -> None:
         """Parse postfix expression (calls, property access, indexing)."""
+        # Track the receiver for method call checking
+        # receiver_type is the known object type (e.g., "Sibelius"), or None
+        # Only set if followed by '.' to avoid false positives on Sibelius() bare calls
+        receiver_type: str | None = None
+        last_identifier: str | None = None
+        last_identifier_token: Token | None = None
+
+        # Check if primary is a known object type followed by '.'
+        if self._check(TokenType.IDENTIFIER):
+            name = self._current().value
+            last_identifier = name
+            last_identifier_token = self._current()
+            # Peek ahead - only set receiver_type if followed by '.'
+            if self.pos + 1 < len(self.tokens) - 1:  # pragma: no branch
+                next_tok = self.tokens[self.pos + 1]
+                if next_tok.type == TokenType.DOT and name in OBJECT_METHODS:
+                    receiver_type = name
+
         self._parse_primary()
 
         while True:
             self._skip_comments()
             if self._check(TokenType.DOT):
+                # After property access, we lose type info unless we track return types
+                # Keep receiver_type only for immediate method call (Sibelius.Foo())
+                # but reset if we're accessing a property first (Sibelius.ActiveScore.Foo())
+                had_receiver = receiver_type is not None
                 self._advance()
                 self._skip_comments()
                 if self._check(TokenType.IDENTIFIER):
+                    last_identifier = self._current().value
+                    last_identifier_token = self._current()
                     self._advance()
+                    # If next token is NOT '(', this was property access, lose type
+                    self._skip_comments()
+                    if not self._check(TokenType.LPAREN) and had_receiver:
+                        receiver_type = None
                 else:
                     self.errors.append(
                         CheckError(
@@ -599,11 +644,20 @@ class MethodBodyChecker:
                     )
                     return
             elif self._check(TokenType.LPAREN):
+                # This is a function/method call
+                self._check_call(receiver_type, last_identifier, last_identifier_token)
                 self._parse_call_args()
+                # After a call, we don't know the type anymore
+                receiver_type = None
+                last_identifier = None
+                last_identifier_token = None
             elif self._check(TokenType.LBRACKET):
                 self._advance()
                 self._parse_expression()
                 self._expect(TokenType.RBRACKET, "Expected ']' after index")
+                # After indexing, type is unknown
+                receiver_type = None
+                last_identifier = None
             elif self._check(TokenType.COLON):
                 # User property syntax: obj._property:name
                 self._advance()
@@ -619,8 +673,76 @@ class MethodBodyChecker:
                         )
                     )
                     return
+                receiver_type = None
+                last_identifier = None
             else:
                 break
+
+    def _check_call(
+        self,
+        receiver_type: str | None,
+        method_name: str | None,
+        token: Token | None,
+    ) -> None:
+        """Check if a function/method call is valid.
+
+        Args:
+            receiver_type: Known object type (e.g., "Sibelius") or None
+            method_name: Name of the method/function being called
+            token: Token for error reporting
+        """
+        if method_name is None or token is None:
+            return
+
+        # Case 1: Known receiver type (e.g., Sibelius.Foo())
+        if receiver_type is not None:
+            methods = OBJECT_METHODS.get(receiver_type, set())
+            if method_name not in methods:
+                self.errors.append(
+                    CheckError(
+                        token.line,
+                        token.col,
+                        "MS-W022",
+                        f"Method '{method_name}' not found on '{receiver_type}'",
+                    )
+                )
+            return
+
+        # Case 2: Bare function call (e.g., Foo())
+        # Check if it's a builtin function
+        if method_name in BUILTIN_FUNCTIONS:
+            return
+
+        # Check if it's a method defined in the same plugin
+        if method_name in self.plugin_methods:
+            return
+
+        # Check if it's a known object type being called as constructor
+        # (ManuScript doesn't have constructors, but we allow it)
+        if method_name in OBJECT_METHODS:
+            return
+
+        # Check if it's a method on Self
+        # Note: Self currently has no methods in lang.json, but kept for future
+        self_methods = OBJECT_METHODS.get("Self", set())
+        if method_name in self_methods:  # pragma: no cover
+            return
+
+        # Check if it could be a method call on an unknown receiver
+        # If the method exists on ANY object, don't warn (could be valid)
+        for obj_methods in OBJECT_METHODS.values():
+            if method_name in obj_methods:
+                return
+
+        # Unknown function - warn
+        self.errors.append(
+            CheckError(
+                token.line,
+                token.col,
+                "MS-W022",
+                f"Function '{method_name}' is not a known builtin or method",
+            )
+        )
 
     def _parse_call_args(self) -> None:
         """Parse function call arguments."""
@@ -724,6 +846,7 @@ def check_method_body(
     start_col: int = 1,
     parameters: list[str] | None = None,
     global_vars: set[str] | None = None,
+    plugin_methods: set[str] | None = None,
 ) -> list[CheckError]:
     """Check a method body for errors.
 
@@ -734,6 +857,7 @@ def check_method_body(
         start_col: Column where body starts
         parameters: List of parameter names
         global_vars: Set of global variable names
+        plugin_methods: Set of method names defined in the same plugin
 
     Returns:
         List of check errors
@@ -751,7 +875,7 @@ def check_method_body(
         defined |= global_vars
 
     # Parse and check
-    checker = MethodBodyChecker(tokens, method_name, defined)
+    checker = MethodBodyChecker(tokens, method_name, defined, plugin_methods)
     errors.extend(checker.check())
 
     return errors

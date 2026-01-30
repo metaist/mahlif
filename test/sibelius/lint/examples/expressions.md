@@ -87,7 +87,7 @@ Property access requires a name after the dot.
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
     Run "() {
-        x = Foo(1, 2;
+        x = Substring('hello', 1, 2;
     }"
 }
 ```

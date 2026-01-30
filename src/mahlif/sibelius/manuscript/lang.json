@@ -74,6 +74,13 @@
       ],
       "returns": "number"
     },
+    "Pos": {
+      "params": [
+        "source",
+        "search"
+      ],
+      "returns": "Integer"
+    },
     "RandomNumber": {
       "params": [],
       "returns": "int"
@@ -83,6 +90,15 @@
         "seed"
       ],
       "returns": "void"
+    },
+    "Replace": {
+      "params": [
+        "source",
+        "find",
+        "replace",
+        "case_sensitive"
+      ],
+      "returns": "String"
     },
     "Round": {
       "params": [
@@ -4199,6 +4215,21 @@
               "min_params": 1,
               "params": [
                 "string"
+              ]
+            }
+          ]
+        },
+        "SelectFileToSave": {
+          "signatures": [
+            {
+              "max_params": 5,
+              "min_params": 5,
+              "params": [
+                "caption",
+                "default_name",
+                "extension_name",
+                "extension",
+                "mac_file_type"
               ]
             }
           ]

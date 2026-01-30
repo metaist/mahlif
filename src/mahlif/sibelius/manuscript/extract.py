@@ -69,8 +69,9 @@ def _is_section_header(line: str, next_lines: list[str]) -> bool:
         ):
             return True
 
-    # Chapter header
-    if line.startswith("7 Global Constants"):
+    # Chapter header - unreachable because "7 Global Constants" has a space
+    # and matches "Constants" pattern above, but kept for clarity
+    if line.startswith("7 Global Constants"):  # pragma: no cover
         return True
 
     return False

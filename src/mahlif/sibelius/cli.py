@@ -184,6 +184,29 @@ def _add_commands(parser: argparse.ArgumentParser) -> None:
         description="Print the OS-specific Sibelius plugin directory",
     )
 
+    # format
+    format_parser = subparsers.add_parser(
+        "format",
+        help="Format ManuScript files",
+        description="Auto-format ManuScript plugin files",
+    )
+    format_parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Check if files are formatted (don't modify)",
+    )
+    format_parser.add_argument(
+        "--diff",
+        action="store_true",
+        help="Show diff of what would change",
+    )
+    format_parser.add_argument(
+        "files",
+        type=Path,
+        nargs="*",
+        help="Files to format (default: all .plg in sibelius directory)",
+    )
+
 
 def run_command(args: argparse.Namespace) -> int:
     """Run the appropriate sibelius subcommand.
@@ -323,6 +346,57 @@ def run_command(args: argparse.Namespace) -> int:
             print("Could not detect Sibelius plugin directory for this OS")
             return 1
         print(plugin_dir)
+        return 0
+
+    elif args.sibelius_command == "format":
+        from mahlif.sibelius.build import find_plugin_sources
+        from mahlif.sibelius.manuscript.format import format_file
+        from mahlif.sibelius.manuscript.format import format_file_in_place
+
+        # Filter empty paths
+        files = [f for f in args.files if str(f) != "."]
+        if not files:
+            # Default to all plugins in sibelius directory
+            source_dir = Path(__file__).parent
+            files = find_plugin_sources(source_dir)
+
+        unformatted_count = 0
+        for path in files:
+            if not path.exists():
+                print(f"Error: {path} not found", file=sys.stderr)
+                unformatted_count += 1
+                continue
+
+            original = path.read_text(encoding="utf-8")
+            formatted = format_file(path)
+
+            if original == formatted:
+                if not args.check:
+                    print(f"✓ {path}: Already formatted")
+                continue
+
+            if args.check:
+                print(f"✗ {path}: Would reformat")
+                unformatted_count += 1
+            elif args.diff:
+                import difflib
+
+                diff = difflib.unified_diff(
+                    original.splitlines(keepends=True),
+                    formatted.splitlines(keepends=True),
+                    fromfile=str(path),
+                    tofile=str(path),
+                )
+                print("".join(diff))
+                unformatted_count += 1
+            else:
+                format_file_in_place(path)
+                print(f"✓ {path}: Reformatted")
+
+        if args.check and unformatted_count > 0:
+            print(f"\n{unformatted_count} file(s) would be reformatted")
+            return 1
+
         return 0
 
     return 1  # pragma: no cover - unreachable with required=True

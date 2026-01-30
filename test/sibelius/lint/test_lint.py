@@ -602,3 +602,28 @@ x = 1;  // mahlif: ignore MS-W002
     # Line 2 should have both
     assert directives.is_ignored(2, "MS-W001")
     assert directives.is_ignored(2, "MS-W002")
+
+
+def test_lint_for_loop_bounds_no_matches() -> None:
+    """Test lint_for_loop_bounds with no matching patterns."""
+    from mahlif.sibelius.manuscript.lint_bodies import lint_for_loop_bounds
+
+    # No for loops at all
+    content = '{ Initialize "() { x = 1; }" }'
+    errors = lint_for_loop_bounds(content)
+    assert errors == []
+
+    # For loop but not the risky pattern (no subtraction)
+    content = '{ Run "() { for i = 0 to 10 { x = i; } }" }'
+    errors = lint_for_loop_bounds(content)
+    assert errors == []
+
+
+def test_lint_for_loop_bounds_nonzero_start() -> None:
+    """Test for loop with non-zero start - no warning."""
+    from mahlif.sibelius.manuscript.lint_bodies import lint_for_loop_bounds
+
+    # Start is 1, not 0 - different semantics, no warning
+    content = '{ Run "() { for i = 1 to Length(x) - 1 { y = i; } }" }'
+    errors = lint_for_loop_bounds(content)
+    assert errors == []

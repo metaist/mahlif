@@ -35,7 +35,7 @@ def test_missing_lang_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
     monkeypatch.setattr(checker, "LANG_JSON_PATH", fake_path)
 
     with pytest.raises(FileNotFoundError, match="Required language data file"):
-        checker._load_builtin_globals()
+        checker._load_lang_data()
 
 
 # =============================================================================
@@ -382,3 +382,140 @@ y = 2;
 z = x + y;"""
     errors = check_method_body(code, parameters=["x", "y", "z"])
     assert errors == []
+
+
+def test_two_char_operator_at_end() -> None:
+    """Test two-character operator at end of source."""
+    # This tests _advance(2) when close to end of source
+    errors = check_method_body("x <= y", parameters=["x", "y"])
+    assert errors == []
+
+
+def test_neq_operator() -> None:
+    """Test != operator."""
+    errors = check_method_body("if (x != y) { z = 1; }", parameters=["x", "y", "z"])
+    assert errors == []
+
+
+def test_operator_at_very_end() -> None:
+    """Test operator at very end of source (no trailing content)."""
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+
+    # When tokenizing "x<=", _advance(2) is called at pos=1 (length=3)
+    # First iteration advances to pos=2, second advances to pos=3 which equals len
+    # This tests the boundary condition in _advance
+    tokenizer = MethodBodyTokenizer("x<=")
+    tokens = list(tokenizer.tokenize())
+    assert any(t.type.name == "LTE" for t in tokens)
+
+
+def test_unterminated_string_with_escape_at_end() -> None:
+    """Test unterminated string ending with escape sequence.
+
+    This exercises the _advance(2) boundary condition when the escape
+    is at the very end of the source.
+    """
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+
+    # 'a\ - escape at end with no char to escape
+    tokenizer = MethodBodyTokenizer("'a\\")
+    tokens = list(tokenizer.tokenize())
+    # Should get ERROR token for unterminated string
+    assert any(t.type.name == "ERROR" for t in tokens)
+    assert any(e.code == "MS-E030" for e in tokenizer.errors)
+
+
+# =============================================================================
+# MS-W022: Undefined function/method detection
+# =============================================================================
+
+
+def test_undefined_method_on_sibelius() -> None:
+    """Test warning for undefined method on Sibelius object."""
+    errors = check_method_body("Sibelius.WriteTextFile(path);", parameters=["path"])
+    assert len(errors) == 1
+    assert errors[0].code == "MS-W022"
+    assert "WriteTextFile" in errors[0].message
+    assert "Sibelius" in errors[0].message
+
+
+def test_valid_method_on_sibelius() -> None:
+    """Test no warning for valid Sibelius method."""
+    errors = check_method_body("Sibelius.CreateTextFile(path);", parameters=["path"])
+    assert errors == []
+
+
+def test_valid_builtin_function() -> None:
+    """Test no warning for valid builtin function."""
+    errors = check_method_body("x = Chr(65);")
+    assert errors == []
+
+
+def test_undefined_bare_function() -> None:
+    """Test warning for completely unknown function."""
+    errors = check_method_body("FooBarBaz123();")
+    assert len(errors) == 1
+    assert errors[0].code == "MS-W022"
+    assert "FooBarBaz123" in errors[0].message
+
+
+def test_method_exists_on_other_object() -> None:
+    """Test no warning when method exists on some object (could be valid)."""
+    # NthBar exists on Score, Staff, etc.
+    errors = check_method_body("x.NthBar(1);", parameters=["x"])
+    assert errors == []
+
+
+def test_chained_property_then_method() -> None:
+    """Test chained access doesn't false-positive."""
+    # Sibelius.ActiveScore is property access, then .NthStaff is method on unknown
+    errors = check_method_body("x = Sibelius.ActiveScore.NthStaff(1);")
+    assert errors == []
+
+
+def test_direct_method_call() -> None:
+    """Test direct Sibelius.Method() is checked."""
+    errors = check_method_body("Sibelius.MessageBox(msg);", parameters=["msg"])
+    assert errors == []
+
+    errors = check_method_body("Sibelius.NoSuchMethod(msg);", parameters=["msg"])
+    assert len(errors) == 1
+    assert errors[0].code == "MS-W022"
+
+
+def test_plugin_method_call() -> None:
+    """Test no warning when calling a plugin's own method."""
+    errors = check_method_body(
+        "result = ProcessBar(bar);",
+        parameters=["bar"],
+        plugin_methods={"ProcessBar", "Initialize", "Run"},
+    )
+    assert errors == []
+
+
+def test_unknown_without_plugin_methods() -> None:
+    """Test warning when plugin method is not passed."""
+    errors = check_method_body(
+        "result = ProcessBar(bar);",
+        parameters=["bar"],
+        # No plugin_methods passed - should warn
+    )
+    assert len(errors) == 1
+    assert errors[0].code == "MS-W022"
+
+
+def test_object_name_as_function() -> None:
+    """Test that using object type name as function doesn't warn."""
+    # ManuScript doesn't have constructors, but we allow this pattern
+    errors = check_method_body("x = Sibelius();")
+    # Should not warn - Sibelius is a known object type
+    w022_errors = [e for e in errors if e.code == "MS-W022"]
+    assert w022_errors == []
+
+
+def test_call_method_on_any_object() -> None:
+    """Test that methods existing on ANY object don't warn when receiver unknown."""
+    # NthBar exists on Staff, Score, etc. - should be allowed on unknown receiver
+    errors = check_method_body("x = unknown.NthBar(1);", parameters=["unknown"])
+    w022_errors = [e for e in errors if e.code == "MS-W022"]
+    assert w022_errors == []

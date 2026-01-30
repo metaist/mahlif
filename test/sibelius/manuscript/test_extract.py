@@ -385,3 +385,366 @@ def test_extract_main_minimal(monkeypatch: pytest.MonkeyPatch) -> None:
     assert "objects" in output
     assert "constants" in output
     assert "builtin_functions" in output
+
+
+# =============================================================================
+# Additional coverage tests
+# =============================================================================
+
+
+def test_extract_objects_duplicate_object() -> None:
+    """Test extracting an object defined in multiple places merges methods."""
+    # Same object name appears twice - second occurrence adds more methods
+    # The merge logic in lines 249-253 extends methods and properties
+    text = """
+Barline
+A Barline object.
+
+Methods
+l
+
+Test1()
+First method.
+
+Variables
+l
+
+Aa
+Property one.
+
+Barline
+More Barline docs.
+
+Methods
+l
+
+Test2()
+Second method.
+
+Variables
+l
+
+Bb
+Property two.
+"""
+    objects = extract_objects(list(text.split("\n")))
+    assert "Barline" in objects
+    barline = objects["Barline"]
+    # Should have methods from both definitions (merged)
+    assert "Test1" in barline.methods
+    assert "Test2" in barline.methods
+    # Properties get extended from both definitions
+    assert "Aa" in barline.properties
+    assert "Bb" in barline.properties
+
+
+def test_extract_constants_skips_long_descriptions() -> None:
+    """Test that long description lines are skipped."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",
+            "This is a very long description line that should be skipped entirely",
+            "True",
+            "",
+            "1",
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    assert constants.get("True") == 1
+    # The long line should not be treated as a constant name
+    assert "This" not in constants
+
+
+def test_extract_constants_skips_section_headers() -> None:
+    """Test that section headers inside constants section are skipped."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "7 Global Constants",  # Chapter header
+            "Truth Values",  # Section header with known pattern
+            "True",
+            "",
+            "1",
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    assert constants.get("True") == 1
+
+
+def test_extract_constants_hits_next_constant() -> None:
+    """Test when searching for value hits the next constant name."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",
+            "NoValue",  # Constant without a value line
+            "True",  # This is the next constant, should stop search
+            "",
+            "1",
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    # NoValue should not be in constants since we hit True before finding value
+    assert "NoValue" not in constants
+    assert constants.get("True") == 1
+
+
+def test_parse_signature_closing_bracket_with_content() -> None:
+    """Test closing bracket with content in current param."""
+    # This tests line 128-130: ] with current_param having content
+    result = parse_signature("Foo(a,[b])")
+    assert result is not None
+    _, sig = result
+    assert sig.params == ["a", "b?"]
+    assert sig.min_params == 1
+    assert sig.max_params == 2
+
+
+def test_extract_objects_skip_object_reference_header() -> None:
+    """Test that '4 Object Reference' line is skipped."""
+    text = """
+4 Object Reference
+
+Bar
+A Bar.
+
+Methods
+l
+
+Test()
+Test method.
+
+Variables
+l
+
+Name
+The name.
+"""
+    objects = extract_objects(list(text.split("\n")))
+    assert "Bar" in objects
+    # "4 Object Reference" should not be an object
+    assert "4" not in objects
+    assert "4 Object Reference" not in objects
+
+
+def test_extract_main_with_objects(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test main() with objects that have methods."""
+    import sys
+    import json
+    from io import StringIO
+    from mahlif.sibelius.manuscript.extract import main
+
+    # Input with an object that has a method
+    test_input = (
+        """
+Barline
+A Barline.
+
+Methods
+l
+
+Test()
+Test method.
+
+Variables
+l
+
+Name
+The name.
+"""
+        + "\n" * 10001
+        + "Truth Values\nTrue\n\n1\n\nIndex\n"
+    )
+
+    monkeypatch.setattr(sys, "stdin", StringIO(test_input))
+
+    captured = StringIO()
+    monkeypatch.setattr(sys, "stdout", captured)
+
+    result = main()
+    assert result == 0
+
+    output = json.loads(captured.getvalue())
+    assert "objects" in output
+    assert "Barline" in output["objects"]
+    barline = output["objects"]["Barline"]
+    assert "methods" in barline
+    assert "Test" in barline["methods"]
+    assert "signatures" in barline["methods"]["Test"]
+
+
+def test_is_section_header_long_with_spaces() -> None:
+    """Test that long lines with spaces are not headers."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    # > 60 chars with spaces should return False early
+    long_line = (
+        "This is a very long line with spaces that exceeds sixty characters total"
+    )
+    assert not _is_section_header(long_line, [])
+
+
+def test_extract_constants_string_with_or() -> None:
+    """Test extracting string constants with 'or' aliases."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",  # Must start with this marker
+            "Alto or Tenor",
+            "",
+            '"clef.alto"',
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    assert constants.get("Alto") == "clef.alto"
+    assert constants.get("Tenor") == "clef.alto"
+
+
+def test_extract_objects_with_4_object_reference() -> None:
+    """Test that '4 Object Reference' line inside object is skipped."""
+    text = """
+Barline
+A Barline.
+
+Methods
+l
+
+4 Object Reference
+
+Test()
+Test method.
+
+Variables
+l
+
+Name
+The name.
+"""
+    objects = extract_objects(list(text.split("\n")))
+    assert "Barline" in objects
+    # "4 Object Reference" should not be parsed as a method
+    assert "4" not in objects["Barline"].methods
+    assert "Test" in objects["Barline"].methods
+
+
+def test_extract_constants_value_search_exhausted() -> None:
+    """Test when value search loop exhausts without finding value."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",
+            "SomeConstant",
+            # 5 blank lines - search will exhaust
+            "",
+            "",
+            "",
+            "",
+            "",
+            "NextConstant",  # This is line 6, beyond search range
+            "",
+            "1",
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    # SomeConstant should not be found (value search exhausted)
+    assert "SomeConstant" not in constants
+    # NextConstant should be found
+    assert constants.get("NextConstant") == 1
+
+
+def test_extract_constants_non_matching_line() -> None:
+    """Test that non-matching lines are skipped."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",
+            "lowercase_not_a_constant",  # doesn't match [A-Z] pattern
+            "True",
+            "",
+            "1",
+            "",
+            "Index",
+        ]
+    )
+    constants = extract_constants(lines)
+    assert constants.get("True") == 1
+    assert "lowercase_not_a_constant" not in constants
+
+
+def test_parse_signature_empty_optional_bracket() -> None:
+    """Test parsing signature with empty optional brackets."""
+    # This exercises the branch where ] follows [ directly
+    result = parse_signature("Foo(a,[])")
+    assert result is not None
+    _, sig = result
+    # Empty brackets don't add params
+    assert sig.params == ["a"]
+    assert sig.min_params == 1
+    assert sig.max_params == 1
+
+
+def test_extract_objects_method_overload() -> None:
+    """Test extracting overloaded methods (same name, different signatures)."""
+    text = """
+Barline
+A Barline.
+
+Methods
+l
+
+Test(a)
+One param.
+
+l
+
+Test(a,b)
+Two params.
+
+Variables
+l
+
+Name
+The name.
+"""
+    objects = extract_objects(list(text.split("\n")))
+    assert "Barline" in objects
+    barline = objects["Barline"]
+    assert "Test" in barline.methods
+    # Should have both signatures
+    sigs = barline.methods["Test"]
+    assert len(sigs) == 2
+
+
+def test_is_section_header_chapter_7() -> None:
+    """Test that '7 Global Constants' is recognized as chapter header."""
+    from mahlif.sibelius.manuscript.extract import _is_section_header
+
+    assert _is_section_header("7 Global Constants", [])
+
+
+def test_extract_constants_no_index_marker() -> None:
+    """Test constants extraction when Index marker is missing."""
+    lines = [""] * 10001
+    lines.extend(
+        [
+            "Truth Values",
+            "True",
+            "",
+            "1",
+            "",
+            # No Index marker - should read to end
+        ]
+    )
+    constants = extract_constants(lines)
+    assert constants.get("True") == 1
