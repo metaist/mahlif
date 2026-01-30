@@ -376,7 +376,7 @@
         nl = Chr(10);
         xml = '        <barline';
         xml = xml & ' pos=' & q & obj.Position & q;
-        xml = xml & ' type=' & q & GetBarlineType(obj.BarlineInternalType) & q;
+        xml = xml & ' type=' & q & utils.LowerCase(obj.BarlineType) & q;
         xml = xml & '/>' & nl;
         return xml;
     }"
@@ -658,33 +658,6 @@
             return 'end';
         }
         return 'auto';
-    }"
-    GetBarlineType "(internalType) {
-        if (internalType = 0) {
-            return 'single';
-        }
-        if (internalType = 1) {
-            return 'double';
-        }
-        if (internalType = 2) {
-            return 'final';
-        }
-        if (internalType = 3) {
-            return 'repeat-end';
-        }
-        if (internalType = 4) {
-            return 'repeat-start';
-        }
-        if (internalType = 5) {
-            return 'repeat-both';
-        }
-        if (internalType = 6) {
-            return 'dashed';
-        }
-        if (internalType = 7) {
-            return 'invisible';
-        }
-        return 'single';
     }"
     GetArticulations "(nr) {
         art = '';
