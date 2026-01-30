@@ -1,6 +1,6 @@
 """Test runner for ManuScript lint examples.
 
-This module reads `.md` files from `test/examples/` and runs lint tests
+This module reads `.md` files from `test/sibelius/lint/examples/` and runs lint tests
 based on the code blocks and expected errors defined in each file.
 """
 
@@ -14,7 +14,7 @@ import pytest
 from mahlif.sibelius.lint import lint
 
 
-EXAMPLES_DIR = Path(__file__).parent / "sibelius" / "lint" / "examples"
+EXAMPLES_DIR = Path(__file__).parent / "examples"
 
 
 def parse_example_file(path: Path) -> list[tuple[str, str, set[str]]]:
