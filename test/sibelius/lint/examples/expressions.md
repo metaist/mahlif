@@ -269,7 +269,7 @@ The `:` in user property syntax must be followed by a property name.
 {
     Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
     Run "() {
-        Sibelius.MessageBox();
+        Sibelius.DestroyProgressDialog();
     }"
 }
 ```

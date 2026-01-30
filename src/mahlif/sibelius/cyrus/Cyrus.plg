@@ -76,7 +76,7 @@ for each staff in score {
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report (build 17) ===' & Chr(10);
+header = '=== Cyrus Report (build 19) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -218,12 +218,12 @@ if (c = 'с') { return 's'; }
 if (c = 'з') { return 'z'; }
 if (c = 'ш') { return 'ʃ'; }
 if (c = 'ж') { return 'ʒ'; }
-if (c = 'щ') { return 'ɕ'; }
+if (c = 'щ') { return 'ʃ'; }
 if (c = 'ч') { return 't͡ʃ'; }
 if (c = 'ц') { return 't͡s'; }
 if (c = 'й') { return 'j'; }
 if (c = 'х') { return 'x'; }
-if (c = 'л') { return 'ɫ'; }
+if (c = 'л') { return 'l'; }
 if (c = 'ь') { return ''; }
 if (c = 'ъ') { return ''; }
 return '';
@@ -286,8 +286,16 @@ result = '';
 if (Length(text) > 0) {
 	for i = 0 to Length(text) {
 		c = Substring(text, i, 1);
-		if (not(IsDiacritic(c))) {
-			result = result & c;
+		if (not(IsDiacritic(c)) and not(IsTieBar(c))) {
+			if (c = 'ɫ') {
+				result = result & 'l';
+			} else {
+				if (c = 'ɡ') {
+					result = result & 'g';
+				} else {
+					result = result & c;
+				}
+			}
 		}
 	}
 }

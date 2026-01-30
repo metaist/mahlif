@@ -10,24 +10,39 @@ This module parses tokenized method body content and checks for:
 
 from __future__ import annotations
 
+import json
+from dataclasses import dataclass
+from pathlib import Path
+
 from .errors import CheckError
 from .tokenizer import MethodBodyTokenizer
 from .tokenizer import Token
 from .tokenizer import TokenType
 
-import json
-from pathlib import Path
-
 LANG_JSON_PATH = Path(__file__).parent / "lang.json"
 
 
+@dataclass
+class FunctionSignature:
+    """Signature info for argument count validation."""
+
+    min_params: int
+    max_params: int
+
+
 def _load_lang_data() -> tuple[
-    set[str], set[str], dict[str, set[str]], dict[str, set[str]]
+    set[str],
+    set[str],
+    dict[str, set[str]],
+    dict[str, set[str]],
+    dict[str, list[FunctionSignature]],
+    dict[str, dict[str, list[FunctionSignature]]],
 ]:
     """Load language data from lang.json.
 
     Returns:
-        Tuple of (builtin_globals, builtin_functions, object_methods, object_properties)
+        Tuple of (builtin_globals, builtin_functions, object_methods,
+                  object_properties, builtin_signatures, method_signatures)
 
     Raises:
         FileNotFoundError: If lang.json is missing
@@ -45,29 +60,63 @@ def _load_lang_data() -> tuple[
     builtin_functions: set[str] = set()
     object_methods: dict[str, set[str]] = {}
     object_properties: dict[str, set[str]] = {}
+    builtin_signatures: dict[str, list[FunctionSignature]] = {}
+    method_signatures: dict[str, dict[str, list[FunctionSignature]]] = {}
 
-    # Add object type names and collect their methods/properties
-    for name, obj in data.get("objects", {}).items():
-        globals_set.add(name)
-        object_methods[name] = set(obj.get("methods", {}).keys())
-        object_properties[name] = set(obj.get("properties", []))
+    # Add object type names and collect their methods/properties/signatures
+    for obj_name, obj in data.get("objects", {}).items():
+        globals_set.add(obj_name)
+        object_methods[obj_name] = set(obj.get("methods", {}).keys())
+        object_properties[obj_name] = set(obj.get("properties", []))
 
-    # Add built-in functions
-    for name in data.get("builtin_functions", {}):
+        # Extract method signatures
+        method_signatures[obj_name] = {}
+        for method_name, method_info in obj.get("methods", {}).items():
+            sigs = []
+            for sig in method_info.get("signatures", []):
+                sigs.append(
+                    FunctionSignature(
+                        min_params=sig.get("min_params", 0),
+                        max_params=sig.get("max_params", 0),
+                    )
+                )
+            if sigs:
+                method_signatures[obj_name][method_name] = sigs
+
+    # Add built-in functions and their signatures
+    for name, info in data.get("builtin_functions", {}).items():
         globals_set.add(name)
         builtin_functions.add(name)
+
+        # Parse params list - count required vs optional (ending with ?)
+        params = info.get("params", [])
+        min_params = sum(1 for p in params if not p.endswith("?"))
+        max_params = len(params)
+        builtin_signatures[name] = [FunctionSignature(min_params, max_params)]
 
     # Add all constants
     for name in data.get("constants", {}):
         globals_set.add(name)
 
-    return globals_set, builtin_functions, object_methods, object_properties
+    return (
+        globals_set,
+        builtin_functions,
+        object_methods,
+        object_properties,
+        builtin_signatures,
+        method_signatures,
+    )
 
 
 # Load at module import time
-BUILTIN_GLOBALS, BUILTIN_FUNCTIONS, OBJECT_METHODS, OBJECT_PROPERTIES = (
-    _load_lang_data()
-)
+(
+    BUILTIN_GLOBALS,
+    BUILTIN_FUNCTIONS,
+    OBJECT_METHODS,
+    OBJECT_PROPERTIES,
+    BUILTIN_SIGNATURES,
+    METHOD_SIGNATURES,
+) = _load_lang_data()
 
 
 class MethodBodyChecker:
@@ -644,9 +693,11 @@ class MethodBodyChecker:
                     )
                     return
             elif self._check(TokenType.LPAREN):
-                # This is a function/method call
-                self._check_call(receiver_type, last_identifier, last_identifier_token)
-                self._parse_call_args()
+                # This is a function/method call - parse args first to get count
+                arg_count = self._parse_call_args()
+                self._check_call(
+                    receiver_type, last_identifier, last_identifier_token, arg_count
+                )
                 # After a call, we don't know the type anymore
                 receiver_type = None
                 last_identifier = None
@@ -683,6 +734,7 @@ class MethodBodyChecker:
         receiver_type: str | None,
         method_name: str | None,
         token: Token | None,
+        arg_count: int = 0,
     ) -> None:
         """Check if a function/method call is valid.
 
@@ -690,6 +742,7 @@ class MethodBodyChecker:
             receiver_type: Known object type (e.g., "Sibelius") or None
             method_name: Name of the method/function being called
             token: Token for error reporting
+            arg_count: Number of arguments passed
         """
         if method_name is None or token is None:
             return
@@ -706,16 +759,20 @@ class MethodBodyChecker:
                         f"Method '{method_name}' not found on '{receiver_type}'",
                     )
                 )
+            else:
+                # Check argument count
+                self._check_arg_count(receiver_type, method_name, arg_count, token)
             return
 
         # Case 2: Bare function call (e.g., Foo())
         # Check if it's a builtin function
         if method_name in BUILTIN_FUNCTIONS:
+            self._check_arg_count(None, method_name, arg_count, token)
             return
 
         # Check if it's a method defined in the same plugin
         if method_name in self.plugin_methods:
-            return
+            return  # Can't check arg count for plugin methods
 
         # Check if it's a known object type being called as constructor
         # (ManuScript doesn't have constructors, but we allow it)
@@ -744,13 +801,78 @@ class MethodBodyChecker:
             )
         )
 
-    def _parse_call_args(self) -> None:
-        """Parse function call arguments."""
+    def _check_arg_count(
+        self,
+        receiver_type: str | None,
+        method_name: str,
+        arg_count: int,
+        token: Token,
+    ) -> None:
+        """Check if argument count matches function signature.
+
+        Args:
+            receiver_type: Object type or None for builtin
+            method_name: Name of the function/method
+            arg_count: Number of arguments passed
+            token: Token for error reporting
+        """
+        signatures: list[FunctionSignature] = []
+
+        if receiver_type is not None:
+            # Method on known object
+            obj_sigs = METHOD_SIGNATURES.get(receiver_type, {})
+            signatures = obj_sigs.get(method_name, [])
+        else:
+            # Builtin function
+            signatures = BUILTIN_SIGNATURES.get(method_name, [])
+
+        if not signatures:
+            return  # No signature info available
+
+        # Check if arg_count matches any signature
+        for sig in signatures:
+            if sig.min_params <= arg_count <= sig.max_params:
+                return  # Valid
+
+        # Build error message
+        if len(signatures) == 1:
+            sig = signatures[0]
+            if sig.min_params == sig.max_params:
+                expected = f"{sig.min_params}"
+            else:
+                expected = f"{sig.min_params}-{sig.max_params}"
+        else:
+            # Multiple overloads - show all valid ranges
+            ranges = []
+            for sig in signatures:
+                if sig.min_params == sig.max_params:
+                    ranges.append(str(sig.min_params))
+                else:
+                    ranges.append(f"{sig.min_params}-{sig.max_params}")
+            expected = " or ".join(ranges)
+
+        self.errors.append(
+            CheckError(
+                token.line,
+                token.col,
+                "MS-W023",
+                f"'{method_name}' expects {expected} argument(s), got {arg_count}",
+            )
+        )
+
+    def _parse_call_args(self) -> int:
+        """Parse function call arguments.
+
+        Returns:
+            Number of arguments parsed
+        """
         self._advance()  # consume '('
         self._skip_comments()
 
+        arg_count = 0
         if not self._check(TokenType.RPAREN):
             self._parse_expression()
+            arg_count = 1
             while self._check(TokenType.COMMA):
                 self._advance()
                 self._skip_comments()
@@ -758,11 +880,13 @@ class MethodBodyChecker:
                     # Trailing comma - allowed
                     break
                 self._parse_expression()
+                arg_count += 1
 
         self._expect(
             TokenType.RPAREN,  # pyrefly: ignore[unbound-name]
             "Expected ')' to close function call",
         )
+        return arg_count
 
     def _parse_primary(self) -> None:
         """Parse primary expression."""

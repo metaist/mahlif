@@ -199,7 +199,7 @@ def test_property_access() -> None:
 
 def test_method_call_with_args() -> None:
     """Test method call with arguments."""
-    errors = check_method_body("Sibelius.MessageBox('msg', True);")
+    errors = check_method_body("Sibelius.MessageBox('msg');")
     assert errors == []
 
 
@@ -519,3 +519,41 @@ def test_call_method_on_any_object() -> None:
     errors = check_method_body("x = unknown.NthBar(1);", parameters=["unknown"])
     w022_errors = [e for e in errors if e.code == "MS-W022"]
     assert w022_errors == []
+
+
+# =============================================================================
+# MS-W023: Argument count validation
+# =============================================================================
+
+
+def test_arg_count_correct() -> None:
+    """Test no warning when argument count is correct."""
+    errors = check_method_body("x = Chr(65);")
+    w023_errors = [e for e in errors if e.code == "MS-W023"]
+    assert w023_errors == []
+
+
+def test_arg_count_too_few() -> None:
+    """Test warning when too few arguments."""
+    errors = check_method_body("x = Chr();")
+    assert any(e.code == "MS-W023" and "got 0" in e.message for e in errors)
+
+
+def test_arg_count_too_many() -> None:
+    """Test warning when too many arguments."""
+    errors = check_method_body("x = Chr(65, 66);")
+    assert any(e.code == "MS-W023" and "got 2" in e.message for e in errors)
+
+
+def test_arg_count_method_too_few() -> None:
+    """Test warning on method with too few arguments."""
+    errors = check_method_body("Sibelius.CreateTextFile();")
+    assert any(e.code == "MS-W023" for e in errors)
+
+
+def test_arg_count_optional_params() -> None:
+    """Test optional parameters allow variable arg counts."""
+    # Substring with all 3 args - should be valid
+    errors = check_method_body("x = Substring('hello', 0, 5);")
+    w023_errors = [e for e in errors if e.code == "MS-W023"]
+    assert w023_errors == []
