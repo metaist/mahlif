@@ -251,3 +251,238 @@ Content inside switch must be `case` or `default`.
 
 **Expected errors:**
 (none)
+
+## If Statement - Missing Right Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        if (x = 1 {
+            y = 2;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')'
+
+## While Statement - Missing Right Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        while (x < 5 {
+            x = x + 1;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')'
+
+## Else If Statement
+
+Valid else if chain.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        if (x = 1) {
+            y = 1;
+        } else if (x = 2) {
+            y = 2;
+        } else {
+            y = 0;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Standalone Block
+
+Valid standalone block (braces without control flow).
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        {
+            y = 2;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Empty Statement (Semicolon Only)
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        ;
+        x = 1;
+        ;
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## For Statement - Missing Loop Variable
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        for = 1 to 5 {
+            x = i;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E041` - Expected variable name after 'for'
+
+## For Each - Missing Type or Variable After Each
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        for each in list {
+            x = item;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E041` - Expected type or variable
+
+## Switch - Missing Left Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        switch x {
+            case (1) {
+                y = 1;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected '('
+
+## Switch - Missing Right Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        switch (x {
+            case (1) {
+                y = 1;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')'
+
+## For Each - Identifier Followed By Number
+
+When an identifier follows `each`, the next token must be either another identifier (type) or `in`.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        for each item 123 {
+            x = item;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E041` - Expected 'in'
+
+## Switch Case - Missing Right Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        switch (x) {
+            case (1 {
+                y = 1;
+            }
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')'
+
+## Switch With Comment Before Closing Brace
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        switch (x) {
+            case (1) { y = 1; }
+            // comment before closing brace
+        }
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Switch Without Opening Brace
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        switch (x)
+            case (1) { y = 1; }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected '{'
+- `MS-E048` - Cascading error from missing brace
+- `MS-E001` - Cascading error

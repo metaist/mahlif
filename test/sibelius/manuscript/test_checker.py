@@ -264,3 +264,68 @@ def test_inline_comment() -> None:
     """Test inline comment after statement."""
     errors = check_method_body("x = 1; // comment")
     assert errors == []
+
+
+# =============================================================================
+# Edge case coverage tests
+# =============================================================================
+
+
+def test_error_token() -> None:
+    """Test that ERROR tokens from tokenizer are handled."""
+    # Unterminated string creates an ERROR token
+    errors = check_method_body("x = 'unterminated;")
+    assert any(e.code == "MS-E030" for e in errors)  # Tokenizer error
+
+
+def test_expression_with_only_semicolon() -> None:
+    """Test expression that starts with just semicolon."""
+    errors = check_method_body(";")
+    assert errors == []  # Empty statement is valid
+
+
+def test_deeply_nested_recovery() -> None:
+    """Test error recovery with nested blocks."""
+    # Missing closing braces should recover
+    errors = check_method_body("if (x) { if (y) { z = 1; }", parameters=["x", "y", "z"])
+    assert len(errors) > 0
+
+
+def test_method_body_eof() -> None:
+    """Test that method body ending at EOF is handled."""
+    # No trailing semicolon
+    errors = check_method_body("x = 1")
+    assert errors == []
+
+
+def test_return_without_value() -> None:
+    """Test return statement without a value."""
+    errors = check_method_body("return;")
+    assert errors == []
+
+
+def test_return_before_rbrace() -> None:
+    """Test return at end of block (no semicolon before brace)."""
+    errors = check_method_body("if (x) { return }", parameters=["x"])
+    # Missing semicolon should generate error
+    assert any(e.code == "MS-E040" for e in errors)
+
+
+def test_identifier_not_followed_by_assign() -> None:
+    """Test identifier followed by something other than =."""
+    # x + y is an expression, not assignment
+    errors = check_method_body("x + y;", parameters=["x", "y"])
+    assert errors == []
+
+
+def test_identifier_at_end() -> None:
+    """Test identifier at end of tokens."""
+    errors = check_method_body("x", parameters=["x"])
+    assert errors == []
+
+
+def test_recovery_to_eof() -> None:
+    """Test error recovery that reaches EOF without finding brace."""
+    # for without brace and no closing - recovery goes to EOF
+    errors = check_method_body("for i = 1 to 5 x = i;")
+    assert len(errors) > 0

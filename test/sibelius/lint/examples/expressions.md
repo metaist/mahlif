@@ -217,3 +217,109 @@ Dot notation requires a property name.
 
 **Expected errors:**
 (none)
+
+## Missing Operand After Multiplication
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 2 *;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E046` - Expected expression after operator
+
+## Missing Operand After Division
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 10 /;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E046` - Expected expression after operator
+
+## User Property Syntax Error
+
+The `:` in user property syntax must be followed by a property name.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        obj = Sibelius;
+        x = obj._property:;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E047` - Expected property name after ':'
+
+## Empty Expression in Call
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        Sibelius.MessageBox();
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Valid User Property
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        obj = Sibelius.ActiveScore;
+        x = obj._property:Name;
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Trailing Comma in Function Call
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        Sibelius.MessageBox('hello',);
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Empty Expression Where Expected
+
+An expression is expected but none provided.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        if () {
+            x = 1;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E045` - Expected expression
