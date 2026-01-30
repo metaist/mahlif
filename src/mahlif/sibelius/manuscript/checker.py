@@ -678,9 +678,13 @@ class MethodBodyChecker:
                     last_identifier = self._current().value
                     last_identifier_token = self._current()
                     self._advance()
-                    # If next token is NOT '(', this was property access, lose type
+                    # If next token is NOT '(', this was property access
                     self._skip_comments()
                     if not self._check(TokenType.LPAREN) and had_receiver:
+                        # Check if property exists on receiver
+                        self._check_property(
+                            receiver_type, last_identifier, last_identifier_token
+                        )
                         receiver_type = None
                 else:
                     self.errors.append(
@@ -859,6 +863,100 @@ class MethodBodyChecker:
                 f"'{method_name}' expects {expected} argument(s), got {arg_count}",
             )
         )
+
+    def _check_property(
+        self,
+        receiver_type: str | None,
+        prop_name: str,
+        token: Token,
+    ) -> None:
+        """Check if a property access is valid.
+
+        Args:
+            receiver_type: Object type (e.g., "Sibelius") or None
+            prop_name: Name of the property being accessed
+            token: Token for error reporting
+        """
+        if receiver_type is None:
+            return
+
+        properties = OBJECT_PROPERTIES.get(receiver_type, set())
+        methods = OBJECT_METHODS.get(receiver_type, set())
+
+        # Property exists
+        if prop_name in properties:
+            return
+
+        # Could be a method being accessed without call (e.g., for passing as ref)
+        if prop_name in methods:
+            return
+
+        # Property not found - suggest similar names
+        all_members = properties | methods
+        suggestion = self._find_similar(prop_name, all_members)
+
+        msg = f"Property '{prop_name}' not found on '{receiver_type}'"
+        if suggestion:
+            msg += f"; did you mean '{suggestion}'?"
+
+        self.errors.append(CheckError(token.line, token.col, "MS-W024", msg))
+
+    def _find_similar(self, name: str, candidates: set[str]) -> str | None:
+        """Find the most similar name from candidates.
+
+        Uses simple edit distance (Levenshtein) to find closest match.
+
+        Args:
+            name: The misspelled name
+            candidates: Set of valid names
+
+        Returns:
+            Most similar name if close enough, else None
+        """
+        if not candidates:
+            return None
+
+        def edit_distance(s1: str, s2: str) -> int:
+            """Compute Levenshtein distance between two strings."""
+            if len(s1) < len(s2):
+                return edit_distance(s2, s1)
+
+            if len(s2) == 0:
+                return len(s1)
+
+            prev_row = list(range(len(s2) + 1))
+            for i, c1 in enumerate(s1):
+                curr_row = [i + 1]
+                for j, c2 in enumerate(s2):
+                    insertions = prev_row[j + 1] + 1
+                    deletions = curr_row[j] + 1
+                    substitutions = prev_row[j] + (c1 != c2)
+                    curr_row.append(min(insertions, deletions, substitutions))
+                prev_row = curr_row
+
+            return prev_row[-1]
+
+        # Find closest match
+        best_match = None
+        best_distance = float("inf")
+        name_lower = name.lower()
+
+        for candidate in candidates:
+            # Quick check for case-insensitive match
+            if candidate.lower() == name_lower:
+                return candidate
+
+            dist = edit_distance(name.lower(), candidate.lower())
+            if dist < best_distance:
+                best_distance = dist
+                best_match = candidate
+
+        # Only suggest if distance is reasonable (less than 40% of name length)
+        max_distance = max(2, int(len(name) * 0.4))
+        if best_distance <= max_distance:
+            return best_match
+
+        return None
 
     def _parse_call_args(self) -> int:
         """Parse function call arguments.

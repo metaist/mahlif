@@ -557,3 +557,38 @@ def test_arg_count_optional_params() -> None:
     errors = check_method_body("x = Substring('hello', 0, 5);")
     w023_errors = [e for e in errors if e.code == "MS-W023"]
     assert w023_errors == []
+
+
+# =============================================================================
+# MS-W024: Undefined property detection
+# =============================================================================
+
+
+def test_property_valid() -> None:
+    """Test no warning for valid property."""
+    errors = check_method_body("x = Sibelius.ActiveScore;")
+    w024_errors = [e for e in errors if e.code == "MS-W024"]
+    assert w024_errors == []
+
+
+def test_property_invalid_with_suggestion() -> None:
+    """Test warning with 'did you mean' suggestion."""
+    errors = check_method_body("x = Sibelius.ActiveScor;")
+    assert any(
+        e.code == "MS-W024"
+        and "did you mean" in e.message
+        and "ActiveScore" in e.message
+        for e in errors
+    )
+
+
+def test_property_invalid_no_suggestion() -> None:
+    """Test warning without suggestion for very different name."""
+    errors = check_method_body("x = Sibelius.Xyz123;")
+    assert any(e.code == "MS-W024" and "did you mean" not in e.message for e in errors)
+
+
+def test_property_case_mismatch() -> None:
+    """Test suggestion for case mismatch."""
+    errors = check_method_body("x = Sibelius.activescore;")
+    assert any(e.code == "MS-W024" and "ActiveScore" in e.message for e in errors)

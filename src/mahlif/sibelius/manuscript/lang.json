@@ -4222,14 +4222,15 @@
         "SelectFileToSave": {
           "signatures": [
             {
-              "max_params": 5,
+              "max_params": 6,
               "min_params": 5,
               "params": [
                 "caption",
                 "default_name",
                 "extension_name",
                 "extension",
-                "mac_file_type"
+                "mac_file_type",
+                "filter_description?"
               ]
             }
           ]

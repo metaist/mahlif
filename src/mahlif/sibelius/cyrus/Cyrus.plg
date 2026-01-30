@@ -35,48 +35,66 @@ for i = 0 to 100 {
 totalBars = (endBar - startBar + 1) * numStaves;
 Sibelius.CreateProgressDialog('Processing...', 0, 100);
 barsDone = 0;
+cancelled = False;
+staffIdx = 0;
 for each staff in score {
-	isSelected = False;
-	for i = 0 to 100 {
-		if (selectedStaves[i] = null) {
-			i = 100;
-		} else {
-			if (selectedStaves[i] = staff.StaffNum) {
-				isSelected = True;
+	if (cancelled) {
+		staff = null;
+	} else {
+		isSelected = False;
+		for i = 0 to 100 {
+			if (selectedStaves[i] = null) {
 				i = 100;
-			}
-		}
-	}
-	if (isSelected) {
-		staffName = staff.InstrumentName;
-		for barNum = startBar to endBar + 1 {
-			pct = (barsDone * 100) / totalBars;
-			Sibelius.UpdateProgressDialog(pct, staffName & ': Bar ' & barNum & ' of ' & endBar);
-			bar = staff.NthBar(barNum);
-			result = ProcessBar(bar, barNum, staffName);
-			if (Length(result) >= 4) {
-				for j = 0 to Length(result) - 3 {
-					tag = Substring(result, j, 4);
-					if (tag = 'CHNG') {
-						changeCount = changeCount + 1;
-					}
-					if (tag = 'SKIP') {
-						skippedCount = skippedCount + 1;
-					}
-					if (tag = 'UNRE') {
-						boundariesChecked = boundariesChecked + 1;
-					}
+			} else {
+				if (selectedStaves[i] = staff.StaffNum) {
+					isSelected = True;
+					i = 100;
 				}
 			}
-			if (result != 'SKIP') {
-				report = report & result;
+		}
+		if (isSelected) {
+			staffIdx = staffIdx + 1;
+			staffName = staff.InstrumentName;
+			for barNum = startBar to endBar + 1 {
+				if (not(cancelled)) {
+					pct = (barsDone * 100) / totalBars;
+					staffProgress = 'Staff ' & staffIdx & '/' & numStaves & ' (' & staffName & '): Bar ' & barNum & '/' & endBar;
+					continueProcessing = Sibelius.UpdateProgressDialog(pct, staffProgress);
+					if (not(continueProcessing)) {
+						cancelled = True;
+					} else {
+						bar = staff.NthBar(barNum);
+						result = ProcessBar(bar, barNum, staffName);
+						if (Length(result) >= 4) {
+							for j = 0 to Length(result) - 3 {
+								tag = Substring(result, j, 4);
+								if (tag = 'CHNG') {
+									changeCount = changeCount + 1;
+								}
+								if (tag = 'SKIP') {
+									skippedCount = skippedCount + 1;
+								}
+								if (tag = 'UNRE') {
+									boundariesChecked = boundariesChecked + 1;
+								}
+							}
+						}
+						if (result != 'SKIP') {
+							report = report & result;
+						}
+					}
+					barsDone = barsDone + 1;
+				}
 			}
-			barsDone = barsDone + 1;
 		}
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report (build 19) ===' & Chr(10);
+if (cancelled) {
+	Sibelius.MessageBox('Processing cancelled.');
+	return header;
+}
+header = '=== Cyrus Report (build 20) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
