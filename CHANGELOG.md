@@ -17,6 +17,14 @@ Sections order is: `Fixed`, `Changed`, `Added`, `Deprecated`, `Removed`, `Securi
 
 These are changes that are on `main` that are not yet in `prod`.
 
+---
+
+## [0.1.0] - 2026-01-30T20:37:40Z
+
+Initial release.
+
+[0.1.0]: https://github.com/metaist/mahlif/releases/tag/0.1.0
+
 **Fixed**
 
 - [#1] UTF-16 encoding for Cyrillic/Unicode text preservation
