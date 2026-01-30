@@ -14,8 +14,8 @@ from dataclasses import dataclass
 
 
 @dataclass
-class CheckError:
-    """An error found during checking."""
+class LintError:
+    """An error found during linting/checking."""
 
     line: int
     col: int
@@ -24,6 +24,10 @@ class CheckError:
 
     def __str__(self) -> str:
         return f"{self.line}:{self.col} [{self.code}] {self.message}"
+
+
+# Backwards compatibility alias
+CheckError = LintError
 
 
 # Error code constants for documentation and consistency

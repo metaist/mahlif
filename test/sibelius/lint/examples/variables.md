@@ -85,3 +85,19 @@ Loop variables are defined within the loop body.
 
 **Expected errors:**
 (none)
+
+## Plugin With No Variables
+
+A plugin with only methods and no variable declarations.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        Sibelius.MessageBox('Hello');
+    }"
+}
+```
+
+**Expected errors:**
+(none)

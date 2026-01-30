@@ -8,107 +8,16 @@ This module tokenizes the content inside these strings for syntax checking.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from enum import Enum
-from enum import auto
 from typing import Iterator
 
 from .errors import CheckError
+from .tokens import KEYWORDS
+from .tokens import Token
+from .tokens import TokenType
 
 
-class TokenType(Enum):
-    """Token types for ManuScript method bodies."""
-
-    # Literals
-    STRING = auto()
-    NUMBER = auto()
-    IDENTIFIER = auto()
-
-    # Keywords
-    IF = auto()
-    ELSE = auto()
-    FOR = auto()
-    EACH = auto()
-    IN = auto()
-    TO = auto()
-    WHILE = auto()
-    SWITCH = auto()
-    CASE = auto()
-    DEFAULT = auto()
-    RETURN = auto()
-    TRUE = auto()
-    FALSE = auto()
-    NULL = auto()
-    AND = auto()
-    OR = auto()
-    NOT = auto()
-
-    # Operators
-    ASSIGN = auto()  # =
-    PLUS = auto()  # +
-    MINUS = auto()  # -
-    STAR = auto()  # *
-    SLASH = auto()  # /
-    PERCENT = auto()  # %
-    AMPERSAND = auto()  # & (string concat)
-    LT = auto()  # <
-    GT = auto()  # >
-    LTE = auto()  # <=
-    GTE = auto()  # >=
-    NEQ = auto()  # !=
-    DOT = auto()  # .
-    COLON = auto()  # :
-
-    # Delimiters
-    LPAREN = auto()  # (
-    RPAREN = auto()  # )
-    LBRACE = auto()  # {
-    RBRACE = auto()  # }
-    LBRACKET = auto()  # [
-    RBRACKET = auto()  # ]
-    COMMA = auto()  # ,
-    SEMICOLON = auto()  # ;
-
-    # Special
-    COMMENT = auto()
-    EOF = auto()
-    ERROR = auto()  # For tokenization errors
-
-
-@dataclass
-class Token:
-    """A token in ManuScript source."""
-
-    type: TokenType
-    value: str
-    line: int
-    col: int
-
-    def __repr__(self) -> str:
-        return f"Token({self.type.name}, {self.value!r}, {self.line}:{self.col})"
-
-
-KEYWORDS: dict[str, TokenType] = {
-    "if": TokenType.IF,
-    "else": TokenType.ELSE,
-    "for": TokenType.FOR,
-    "each": TokenType.EACH,
-    "in": TokenType.IN,
-    "to": TokenType.TO,
-    "while": TokenType.WHILE,
-    "switch": TokenType.SWITCH,
-    "case": TokenType.CASE,
-    "default": TokenType.DEFAULT,
-    "return": TokenType.RETURN,
-    "true": TokenType.TRUE,
-    "false": TokenType.FALSE,
-    "null": TokenType.NULL,
-    "and": TokenType.AND,
-    "or": TokenType.OR,
-    "not": TokenType.NOT,
-    "True": TokenType.TRUE,
-    "False": TokenType.FALSE,
-}
+# Re-export for backwards compatibility
+__all__ = ["Token", "TokenType", "MethodBodyTokenizer", "KEYWORDS"]
 
 
 class MethodBodyTokenizer:

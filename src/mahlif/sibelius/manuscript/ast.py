@@ -9,101 +9,24 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 from dataclasses import field
-from enum import Enum
-from enum import auto
 from typing import Iterator
 
+from .tokens import KEYWORDS
+from .tokens import Token
+from .tokens import TokenType
 
-class TokenType(Enum):
-    """Token types for ManuScript."""
-
-    # Literals
-    STRING = auto()  # 'text' or "text"
-    NUMBER = auto()  # 123, 123.45
-    IDENTIFIER = auto()  # variableName, MethodName
-
-    # Keywords
-    IF = auto()
-    ELSE = auto()
-    FOR = auto()
-    EACH = auto()
-    IN = auto()
-    TO = auto()
-    WHILE = auto()
-    SWITCH = auto()
-    CASE = auto()
-    RETURN = auto()
-    TRUE = auto()
-    FALSE = auto()
-    NULL = auto()
-    AND = auto()
-    OR = auto()
-    NOT = auto()
-
-    # Operators
-    ASSIGN = auto()  # =
-    PLUS = auto()  # +
-    MINUS = auto()  # -
-    STAR = auto()  # *
-    SLASH = auto()  # /
-    PERCENT = auto()  # %
-    AMPERSAND = auto()  # & (string concat)
-    LT = auto()  # <
-    GT = auto()  # >
-    LTE = auto()  # <=
-    GTE = auto()  # >=
-    NEQ = auto()  # !=
-    DOT = auto()  # .
-
-    # Delimiters
-    LPAREN = auto()  # (
-    RPAREN = auto()  # )
-    LBRACE = auto()  # {
-    RBRACE = auto()  # }
-    LBRACKET = auto()  # [
-    RBRACKET = auto()  # ]
-    COMMA = auto()  # ,
-    SEMICOLON = auto()  # ;
-
-    # Special
-    COMMENT = auto()  # // ...
-    NEWLINE = auto()
-    EOF = auto()
-
-
-@dataclass
-class Token:
-    """A token in ManuScript source."""
-
-    type: TokenType
-    value: str
-    line: int
-    col: int
-
-    def __repr__(self) -> str:
-        return f"Token({self.type.name}, {self.value!r}, {self.line}:{self.col})"
-
-
-KEYWORDS = {
-    "if": TokenType.IF,
-    "else": TokenType.ELSE,
-    "for": TokenType.FOR,
-    "each": TokenType.EACH,
-    "in": TokenType.IN,
-    "to": TokenType.TO,
-    "while": TokenType.WHILE,
-    "switch": TokenType.SWITCH,
-    "case": TokenType.CASE,
-    "return": TokenType.RETURN,
-    "true": TokenType.TRUE,
-    "false": TokenType.FALSE,
-    "null": TokenType.NULL,
-    "and": TokenType.AND,
-    "or": TokenType.OR,
-    "not": TokenType.NOT,
-    "True": TokenType.TRUE,
-    "False": TokenType.FALSE,
-}
+__all__ = [
+    "KEYWORDS",
+    "Token",
+    "TokenType",
+    "Tokenizer",
+    "Parser",
+    "Plugin",
+    "MethodDef",
+    "VarDef",
+    "parse_plugin",
+    "get_method_calls",
+]
 
 
 class Tokenizer:
@@ -576,10 +499,7 @@ def get_method_calls(source: str) -> list[tuple[int, int, str | None, str, int]]
                         depth -= 1
                     elif tokens[i].type == TokenType.COMMA and depth == 1:
                         arg_count += 1
-                    elif tokens[i].type not in (
-                        TokenType.COMMENT,
-                        TokenType.NEWLINE,
-                    ):
+                    elif tokens[i].type != TokenType.COMMENT:
                         has_content = True
                     i += 1
 

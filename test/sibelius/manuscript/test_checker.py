@@ -329,3 +329,21 @@ def test_recovery_to_eof() -> None:
     # for without brace and no closing - recovery goes to EOF
     errors = check_method_body("for i = 1 to 5 x = i;")
     assert len(errors) > 0
+
+
+def test_check_error_str() -> None:
+    """Test CheckError string representation."""
+    from mahlif.sibelius.manuscript.errors import CheckError
+
+    err = CheckError(10, 5, "MS-E001", "Test error")
+    assert str(err) == "10:5 [MS-E001] Test error"
+
+
+def test_tokenizer_token_repr() -> None:
+    """Test tokenizer Token repr."""
+    from mahlif.sibelius.manuscript.tokenizer import Token, TokenType
+
+    token = Token(TokenType.IDENTIFIER, "foo", 1, 5)
+    assert "IDENTIFIER" in repr(token)
+    assert "foo" in repr(token)
+    assert "1:5" in repr(token)

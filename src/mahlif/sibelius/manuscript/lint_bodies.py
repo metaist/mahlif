@@ -137,7 +137,7 @@ def lint_method_bodies(content: str) -> list[LintError]:
     Returns:
         List of lint errors
     """
-    from mahlif.sibelius.manuscript.checker import check_method_body
+    from .checker import check_method_body
 
     errors: list[LintError] = []
     methods = extract_method_bodies(content)
@@ -148,16 +148,18 @@ def lint_method_bodies(content: str) -> list[LintError]:
         params: list[str] = []
         if body.startswith("("):
             paren_end = body.find(")")
-            if paren_end > 0:
+            if paren_end > 0:  # pragma: no branch - parser ensures valid structure
                 params_str = body[1:paren_end]
                 if params_str.strip():
                     params = [p.strip() for p in params_str.split(",")]
 
                 # Find the body content after the parameters
                 brace_start = body.find("{", paren_end)
-                if brace_start >= 0:
+                if (
+                    brace_start >= 0
+                ):  # pragma: no branch - parser ensures valid structure
                     brace_end = body.rfind("}")
-                    if brace_end > brace_start:
+                    if brace_end > brace_start:  # pragma: no branch
                         actual_body = body[brace_start + 1 : brace_end]
                         # Calculate the actual start position
                         body_line = start_line

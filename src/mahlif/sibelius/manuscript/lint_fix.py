@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .common import read_plugin
+from .lint_common import read_plugin
 
 
 def fix_trailing_whitespace(path: Path) -> bool:

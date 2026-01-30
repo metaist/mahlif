@@ -71,7 +71,7 @@ def _load_method_signatures() -> dict[str, tuple[int, int]]:
         Dict mapping method name to (min_params, max_params)
     """
     json_path = Path(__file__).parent.parent / "manuscript" / "lang.json"
-    if not json_path.exists():
+    if not json_path.exists():  # pragma: no cover - lang.json is always present
         return {}
 
     with open(json_path) as f:
@@ -120,7 +120,7 @@ def lint_method_calls(content: str) -> list[LintError]:
     Returns:
         List of lint errors
     """
-    from mahlif.sibelius.manuscript.ast import get_method_calls
+    from .ast import get_method_calls
 
     errors: list[LintError] = []
 

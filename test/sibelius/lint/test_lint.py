@@ -313,7 +313,7 @@ def test_lint_strings_odd_quotes_with_empty_string() -> None:
 
 def test_lint_method_calls_empty_signatures() -> None:
     """Test lint_method_calls with empty signatures."""
-    import mahlif.sibelius.lint.methods as methods_module
+    import mahlif.sibelius.manuscript.lint_methods as methods_module
 
     old_sigs = methods_module.METHOD_SIGNATURES
     methods_module.METHOD_SIGNATURES = {}
