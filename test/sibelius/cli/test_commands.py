@@ -156,7 +156,7 @@ def test_check_command_default_files(
 
 
 def test_install_command(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
-    """Test install command (shortcut for build --install)."""
+    """Test install command installs MahlifExport by default."""
     sibelius_dir = tmp_path / "sibelius"
     with patch(
         "mahlif.sibelius.build.get_sibelius_plugin_dir",
@@ -165,7 +165,10 @@ def test_install_command(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> 
         result = sibelius_main(["install"])
     assert result == 0
     assert sibelius_dir.exists()
-    assert any(sibelius_dir.glob("*.plg"))
+    # Should only install MahlifExport by default
+    plugins = list(sibelius_dir.glob("*.plg"))
+    assert len(plugins) == 1
+    assert plugins[0].stem == "MahlifExport"
 
 
 def test_install_command_dry_run(
@@ -182,6 +185,40 @@ def test_install_command_dry_run(
     assert not sibelius_dir.exists()
     captured = capsys.readouterr()
     assert "Would build" in captured.out
+    assert "MahlifExport" in captured.out
+
+
+def test_install_command_specific_plugin(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test install command with specific plugin name."""
+    sibelius_dir = tmp_path / "sibelius"
+    with patch(
+        "mahlif.sibelius.build.get_sibelius_plugin_dir",
+        return_value=sibelius_dir,
+    ):
+        result = sibelius_main(["install", "Cyrus"])
+    assert result == 0
+    plugins = list(sibelius_dir.glob("*.plg"))
+    assert len(plugins) == 1
+    assert plugins[0].stem == "Cyrus"
+
+
+def test_install_command_multiple_plugins(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test install command with multiple plugin names."""
+    sibelius_dir = tmp_path / "sibelius"
+    with patch(
+        "mahlif.sibelius.build.get_sibelius_plugin_dir",
+        return_value=sibelius_dir,
+    ):
+        result = sibelius_main(["install", "MahlifExport", "Cyrus"])
+    assert result == 0
+    plugins = list(sibelius_dir.glob("*.plg"))
+    assert len(plugins) == 2
+    names = {p.stem for p in plugins}
+    assert names == {"MahlifExport", "Cyrus"}
 
 
 def test_list_command(capsys: pytest.CaptureFixture[str]) -> None:

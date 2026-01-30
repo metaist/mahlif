@@ -49,11 +49,17 @@ mahlif sibelius show-plugin-dir
 
 ### `mahlif sibelius install`
 
-Install plugins to Sibelius plugin directory.
+Install plugins to Sibelius plugin directory. By default, installs only the `MahlifExport` plugin.
 
 ```bash
-# Install all plugins
+# Install MahlifExport plugin (default)
 mahlif sibelius install
+
+# Install a specific plugin
+mahlif sibelius install Cyrus
+
+# Install multiple plugins
+mahlif sibelius install MahlifExport Cyrus
 
 # Preview without installing
 mahlif sibelius install --dry-run
@@ -176,6 +182,59 @@ someOtherMethod "() { ... }"
 ```toml
 [sibelius.lint]
 ignore = ["MS-W002", "MS-W003"]
+```
+
+## ManuScript Formatter
+
+The formatter standardizes ManuScript code style.
+
+```bash
+# Format all plugins
+mahlif sibelius format
+
+# Check formatting
+mahlif sibelius format --check
+
+# Show diff
+mahlif sibelius format --diff
+```
+
+### Formatting Rules
+
+The formatter applies consistent style:
+
+- **Indentation**: 4 spaces per level
+- **Trailing whitespace**: Removed
+- **Blank lines**: Normalized around methods
+- **Braces**: Consistent placement
+
+### Example
+
+Before:
+
+```manuscript
+{
+Initialize "() {
+AddToPluginsMenu('Test','Run');
+}"
+Run "() {
+x=1;
+}"
+}
+```
+
+After:
+
+```manuscript
+{
+    Initialize "() {
+        AddToPluginsMenu('Test', 'Run');
+    }"
+
+    Run "() {
+        x = 1;
+    }"
+}
 ```
 
 ## Development Workflow

@@ -12,6 +12,7 @@ mahlif <command> [options]
 | ----------------------- | -------------------------- |
 | [`convert`](#convert)   | Convert between formats    |
 | [`stats`](#stats)       | Show score statistics      |
+| [`encoding`](#encoding) | Convert file encoding      |
 | [`sibelius`](#sibelius) | Sibelius plugin management |
 
 ---
@@ -58,6 +59,43 @@ mahlif convert score.mahlif.xml score.ly --dry-run
 ```
 
 See also: [LilyPond](lilypond.md), [Sibelius](sibelius.md)
+
+---
+
+## `encoding`
+
+Convert a file between text encodings.
+
+```bash
+mahlif encoding <target> <file> [options]
+```
+
+### Arguments
+
+| Argument | Description                                                                |
+| -------- | -------------------------------------------------------------------------- |
+| `target` | Target encoding (`utf8`, `utf16`, `utf16le`, `utf16be`, `latin1`, `ascii`) |
+| `file`   | Input file                                                                 |
+
+### Options
+
+| Option           | Description                            |
+| ---------------- | -------------------------------------- |
+| `-o`, `--output` | Output file (default: overwrite input) |
+| `-s`, `--source` | Source encoding (default: auto-detect) |
+
+### Examples
+
+```bash
+# Convert UTF-16 file to UTF-8
+mahlif encoding utf8 score.mahlif.xml
+
+# Convert with explicit output file
+mahlif encoding utf8 score.mahlif.xml -o score_utf8.mahlif.xml
+
+# Convert with explicit source encoding
+mahlif encoding utf8 score.mahlif.xml -s utf16le
+```
 
 ---
 
@@ -133,6 +171,7 @@ mahlif sibelius <subcommand> [options]
 | [`install`](#sibelius-install)                 | Install plugins to Sibelius |
 | [`build`](#sibelius-build)                     | Build plugins from source   |
 | [`check`](#sibelius-check)                     | Lint ManuScript files       |
+| [`format`](#sibelius-format)                   | Format ManuScript files     |
 | [`list`](#sibelius-list)                       | List available plugins      |
 | [`show-plugin-dir`](#sibelius-show-plugin-dir) | Show plugin directory       |
 
@@ -142,11 +181,17 @@ See [Sibelius](sibelius.md) for detailed documentation.
 
 ### `sibelius install`
 
-Install plugins to Sibelius plugin directory.
+Install plugins to Sibelius plugin directory. By default, installs only the `MahlifExport` plugin.
 
 ```bash
-mahlif sibelius install [options]
+mahlif sibelius install [plugins...] [options]
 ```
+
+#### Arguments
+
+| Argument  | Description                                     |
+| --------- | ----------------------------------------------- |
+| `plugins` | Plugin names to install (default: MahlifExport) |
 
 #### Options
 
@@ -157,8 +202,14 @@ mahlif sibelius install [options]
 #### Examples
 
 ```bash
-# Install all plugins
+# Install MahlifExport plugin (default)
 mahlif sibelius install
+
+# Install a specific plugin
+mahlif sibelius install Cyrus
+
+# Install multiple plugins
+mahlif sibelius install MahlifExport Cyrus
 
 # Preview installation
 mahlif sibelius install --dry-run
@@ -246,6 +297,44 @@ mahlif sibelius check --fix --dry-run
 ```
 
 See [Sibelius § ManuScript Linter](sibelius.md#manuscript-linter) for error codes.
+
+---
+
+### `sibelius format`
+
+Auto-format ManuScript plugin files.
+
+```bash
+mahlif sibelius format [files...] [options]
+```
+
+#### Arguments
+
+| Argument | Description                                                |
+| -------- | ---------------------------------------------------------- |
+| `files`  | Files to format (optional, defaults to all source plugins) |
+
+#### Options
+
+| Option    | Description                                 |
+| --------- | ------------------------------------------- |
+| `--check` | Check if files are formatted (don't modify) |
+| `--diff`  | Show diff of what would change              |
+
+#### Examples
+
+```bash
+# Format all plugins
+mahlif sibelius format
+
+# Check formatting without modifying
+mahlif sibelius format --check
+
+# Show what would change
+mahlif sibelius format --diff
+```
+
+See [Sibelius § ManuScript Formatter](sibelius.md#manuscript-formatter) for formatting rules.
 
 ---
 

@@ -1,9 +1,10 @@
 """CLI for Sibelius-related commands.
 
 Usage:
-    mahlif sibelius install            # Install plugins to Sibelius
+    mahlif sibelius install            # Install MahlifExport plugin to Sibelius
+    mahlif sibelius install Cyrus      # Install specific plugin(s)
     mahlif sibelius build              # Build all plugins to dist/
-    mahlif sibelius build --install    # Build to Sibelius plugin directory
+    mahlif sibelius build --install    # Build all to Sibelius plugin directory
     mahlif sibelius check              # Lint ManuScript files
     mahlif sibelius list               # List available plugins
     mahlif sibelius show-plugin-dir    # Show Sibelius plugin directory
@@ -172,7 +173,13 @@ def _add_commands(parser: argparse.ArgumentParser) -> None:
     install_parser = subparsers.add_parser(
         "install",
         help="Install plugins to Sibelius",
-        description="Build and install plugins to Sibelius plugin directory",
+        description="Build and install plugins to Sibelius plugin directory. "
+        "By default, installs only MahlifExport. Specify plugin names to install others.",
+    )
+    install_parser.add_argument(
+        "plugins",
+        nargs="*",
+        help="Plugin names to install (default: MahlifExport)",
     )
     install_parser.add_argument(
         "-n",
@@ -342,7 +349,11 @@ def run_command(args: argparse.Namespace) -> int:
     elif args.sibelius_command == "install":
         from mahlif.sibelius.build import build_plugins
 
+        # Default to MahlifExport if no plugins specified
+        plugin_names = args.plugins if args.plugins else ["MahlifExport"]
+
         error_count, _ = build_plugins(
+            plugin_names=plugin_names,
             install=True,
             dry_run=args.dry_run,
         )

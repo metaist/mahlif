@@ -135,7 +135,5 @@
     "Чайковский",
     "מַחֲלִיף"
   ],
-  "ignorePaths": [
-    "src/mahlif/sibelius/cyrus/README.md"
-  ]
+  "ignorePaths": ["src/mahlif/sibelius/cyrus/README.md"]
 }
