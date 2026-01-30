@@ -3,7 +3,6 @@
 AddToPluginsMenu('Cyrus', 'Run');
 }"
 	Run "() {
-Sibelius.MessageBox('Cyrus v4 - with ProcessScore');
 score = Sibelius.ActiveScore;
 if (null = score) {
 	Sibelius.MessageBox('No score is open.');
@@ -153,7 +152,14 @@ if (unitsToMove = 0) {
 if (unitsToMove < 0) {
 	return 'UNRE';
 }
-return 'CHNG test2';
+toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
+remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
+newIpaA = ipaA & toMove;
+newIpaB = remaining;
+if (hasStress) {
+	newIpaB = GetStressMarker() & newIpaB;
+}
+return 'CHNG test5';
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
