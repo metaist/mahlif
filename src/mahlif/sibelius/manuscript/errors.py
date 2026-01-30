@@ -66,3 +66,6 @@ W011_NO_MENU = "MS-W011"  # Initialize should call AddToPluginsMenu
 
 # Semantic warnings (MS-W02x)
 W020_UNDEFINED_VAR = "MS-W020"  # Possibly undefined variable
+
+# Runtime warnings (MS-W02x)
+W021_FOR_LOOP_BOUNDS = "MS-W021"  # For loop end could be negative

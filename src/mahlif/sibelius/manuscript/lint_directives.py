@@ -104,7 +104,8 @@ def parse_inline_directives(content: str) -> InlineDirectives:
                 line_ignores[line_num] = set()
             line_ignores[line_num] |= codes
             if line_content.strip().startswith("//"):
-                if line_num + 1 not in line_ignores:
+                # Apply to next line too (standalone comment)
+                if line_num + 1 not in line_ignores:  # pragma: no branch
                     line_ignores[line_num + 1] = set()
                 line_ignores[line_num + 1] |= codes
 

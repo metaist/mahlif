@@ -496,3 +496,109 @@ def test_lint_can_ignore_inline(tmp_path: Path) -> None:
     # With respect_inline=False, W010 should NOT be suppressed
     errors_without_inline = lint(plg, respect_inline=False)
     assert any(e.code == "MS-W010" for e in errors_without_inline)
+
+
+def test_extract_variables_no_matches() -> None:
+    """Test extract_plugin_variables with content that has no variable declarations."""
+    from mahlif.sibelius.manuscript.lint_bodies import extract_plugin_variables
+
+    # Content with only methods, no variable declarations
+    content = """
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() { Sibelius.MessageBox('hi'); }"
+}
+"""
+    variables = extract_plugin_variables(content)
+    assert variables == set()
+
+
+def test_ignore_directive_on_own_line() -> None:
+    """Test // mahlif: ignore on its own line applies to next line."""
+    from mahlif.sibelius.manuscript.lint_directives import parse_inline_directives
+
+    content = """// mahlif: ignore MS-W002
+trailing whitespace   
+"""
+    directives = parse_inline_directives(content)
+    # Should ignore MS-W002 on line 2
+    assert directives.is_ignored(2, "MS-W002")
+
+
+def test_extract_variables_excludes_methods() -> None:
+    """Test that Initialize and Run are excluded from variables."""
+    from mahlif.sibelius.manuscript.lint_bodies import extract_plugin_variables
+
+    content = """
+{
+    MyVar "some value"
+    Initialize "() { }"
+    Run "() { }"
+    OtherVar "other value"
+}
+"""
+    variables = extract_plugin_variables(content)
+    # MyVar and OtherVar should be found, but not Initialize or Run
+    assert "MyVar" in variables
+    assert "OtherVar" in variables
+    assert "Initialize" not in variables
+    assert "Run" not in variables
+
+
+def test_extract_variables_excludes_initialize_as_var() -> None:
+    """Test that Initialize is excluded even if it looks like a variable."""
+    from mahlif.sibelius.manuscript.lint_bodies import extract_plugin_variables
+
+    # Edge case: Initialize with non-method string (not starting with "(")
+    content = """
+{
+    Initialize "not a method definition"
+    MyVar "some value"
+}
+"""
+    variables = extract_plugin_variables(content)
+    assert "MyVar" in variables
+    assert "Initialize" not in variables
+
+
+def test_ignore_directive_inline() -> None:
+    """Test // mahlif: ignore inline (not on its own line)."""
+    from mahlif.sibelius.manuscript.lint_directives import parse_inline_directives
+
+    content = """x = 1;  // mahlif: ignore MS-W002
+"""
+    directives = parse_inline_directives(content)
+    # Should ignore MS-W002 on line 1 only
+    assert directives.is_ignored(1, "MS-W002")
+    assert not directives.is_ignored(2, "MS-W002")
+
+
+def test_ignore_directive_consecutive_lines() -> None:
+    """Test consecutive ignore directives."""
+    from mahlif.sibelius.manuscript.lint_directives import parse_inline_directives
+
+    content = """// mahlif: ignore MS-W001
+// mahlif: ignore MS-W002
+some line
+"""
+    directives = parse_inline_directives(content)
+    # Line 2 should have both MS-W001 (from line 1) and MS-W002 (from line 2)
+    assert directives.is_ignored(2, "MS-W001")
+    assert directives.is_ignored(2, "MS-W002")
+    # Line 3 should have MS-W002 (from line 2)
+    assert directives.is_ignored(3, "MS-W002")
+
+
+def test_ignore_directive_overlap() -> None:
+    """Test ignore directive where next line already has ignores."""
+    from mahlif.sibelius.manuscript.lint_directives import parse_inline_directives
+
+    # Line 1: standalone ignore -> adds to line 2
+    # Line 2: also has ignore (inline) -> line 2 already exists when we try to add
+    content = """// mahlif: ignore MS-W001
+x = 1;  // mahlif: ignore MS-W002
+"""
+    directives = parse_inline_directives(content)
+    # Line 2 should have both
+    assert directives.is_ignored(2, "MS-W001")
+    assert directives.is_ignored(2, "MS-W002")

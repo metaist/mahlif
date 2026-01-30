@@ -165,7 +165,7 @@ class MethodBodyTokenizer:
         pos = self.pos + offset
         if pos < len(self.source):
             return self.source[pos]
-        return ""
+        return ""  # pragma: no cover - defensive for peek past end
 
     def _read_until(self, char: str) -> str:
         """Read until character (exclusive)."""

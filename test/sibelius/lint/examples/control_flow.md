@@ -486,3 +486,21 @@ When an identifier follows `each`, the next token must be either another identif
 - `MS-E040` - Expected '{'
 - `MS-E048` - Cascading error from missing brace
 - `MS-E001` - Cascading error
+
+## For Loop With Potentially Negative End
+
+When a for loop end value involves subtraction, it could become negative at runtime.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "(arr) {
+        for i = 0 to Length(arr) - 3 {
+            x = i;
+        }
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-W021` - For loop end could be negative

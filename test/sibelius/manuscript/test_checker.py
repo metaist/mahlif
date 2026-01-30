@@ -366,3 +366,19 @@ def test_unknown_character() -> None:
     # Backtick is not valid in ManuScript
     errors = check_method_body("x = `test`;", parameters=["x"])
     assert any(e.code == "MS-E031" for e in errors)
+
+
+def test_string_with_newline() -> None:
+    """Test unterminated string at newline."""
+    # String with embedded newline - should error
+    errors = check_method_body("x = 'hello\nworld';", parameters=["x"])
+    assert any(e.code == "MS-E030" for e in errors)
+
+
+def test_multiline_code() -> None:
+    """Test code with newlines exercises newline handling."""
+    code = """x = 1;
+y = 2;
+z = x + y;"""
+    errors = check_method_body(code, parameters=["x", "y", "z"])
+    assert errors == []

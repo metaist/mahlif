@@ -182,3 +182,66 @@ def lint_method_bodies(content: str) -> list[LintError]:
                             )
 
     return errors
+
+
+def lint_for_loop_bounds(content: str) -> list[LintError]:
+    """Check for potentially negative for loop end values.
+
+    ManuScript for loops require end >= start. When the end value involves
+    subtraction, it could become negative at runtime, causing silent failure.
+
+    Example of problematic pattern:
+        for j = 0 to Length(result) - 3 { ... }
+
+    If Length(result) < 3, this becomes negative.
+
+    Args:
+        content: Plugin file content
+
+    Returns:
+        List of lint warnings
+    """
+    import re
+
+    errors: list[LintError] = []
+
+    # Pattern: for IDENT = EXPR to EXPR - NUMBER
+    # We look for subtraction at the end of the `to` expression
+    # This catches: for i = 0 to Length(x) - 3
+    #               for i = 0 to arr.NumChildren - 1
+    for_pattern = re.compile(
+        r"\bfor\s+\w+\s*=\s*(\d+)\s+to\s+(.+?)\s*-\s*(\d+)\s*\{",
+        re.MULTILINE | re.DOTALL,
+    )
+
+    # Track line numbers
+    lines = content.split("\n")
+    line_starts = [0]
+    for line in lines:
+        line_starts.append(line_starts[-1] + len(line) + 1)
+
+    def pos_to_line(pos: int) -> int:
+        for i, start in enumerate(line_starts):
+            if start > pos:
+                return i
+        return len(lines)
+
+    for match in for_pattern.finditer(content):
+        start_val = int(match.group(1))
+        end_expr = match.group(2).strip()
+        subtract_val = int(match.group(3))
+
+        # If start is 0 and we're subtracting, there's risk of negative
+        if start_val == 0 and subtract_val > 0:
+            line_num = pos_to_line(match.start())
+            errors.append(
+                LintError(
+                    line_num,
+                    1,
+                    "MS-W021",
+                    f"For loop end value '{end_expr} - {subtract_val}' could be "
+                    f"negative if {end_expr} < {subtract_val}; consider adding a guard",
+                )
+            )
+
+    return errors

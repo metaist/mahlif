@@ -15,6 +15,7 @@ from pathlib import Path
 
 from .errors import LintError
 from .lint_bodies import extract_method_bodies
+from .lint_bodies import lint_for_loop_bounds
 from .lint_bodies import lint_method_bodies
 from .lint_braces import lint_braces
 from .lint_braces import lint_strings
@@ -48,6 +49,7 @@ def lint(path: Path, respect_inline: bool = True) -> list[LintError]:
     errors.extend(lint_method_calls(content))
     errors.extend(lint_common_issues(content))
     errors.extend(lint_method_bodies(content))
+    errors.extend(lint_for_loop_bounds(content))
 
     # Filter out errors suppressed by inline directives
     if respect_inline:
@@ -125,6 +127,7 @@ __all__ = [
     "parse_inline_directives",
     # Individual linters
     "lint_braces",
+    "lint_for_loop_bounds",
     "lint_strings",
     "lint_methods",
     "lint_method_calls",
