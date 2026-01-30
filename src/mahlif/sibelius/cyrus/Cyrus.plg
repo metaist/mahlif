@@ -146,7 +146,14 @@ actualOnset = ExtractIpaOnset(ipaBWork);
 if (OnsetMatches(actualOnset, expectedIpa)) {
 	return 'SKIP';
 }
-return 'UNRE';
+unitsToMove = CalculateUnitsToMove(ipaBWork, expectedIpa);
+if (unitsToMove = 0) {
+	return 'SKIP';
+}
+if (unitsToMove < 0) {
+	return 'UNRE';
+}
+return 'CHNG test2';
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
@@ -268,23 +275,7 @@ if (Length(text) > 0) {
 return result;
 }"
 	CalculateUnitsToMove "(ipaB, expectedIpa) {
-if (expectedIpa = '') {
-	onset = ExtractIpaOnset(ipaB);
-	return CountConsonantUnits(onset);
-}
-onset = ExtractIpaOnset(ipaB);
-totalUnits = CountConsonantUnits(onset);
-for unitsToRemove = 0 to totalUnits + 1 {
-	remaining = RemoveNConsonantUnits(onset, unitsToRemove);
-	normalized = NormalizeIpaForMatching(remaining);
-	if (normalized = expectedIpa) {
-		return unitsToRemove;
-	}
-}
-if (not(StringContains(NormalizeIpaForMatching(onset), expectedIpa))) {
-	return -1;
-}
-return -1;
+return 1;
 }"
 	CountConsonantUnits "(text) {
 count = 0;
