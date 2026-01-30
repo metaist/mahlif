@@ -162,28 +162,39 @@ def lint_method_bodies(content: str) -> list[LintError]:
                     brace_start >= 0
                 ):  # pragma: no branch - parser ensures valid structure
                     brace_end = body.rfind("}")
-                    if brace_end > brace_start:  # pragma: no branch
-                        actual_body = body[brace_start + 1 : brace_end]
-                        # Calculate the actual start position
-                        body_line = start_line
-                        body_col = start_col + brace_start + 1
-
-                        # Check the body
-                        check_errors = check_method_body(
-                            actual_body,
-                            method_name,
-                            body_line,
-                            body_col,
-                            params,
-                            plugin_vars,
-                            plugin_methods,
-                        )
-
-                        # Convert CheckErrors to LintErrors
-                        for err in check_errors:
-                            errors.append(
-                                LintError(err.line, err.col, err.code, err.message)
+                    if brace_end <= brace_start:
+                        # No closing brace - likely unescaped " in body
+                        errors.append(
+                            LintError(
+                                start_line,
+                                start_col,
+                                "MS-E050",
+                                f"Method '{method_name}' body has no closing '}}'; "
+                                "possibly unescaped '\"' in comment or string",
                             )
+                        )
+                        continue
+                    actual_body = body[brace_start + 1 : brace_end]
+                    # Calculate the actual start position
+                    body_line = start_line
+                    body_col = start_col + brace_start + 1
+
+                    # Check the body
+                    check_errors = check_method_body(
+                        actual_body,
+                        method_name,
+                        body_line,
+                        body_col,
+                        params,
+                        plugin_vars,
+                        plugin_methods,
+                    )
+
+                    # Convert CheckErrors to LintErrors
+                    for err in check_errors:
+                        errors.append(
+                            LintError(err.line, err.col, err.code, err.message)
+                        )
 
     return errors
 

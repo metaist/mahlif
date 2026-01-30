@@ -21,6 +21,7 @@ The `if` statement requires parentheses around the condition.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '(' after 'if'
 
 ## If Statement - Missing Braces
@@ -41,6 +42,7 @@ Braces are required even for single statements.
 ```
 
 **Expected errors:**
+
 - `MS-E043` - Expected '{' after if
 
 ## While Statement - Missing Parentheses
@@ -57,6 +59,7 @@ Braces are required even for single statements.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '(' after 'while'
 
 ## For Statement - Missing Equals
@@ -75,6 +78,7 @@ The `for` loop syntax is `for var = start to end { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '=' in for statement
 
 ## For Statement - Missing To
@@ -91,6 +95,7 @@ The `for` loop syntax is `for var = start to end { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected 'to' in for statement
 
 ## For Each - Missing In
@@ -107,6 +112,7 @@ The `for` loop syntax is `for var = start to end { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected 'in' in for each statement
 
 ## Switch - Case Without Parentheses
@@ -128,6 +134,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '(' after 'case'
 
 ## While Statement - Missing Braces
@@ -144,6 +151,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E043` - Expected '{' after while
 
 ## For Statement - Missing Braces
@@ -159,6 +167,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E043` - Expected '{' after for
 
 ## For Each - Missing Braces
@@ -175,6 +184,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E043` - Expected '{' after for each
 
 ## Switch - Case Without Braces
@@ -193,6 +203,7 @@ The `case` clause requires parentheses: `case (value) { }`.
 ```
 
 **Expected errors:**
+
 - `MS-E043` - Expected '{' after case
 - `MS-E042` - Cascading errors from missing brace
 
@@ -213,6 +224,7 @@ Content inside switch must be `case` or `default`.
 ```
 
 **Expected errors:**
+
 - `MS-E042` - Expected 'case' or 'default' in switch
 
 ## Valid If-Else Statement
@@ -267,6 +279,7 @@ Content inside switch must be `case` or `default`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')'
 
 ## While Statement - Missing Right Parenthesis
@@ -284,6 +297,7 @@ Content inside switch must be `case` or `default`.
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')'
 
 ## Else If Statement
@@ -342,6 +356,7 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
+
 - `MS-W030` - Empty statement (lone ';')
 - `MS-W030` - Empty statement (second one)
 
@@ -359,6 +374,7 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
+
 - `MS-E041` - Expected variable name after 'for'
 
 ## For Each - Missing Type or Variable After Each
@@ -375,6 +391,7 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
+
 - `MS-E041` - Expected type or variable
 
 ## Switch - Missing Left Parenthesis
@@ -394,6 +411,7 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '('
 
 ## Switch - Missing Right Parenthesis
@@ -413,6 +431,7 @@ Valid standalone block (braces without control flow).
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')'
 
 ## For Each - Identifier Followed By Number
@@ -431,6 +450,7 @@ When an identifier follows `each`, the next token must be either another identif
 ```
 
 **Expected errors:**
+
 - `MS-E041` - Expected 'in'
 
 ## Switch Case - Missing Right Parenthesis
@@ -450,6 +470,7 @@ When an identifier follows `each`, the next token must be either another identif
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected ')'
 
 ## Switch With Comment Before Closing Brace
@@ -484,6 +505,7 @@ When an identifier follows `each`, the next token must be either another identif
 ```
 
 **Expected errors:**
+
 - `MS-E040` - Expected '{'
 - `MS-E048` - Cascading error from missing brace
 - `MS-E001` - Cascading error
@@ -504,6 +526,7 @@ When a for loop end value involves subtraction, it could become negative at runt
 ```
 
 **Expected errors:**
+
 - `MS-W021` - For loop end could be negative
 
 ## For Loop With Guard - No Warning
@@ -564,6 +587,7 @@ Guard value is too small to prevent negative.
 ```
 
 **Expected errors:**
+
 - `MS-W021` - Guard is insufficient (>= 2 but subtracting 3)
 
 ## For Loop With Insufficient GT Guard - Warning
@@ -584,4 +608,5 @@ Guard using > but value too small.
 ```
 
 **Expected errors:**
+
 - `MS-W021` - Guard is insufficient (> 1 but subtracting 3)
