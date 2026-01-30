@@ -55,6 +55,8 @@ for each staff in score {
 		if (isSelected) {
 			staffIdx = staffIdx + 1;
 			staffName = staff.InstrumentName;
+			currentSection = '';
+			currentPage = 1;
 			for barNum = startBar to endBar + 1 {
 				if (not(cancelled)) {
 					pct = (barsDone * 100) / totalBars;
@@ -65,7 +67,16 @@ for each staff in score {
 					} else {
 						bar = staff.NthBar(barNum);
 						displayBarNum = bar.ExternalBarNumberString;
-						result = ProcessBar(bar, barNum, displayBarNum, staffName);
+						sysBar = score.SystemStaff.NthBar(barNum);
+						for each obj in sysBar {
+							if (obj.Type = 'RehearsalMark') {
+								currentSection = obj.MarkAsText;
+							}
+						}
+						if (bar.OnNthPage > 0) {
+							currentPage = bar.OnNthPage;
+						}
+						result = ProcessBar(bar, barNum, displayBarNum, currentSection, currentPage, staffName);
 						if (Length(result) >= 4) {
 							for j = 0 to Length(result) - 3 {
 								tag = Substring(result, j, 4);
@@ -108,7 +119,7 @@ if (cancelled) {
 	Sibelius.MessageBox('Processing cancelled.');
 	return header;
 }
-header = '=== Cyrus Report (build 29) ===' & Chr(10);
+header = '=== Cyrus Report (build 34) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -136,7 +147,7 @@ if (filePath != '') {
 }
 return header;
 }"
-	ProcessBar "(bar, barNum, displayBarNum, staffName) {
+	ProcessBar "(bar, barNum, displayBarNum, section, page, staffName) {
 report = '';
 skipCount = 0;
 cyrillic = CreateSparseArray();
@@ -172,7 +183,7 @@ for i = 0 to 1000 {
 					nextCyrText = cyrillic[nextPos];
 					nextIpaObj = ipa[nextPos];
 					if (nextCyrText != null and nextIpaObj != null) {
-						result = ProcessSyllableBoundary(cyrText, ipaObj, nextCyrText, nextIpaObj, barNum, displayBarNum, pos, staffName);
+						result = ProcessSyllableBoundary(cyrText, ipaObj, nextCyrText, nextIpaObj, barNum, displayBarNum, section, page, pos, staffName);
 						if (result = 'SKIP') {
 							skipCount = skipCount + 1;
 						} else {
@@ -189,7 +200,7 @@ if (skipCount > 0) {
 }
 return report;
 }"
-	ProcessSyllableBoundary "(cyrA, ipaObjA, cyrB, ipaObjB, barNum, displayBarNum, pos, staffName) {
+	ProcessSyllableBoundary "(cyrA, ipaObjA, cyrB, ipaObjB, barNum, displayBarNum, section, page, pos, staffName) {
 ipaA = ipaObjA.Text;
 ipaB = ipaObjB.Text;
 cyrOnset = ExtractCyrillicOnset(cyrB);
@@ -207,13 +218,21 @@ actualOnset = ExtractIpaOnset(ipaBWork);
 if (OnsetMatches(actualOnset, expectedIpa)) {
 	return 'SKIP';
 }
+if (StartsWithPalatalizingVowel(cyrB) and IsJotatedVowelOnset(ipaBWork)) {
+	return 'SKIP';
+}
 unitsToMove = CalculateUnitsToMove(ipaBWork, expectedIpa);
 if (unitsToMove = 0) {
 	return 'SKIP';
 }
 if (unitsToMove < 0) {
 	beat = (pos / 256) + 1;
-	return 'UNRE Bar ' & displayBarNum & ' (int:' & barNum & '), Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' (cyr: ' & cyrA & '-' & cyrB & ', expected: ' & expectedIpa & ')' & Chr(10);
+loc = 'p' & page;
+if (section != '') {
+	loc = loc & ' [' & section & ']';
+}
+loc = loc & ' Bar ' & displayBarNum;
+	return 'UNRE ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' (cyr: ' & cyrA & '-' & cyrB & ', expected: ' & expectedIpa & ')' & Chr(10);
 }
 toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
 remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
@@ -225,7 +244,12 @@ if (hasStress) {
 ipaObjA.Text = newIpaA;
 ipaObjB.Text = newIpaB;
 beat = (pos / 256) + 1;
-return 'CHNG Bar ' & displayBarNum & ' (int:' & barNum & '), Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & Chr(10);
+loc = 'p' & page;
+if (section != '') {
+	loc = loc & ' [' & section & ']';
+}
+loc = loc & ' Bar ' & displayBarNum;
+return 'CHNG ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & Chr(10);
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
@@ -414,6 +438,26 @@ return Substring(text, idx, Length(text) - idx);
 }"
 	GetCyrillicVowels "() {
 return 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
+}"
+	GetPalatalizingVowels "() {
+return 'яеёюЯЕЁЮ';
+}"
+	StartsWithPalatalizingVowel "(cyrText) {
+if (Length(cyrText) = 0) {
+	return False;
+}
+firstChar = Substring(cyrText, 0, 1);
+return CharInString(firstChar, GetPalatalizingVowels());
+}"
+	IsJotatedVowelOnset "(ipaOnset) {
+if (Length(ipaOnset) < 2) {
+	return False;
+}
+if (Substring(ipaOnset, 0, 1) != 'j') {
+	return False;
+}
+secondChar = Substring(ipaOnset, 1, 1);
+return CharInString(secondChar, GetIpaVowels());
 }"
 	GetIpaVowels "() {
 return 'ɑʌɐeɛɪiouaæɨ';
