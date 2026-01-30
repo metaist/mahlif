@@ -3,7 +3,7 @@
         AddToPluginsMenu('Cyrus', 'Run');
     }"
     _version "() {
-        return 41;
+        return 44;
     }"
     Run "() {
         score = Sibelius.ActiveScore;
@@ -229,13 +229,8 @@
             return 'SKIP';
         }
         if (unitsToMove < 0) {
-            beat = (pos / 256) + 1;
-            loc = 'p' & page;
-            if (section != '') {
-                loc = loc & ' [' & section & ']';
-            }
-            loc = loc & ' Bar ' & displayBarNum;
-            return 'UNRE ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' (cyr: ' & cyrA & '-' & cyrB & ', expected: ' & expectedIpa & ')' & Chr(10);
+            loc = BuildLocation(page, section, displayBarNum, pos);
+            return 'UNRE ' & loc & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' (cyr: ' & cyrA & '-' & cyrB & ', expected: ' & expectedIpa & ')' & Chr(10);
         }
         toMove = ExtractConsonantUnits(ipaBWork, unitsToMove);
         remaining = Substring(ipaBWork, Length(toMove), Length(ipaBWork) - Length(toMove));
@@ -246,13 +241,17 @@
         }
         ipaObjA.Text = newIpaA;
         ipaObjB.Text = newIpaB;
+        loc = BuildLocation(page, section, displayBarNum, pos);
+        return 'CHNG ' & loc & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & ' (cyr: ' & cyrA & '-' & cyrB & ')' & Chr(10);
+    }"
+    BuildLocation "(page, section, displayBarNum, pos) {
         beat = (pos / 256) + 1;
         loc = 'p' & page;
         if (section != '') {
             loc = loc & ' [' & section & ']';
         }
-        loc = loc & ' Bar ' & displayBarNum;
-        return 'CHNG ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & ' (cyr: ' & cyrA & '-' & cyrB & ')' & Chr(10);
+        loc = loc & ' Bar ' & displayBarNum & ', Beat ' & beat;
+        return loc;
     }"
     ExtractCyrillicOnset "(text) {
         onset = '';
