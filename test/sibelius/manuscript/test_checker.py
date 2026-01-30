@@ -617,3 +617,107 @@ def test_nested_array_assignment() -> None:
     """Test nested array element assignment."""
     errors = check_method_body("arr[i][j] = 1;", parameters=VARS)
     assert errors == []
+
+
+# =============================================================================
+# More edge case coverage tests
+# =============================================================================
+
+
+def test_for_each_second_token_not_identifier() -> None:
+    """Test for each where second token is not identifier."""
+    # "for each 123 in list { }" - number instead of identifier
+    errors = check_method_body("for each 123 in list { }", parameters=VARS)
+    assert any(e.code == "MS-E041" for e in errors)
+
+
+def test_empty_assignment_semicolon() -> None:
+    """Test assignment with empty right side (semicolon immediately after =)."""
+    # This should hit MS-E045 "Expected expression after '='"
+    errors = check_method_body("y = x; x =;", parameters=VARS)
+    # Should get either E045 or E048 for the empty assignment
+    assert any(e.code in ("MS-E045", "MS-E048") for e in errors)
+
+
+def test_multiply_incomplete() -> None:
+    """Test incomplete multiplication expression."""
+    errors = check_method_body("x = 2 *;", parameters=VARS)
+    assert any(e.code == "MS-E046" for e in errors)
+
+
+def test_divide_incomplete() -> None:
+    """Test incomplete division expression."""
+    errors = check_method_body("x = 2 /;", parameters=VARS)
+    assert any(e.code == "MS-E046" for e in errors)
+
+
+def test_user_property_syntax() -> None:
+    """Test user property syntax with colon."""
+    # obj._property:name syntax
+    errors = check_method_body("x = obj._custom:PropertyName;", parameters=VARS)
+    # This is valid syntax
+    assert not any(e.code == "MS-E047" for e in errors)
+
+
+def test_user_property_missing_name() -> None:
+    """Test user property syntax with missing name after colon."""
+    errors = check_method_body("x = obj._custom:;", parameters=VARS)
+    assert any(e.code == "MS-E047" for e in errors)
+
+
+def test_and_expression() -> None:
+    """Test and expression."""
+    errors = check_method_body("x = a and b;", parameters=VARS)
+    assert errors == []
+
+
+def test_or_expression() -> None:
+    """Test or expression."""
+    errors = check_method_body("x = a or b;", parameters=VARS)
+    assert errors == []
+
+
+def test_not_expression() -> None:
+    """Test not expression."""
+    errors = check_method_body("x = not a;", parameters=VARS)
+    assert errors == []
+
+
+def test_concat_incomplete() -> None:
+    """Test incomplete concatenation expression."""
+    errors = check_method_body("x = 'a' &;", parameters=VARS)
+    assert any(e.code == "MS-E046" for e in errors)
+
+
+def test_addition_incomplete() -> None:
+    """Test incomplete addition expression."""
+    errors = check_method_body("x = 1 +;", parameters=VARS)
+    assert any(e.code == "MS-E046" for e in errors)
+
+
+def test_subtraction_incomplete() -> None:
+    """Test incomplete subtraction expression."""
+    errors = check_method_body("x = 1 -;", parameters=VARS)
+    # Minus can be unary, so this might parse as "1" then "-" then error
+    assert len(errors) > 0
+
+
+def test_comparison_incomplete() -> None:
+    """Test incomplete comparison expression."""
+    errors = check_method_body("x = a <;", parameters=VARS)
+    # Gets unexpected token error
+    assert any(e.code == "MS-E048" for e in errors)
+
+
+def test_equality_incomplete() -> None:
+    """Test incomplete equality expression."""
+    errors = check_method_body("if (a =) { }", parameters=VARS)
+    # Should error on empty after =
+    assert len(errors) > 0
+
+
+def test_switch_empty_body() -> None:
+    """Test switch with empty body (no cases)."""
+    errors = check_method_body("switch (x) { }", parameters=VARS)
+    # Empty switch is actually valid (just does nothing)
+    assert errors == []
