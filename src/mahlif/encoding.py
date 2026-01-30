@@ -209,3 +209,27 @@ def convert_to_utf8(
     """
     result_path, _, _ = convert_encoding(input_path, "utf-8", output_path)
     return result_path
+
+
+def encode_utf16be(content: str) -> bytes:
+    """Encode string to UTF-16 BE with BOM.
+
+    Args:
+        content: Source content (string)
+
+    Returns:
+        UTF-16 BE encoded bytes with BOM prefix
+    """
+    return b"\xfe\xff" + content.encode("utf-16-be")
+
+
+def encode_utf16le(content: str) -> bytes:
+    """Encode string to UTF-16 LE with BOM.
+
+    Args:
+        content: Source content (string)
+
+    Returns:
+        UTF-16 LE encoded bytes with BOM prefix
+    """
+    return b"\xff\xfe" + content.encode("utf-16-le")

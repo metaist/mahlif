@@ -16,6 +16,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+from mahlif.encoding import encode_utf16be
 from mahlif.sibelius.manuscript.lint import lint
 from mahlif.sibelius.manuscript.lint import read_plugin
 
@@ -53,7 +54,7 @@ def convert_to_utf16be(content: str) -> bytes:
     # Strip trailing whitespace from each line
     lines = content.split("\n")
     cleaned = "\n".join(line.rstrip() for line in lines)
-    return b"\xfe\xff" + cleaned.encode("utf-16-be")
+    return encode_utf16be(cleaned)
 
 
 def find_plugin_sources(source_dir: Path) -> list[Path]:
