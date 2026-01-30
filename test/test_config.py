@@ -278,3 +278,19 @@ def test_mahlif_config_defaults() -> None:
     """Test MahlifConfig default values."""
     config = MahlifConfig()
     assert isinstance(config.sibelius, SibeliusConfig)
+
+
+def test_parse_lint_config_error_not_list() -> None:
+    """Test _parse_lint_config handles non-list error value."""
+    from mahlif.config import _parse_lint_config
+
+    config = _parse_lint_config({"error": "not-a-list"})
+    assert config.error == set()
+
+
+def test_parse_lint_config_strict_not_bool() -> None:
+    """Test _parse_lint_config handles non-bool strict value."""
+    from mahlif.config import _parse_lint_config
+
+    config = _parse_lint_config({"strict": "not-a-bool"})
+    assert config.strict is False

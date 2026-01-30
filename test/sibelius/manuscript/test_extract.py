@@ -748,3 +748,145 @@ def test_extract_constants_no_index_marker() -> None:
     )
     constants = extract_constants(lines)
     assert constants.get("True") == 1
+
+
+def test_parse_signature_optional_mid_params() -> None:
+    """Test parse_signature with optional marker mid-params."""
+    from mahlif.sibelius.manuscript.extract import parse_signature
+
+    # Format: (required, [optional1, optional2])
+    result = parse_signature("TestMethod(a, [b, c])")
+    assert result is not None
+    name, sig = result
+    assert name == "TestMethod"
+    assert sig.min_params == 1  # Only 'a' is required
+    assert sig.max_params == 3  # a, b, c
+
+
+def test_extract_duplicate_method_name() -> None:
+    """Test extraction handles duplicate method names (merges signatures)."""
+    from mahlif.sibelius.manuscript.extract import extract_objects
+
+    # Simulate PDF text with duplicate method in same object
+    # Need proper PascalCase object name followed by Methods within 15 lines
+    lines = [
+        "Sibelius",
+        "Description of Sibelius object",
+        "Methods",
+        "TestMethod()",
+        "TestMethod(param1)",
+        "Variables",
+        "SomeProp",
+        "",
+        "Bar",
+        "Description of Bar",
+        "Methods",
+        "OtherMethod()",
+    ]
+    objects = extract_objects(lines)
+
+    # Should have merged both signatures
+    assert "Sibelius" in objects
+    assert "TestMethod" in objects["Sibelius"].methods
+    assert len(objects["Sibelius"].methods["TestMethod"]) == 2
+
+
+def test_extract_object_split_across_pages() -> None:
+    """Test extraction handles object split across pages (same name twice)."""
+    from mahlif.sibelius.manuscript.extract import extract_objects
+
+    # Sibelius object appears twice - simulating page break in PDF
+    lines = [
+        "Sibelius",
+        "First description",
+        "Methods",
+        "FirstMethod()",
+        "",
+        "Bar",
+        "Bar description",
+        "Methods",
+        "BarMethod()",
+        "",
+        "Sibelius",  # Same object again (page 2)
+        "Continued description",
+        "Methods",
+        "FirstMethod(x)",  # Same method, different signature
+        "SecondMethod()",
+        "Variables",
+        "ExtraProp",
+    ]
+    objects = extract_objects(lines)
+
+    assert "Sibelius" in objects
+    # FirstMethod should have 2 signatures merged
+    assert "FirstMethod" in objects["Sibelius"].methods
+    assert len(objects["Sibelius"].methods["FirstMethod"]) == 2
+    # SecondMethod should also be present
+    assert "SecondMethod" in objects["Sibelius"].methods
+
+
+def test_extract_constants_multiline() -> None:
+    """Test extraction of constants spanning multiple lines before value."""
+    from mahlif.sibelius.manuscript.extract import extract_constants
+
+    # Need "Truth Values" after line 10000
+    # Create enough lines to get past the threshold
+    lines = [""] * 10001
+    lines.append("Truth Values")
+    lines.append("TestConstant")
+    lines.append("")  # blank line - should loop back
+    lines.append("42")
+    lines.append("")
+    lines.append("AnotherConstant")
+    lines.append("99")
+    lines.append("Index")  # End marker
+
+    constants = extract_constants(lines)
+
+    assert "TestConstant" in constants
+    assert constants["TestConstant"] == 42
+    assert "AnotherConstant" in constants
+    assert constants["AnotherConstant"] == 99
+
+
+def test_regex_match_non_string_comparison() -> None:
+    """Test RegexMatch falls back to str.__eq__ for non-string comparison."""
+    from mahlif.sibelius.manuscript.extract import RegexMatch
+
+    rm = RegexMatch("hello")
+    # Compare with non-string (int)
+    assert (rm == 123) is False
+    # Test hash works
+    assert hash(rm) == hash("hello")
+
+
+def test_extract_constants_unknown_pattern() -> None:
+    """Test constant extraction handles unknown patterns (not int, string, or name)."""
+    from mahlif.sibelius.manuscript.extract import extract_constants
+
+    # Need "Truth Values" after line 10000
+    lines = [""] * 10001
+    lines.append("Truth Values")
+    lines.append("TestConstant")
+    lines.append("some random text that matches nothing")  # Unknown pattern
+    lines.append("42")  # Should still find this
+    lines.append("Index")
+
+    constants = extract_constants(lines)
+    assert "TestConstant" in constants
+    assert constants["TestConstant"] == 42
+
+
+def test_parse_signature_nested_bracket_with_param() -> None:
+    """Test nested bracket where param exists before inner bracket."""
+    from mahlif.sibelius.manuscript.extract import parse_signature
+
+    # (a,[bc[d]]) - 'bc' is before nested [, in_optional becomes 2
+    # When second [ is hit, bc gets appended but min_params not set (in_optional==2)
+    result = parse_signature("Test(a,[bc[d]])")
+    assert result is not None
+    name, sig = result
+    assert name == "Test"
+    # 'a' and 'bc' counted before nested optional, 'd' is deeply optional
+    assert sig.min_params == 2  # bc was appended before in_optional check
+    assert sig.max_params == 3

@@ -783,3 +783,84 @@ def test_stats_main_direct(tmp_path: Path) -> None:
     )
     result = stats_main([str(src)])
     assert result == 0
+
+
+# =============================================================================
+# Encoding command tests
+# =============================================================================
+
+
+def test_encoding_command_utf8_to_utf16(tmp_path: Path) -> None:
+    """Test encoding command converts UTF-8 to UTF-16."""
+    from mahlif.cli import main
+
+    src = tmp_path / "test.txt"
+    src.write_text("Hello World", encoding="utf-8")
+    dest = tmp_path / "test_utf16.txt"
+
+    result = main(["encoding", "utf16", str(src), "--output", str(dest)])
+    assert result == 0
+    assert dest.exists()
+
+
+def test_encoding_command_in_place(tmp_path: Path) -> None:
+    """Test encoding command converts in place."""
+    from mahlif.cli import main
+
+    src = tmp_path / "test.txt"
+    src.write_text("Hello World", encoding="utf-8")
+
+    result = main(["encoding", "utf16", str(src)])
+    assert result == 0
+
+
+def test_encoding_command_file_not_found(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test encoding command with nonexistent file."""
+    from mahlif.cli import main
+
+    result = main(["encoding", "utf16", str(tmp_path / "nonexistent.txt")])
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "not found" in captured.out
+
+
+def test_encoding_command_value_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Test encoding command handles ValueError."""
+    from mahlif.cli import main
+
+    src = tmp_path / "test.txt"
+    src.write_text("Hello World", encoding="utf-8")
+
+    def mock_convert(*args: object, **kwargs: object) -> None:
+        raise ValueError("Mock error")
+
+    monkeypatch.setattr("mahlif.encoding.convert_encoding", mock_convert)
+
+    result = main(["encoding", "utf16", str(src)])
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error" in captured.out
+
+
+def test_encoding_command_generic_error(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Test encoding command handles generic Exception."""
+    from mahlif.cli import main
+
+    src = tmp_path / "test.txt"
+    src.write_text("Hello World", encoding="utf-8")
+
+    def mock_convert(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("Mock error")
+
+    monkeypatch.setattr("mahlif.encoding.convert_encoding", mock_convert)
+
+    result = main(["encoding", "utf16", str(src)])
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Error" in captured.out

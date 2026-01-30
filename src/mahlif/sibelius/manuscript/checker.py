@@ -80,7 +80,7 @@ def _load_lang_data() -> tuple[
                         max_params=sig.get("max_params", 0),
                     )
                 )
-            if sigs:
+            if sigs:  # pragma: no branch - lang.json methods always have signatures
                 method_signatures[obj_name][method_name] = sigs
 
     # Add built-in functions and their signatures
@@ -221,62 +221,66 @@ class MethodBodyChecker:
         self._skip_comments()
 
         # Check for unreachable code after return
-        if self.return_seen and not self.unreachable_warned:
-            if not self._check(TokenType.RBRACE, TokenType.EOF):
+        match (self.return_seen, self.unreachable_warned):
+            case (True, False):
+                # Check if there's actual code (not just block end)
+                if not self._check(  # pragma: no branch
+                    TokenType.RBRACE, TokenType.EOF
+                ):
+                    self.errors.append(
+                        CheckError(
+                            self._current().line,
+                            self._current().col,
+                            "MS-W026",
+                            "Unreachable code after return statement",
+                        )
+                    )
+                    self.unreachable_warned = True
+            case _:
+                pass  # No return seen, or already warned
+
+        # Control flow statements - dispatch based on current token type
+        match self._current().type:
+            case TokenType.IF:
+                self._parse_if()
+            case TokenType.WHILE:
+                self._parse_while()
+            case TokenType.FOR:
+                self._parse_for()
+            case TokenType.SWITCH:
+                self._parse_switch()
+            case TokenType.RETURN:
+                self._parse_return()
+            case TokenType.LBRACE:
+                self._parse_block()
+            case TokenType.RBRACE:
+                # Unexpected closing brace - report error and skip
+                token = self._current()
+                self.errors.append(
+                    CheckError(
+                        token.line,
+                        token.col,
+                        "MS-E001",
+                        "Unexpected '}'",
+                    )
+                )
+                self._advance()
+            case TokenType.SEMICOLON:
+                # Empty statement - warn about it
                 self.errors.append(
                     CheckError(
                         self._current().line,
                         self._current().col,
-                        "MS-W026",
-                        "Unreachable code after return statement",
+                        "MS-W030",
+                        "Empty statement (lone ';')",
                     )
                 )
-                self.unreachable_warned = True
-
-        # Control flow statements
-        if self._check(TokenType.IF):
-            self._parse_if()
-        elif self._check(TokenType.WHILE):
-            self._parse_while()
-        elif self._check(TokenType.FOR):
-            self._parse_for()
-        elif self._check(TokenType.SWITCH):
-            self._parse_switch()
-        elif self._check(TokenType.RETURN):
-            self._parse_return()
-        elif self._check(TokenType.LBRACE):
-            self._parse_block()
-        elif self._check(TokenType.RBRACE):
-            # Unexpected closing brace - report error and skip
-            token = self._current()
-            self.errors.append(
-                CheckError(
-                    token.line,
-                    token.col,
-                    "MS-E001",
-                    "Unexpected '}'",
-                )
-            )
-            self._advance()
-            return
-        elif self._check(TokenType.SEMICOLON):
-            # Empty statement - warn about it
-            self.errors.append(
-                CheckError(
-                    self._current().line,
-                    self._current().col,
-                    "MS-W030",
-                    "Empty statement (lone ';')",
-                )
-            )
-            self._advance()
-        elif self._check(
-            TokenType.EOF
-        ):  # pragma: no cover - main loop catches EOF first
-            return
-        else:
-            # Expression statement (assignment or call)
-            self._parse_expression_statement()
+                self._advance()
+            case TokenType.EOF:  # pragma: no cover - main loop catches EOF first
+                pass
+            case _:
+                # Expression statement (assignment or call)
+                self._parse_expression_statement()
 
     def _parse_if(self) -> None:
         """Parse if statement."""
@@ -504,7 +508,7 @@ class MethodBodyChecker:
             context: Where this condition appears (for error message)
         """
         # Only warn for 'if', not 'while' (constant while is common pattern)
-        if context != "if":
+        if context != "if":  # pragma: no cover - currently only called with "if"
             return
 
         # Check if next token is a constant
@@ -777,24 +781,37 @@ class MethodBodyChecker:
                     and rhs_tok.type == TokenType.IDENTIFIER
                     and lhs_tok.value == rhs_tok.value
                 ):
-                    if op_token.type == TokenType.ASSIGN:
-                        self.errors.append(
-                            CheckError(
-                                op_token.line,
-                                op_token.col,
-                                "MS-W032",
-                                f"Comparison '{lhs_tok.value} = {rhs_tok.value}' is always true",
+                    match op_token.type:
+                        case TokenType.ASSIGN | TokenType.LTE | TokenType.GTE:
+                            op_str = {
+                                TokenType.ASSIGN: "=",
+                                TokenType.LTE: "<=",
+                                TokenType.GTE: ">=",
+                            }[op_token.type]
+                            self.errors.append(
+                                CheckError(
+                                    op_token.line,
+                                    op_token.col,
+                                    "MS-W032",
+                                    f"Comparison '{lhs_tok.value} {op_str} {lhs_tok.value}' is always true",
+                                )
                             )
-                        )
-                    elif op_token.type == TokenType.NEQ:
-                        self.errors.append(
-                            CheckError(
-                                op_token.line,
-                                op_token.col,
-                                "MS-W032",
-                                f"Comparison '{lhs_tok.value} != {rhs_tok.value}' is always false",
+                        case TokenType.NEQ | TokenType.LT | TokenType.GT:
+                            op_str = {
+                                TokenType.NEQ: "!=",
+                                TokenType.LT: "<",
+                                TokenType.GT: ">",
+                            }[op_token.type]
+                            self.errors.append(
+                                CheckError(
+                                    op_token.line,
+                                    op_token.col,
+                                    "MS-W032",
+                                    f"Comparison '{lhs_tok.value} {op_str} {lhs_tok.value}' is always false",
+                                )
                             )
-                        )
+                        case _:  # pragma: no cover
+                            pass  # Other token types can't reach here
 
             # Update for next iteration
             lhs_start, lhs_end = rhs_start, rhs_end

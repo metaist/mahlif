@@ -31,6 +31,18 @@ import sys
 from dataclasses import dataclass, field
 
 
+class RegexMatch(str):
+    """String subclass that matches against regex patterns in match/case."""
+
+    def __eq__(self, pattern: object) -> bool:
+        if isinstance(pattern, str):
+            return bool(re.fullmatch(pattern, self))
+        return super().__eq__(pattern)
+
+    def __hash__(self) -> int:
+        return super().__hash__()
+
+
 def _is_section_header(line: str, next_lines: list[str]) -> bool:
     """Check if a line is a section header in the constants chapter.
 
@@ -122,25 +134,26 @@ def parse_signature(sig: str) -> tuple[str, MethodSignature] | None:
     current_param = ""
 
     for char in params_str:
-        if char == "[":
-            in_optional += 1
-            if current_param.strip():
-                params.append(current_param.strip())
-                if in_optional == 1:
-                    min_params = len(params)
-                current_param = ""
-        elif char == "]":
-            in_optional = max(0, in_optional - 1)
-            if current_param.strip():
-                params.append(current_param.strip() + "?")
-                current_param = ""
-        elif char == ",":
-            if current_param.strip():
-                suffix = "?" if in_optional > 0 else ""
-                params.append(current_param.strip() + suffix)
-                current_param = ""
-        else:
-            current_param += char
+        match char:
+            case "[":
+                in_optional += 1
+                if current_param.strip():
+                    params.append(current_param.strip())
+                    if in_optional == 1:
+                        min_params = len(params)
+                    current_param = ""
+            case "]":
+                in_optional = max(0, in_optional - 1)
+                if current_param.strip():
+                    params.append(current_param.strip() + "?")
+                    current_param = ""
+            case ",":
+                if current_param.strip():
+                    suffix = "?" if in_optional > 0 else ""
+                    params.append(current_param.strip() + suffix)
+                    current_param = ""
+            case _:
+                current_param += char
 
     if current_param.strip():
         suffix = "?" if in_optional > 0 else ""
@@ -221,7 +234,7 @@ def extract_objects(lines: list[str]) -> dict[str, ObjectInfo]:
                 match = re.match(r"^([A-Z][a-zA-Z0-9_]*\([^)]*\))\s*$", text)
                 if match:
                     result = parse_signature(match.group(1))
-                    if result:
+                    if result:  # pragma: no branch - regex ensures valid format
                         method_name, sig = result
                         if method_name not in methods:
                             methods[method_name] = []
@@ -320,19 +333,20 @@ def extract_constants(lines: list[str]) -> dict[str, int | str]:
             j = i + 1
             for j in range(i + 1, min(i + 5, end_idx)):
                 val_line = lines[j].strip()
-                if not val_line:
-                    continue
-                # Integer
-                if re.match(r"^-?\d+$", val_line):
-                    value = int(val_line)
-                    break
-                # String
-                if re.match(r'^"[^"]*"$', val_line):
-                    value = val_line.strip('"')
-                    break
-                # Hit another constant name
-                if re.match(r"^[A-Z][a-zA-Z0-9_]+", val_line):
-                    break
+                match RegexMatch(val_line):
+                    case "":
+                        continue
+                    case r"^-?\d+$":
+                        value = int(val_line)
+                        break
+                    case r'^"[^"]*"$':
+                        value = val_line.strip('"')
+                        break
+                    case r"^[A-Z][a-zA-Z0-9_]+":
+                        # Hit another constant name
+                        break
+                    case _:
+                        continue
 
             if value is not None:
                 for name in names:

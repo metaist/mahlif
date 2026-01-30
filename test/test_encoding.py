@@ -351,3 +351,72 @@ def test_parse_utf16_file() -> None:
         assert score.meta.composer == "Чайковский"
     finally:
         Path(path).unlink()
+
+
+def test_normalize_unknown_encoding() -> None:
+    """Test normalize_encoding raises for unknown encoding."""
+    from mahlif.encoding import normalize_encoding
+    import pytest
+
+    with pytest.raises(ValueError, match="Unknown encoding"):
+        normalize_encoding("invalid-xyz")
+
+
+def test_convert_with_source_encoding(tmp_path: Path) -> None:
+    """Test convert_encoding with explicit source encoding."""
+    from mahlif.encoding import convert_encoding
+
+    src = tmp_path / "test.txt"
+    src.write_text("Hello", encoding="utf-8")
+
+    result_path, src_enc, dest_enc = convert_encoding(
+        src, "utf-16", source_encoding="utf-8"
+    )
+    assert src_enc == "utf-8"
+
+
+def test_convert_xml_utf16(tmp_path: Path) -> None:
+    """Test convert_encoding updates XML declaration for UTF-16."""
+    from mahlif.encoding import convert_encoding
+
+    src = tmp_path / "test.xml"
+    src.write_text('<?xml version="1.0" encoding="UTF-8"?>\n<root/>', encoding="utf-8")
+    dest = tmp_path / "test_utf16.xml"
+
+    convert_encoding(src, "utf-16", dest)
+    content = dest.read_text(encoding="utf-16")
+    assert "UTF-16" in content
+
+
+def test_convert_xml_utf16le(tmp_path: Path) -> None:
+    """Test convert_encoding updates XML declaration for UTF-16LE."""
+    from mahlif.encoding import convert_encoding
+
+    src = tmp_path / "test.xml"
+    src.write_text('<?xml version="1.0" encoding="UTF-8"?>\n<root/>', encoding="utf-8")
+    dest = tmp_path / "test_utf16le.xml"
+
+    convert_encoding(src, "utf-16-le", dest)
+    content = dest.read_text(encoding="utf-16-le")
+    assert "UTF-16" in content
+
+
+def test_convert_xml_utf16be(tmp_path: Path) -> None:
+    """Test convert_encoding updates XML declaration for UTF-16BE."""
+    from mahlif.encoding import convert_encoding
+
+    src = tmp_path / "test.xml"
+    src.write_text('<?xml version="1.0" encoding="UTF-8"?>\n<root/>', encoding="utf-8")
+    dest = tmp_path / "test_utf16be.xml"
+
+    convert_encoding(src, "utf-16-be", dest)
+    content = dest.read_text(encoding="utf-16-be")
+    assert "UTF-16" in content
+
+
+def test_encode_utf16le() -> None:
+    """Test encode_utf16le adds BOM prefix."""
+    from mahlif.encoding import encode_utf16le
+
+    result = encode_utf16le("Hello")
+    assert result.startswith(b"\xff\xfe")

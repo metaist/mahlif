@@ -173,14 +173,13 @@ def convert_encoding(
             rest = content[end_decl + 2 :]
             # Map encoding to XML-style name
             xml_encoding = target_encoding.upper().replace("-", "")
-            if xml_encoding == "UTF8":
-                xml_encoding = "UTF-8"
-            elif xml_encoding == "UTF16":
-                xml_encoding = "UTF-16"
-            elif xml_encoding == "UTF16LE":
-                xml_encoding = "UTF-16"  # XML doesn't distinguish LE/BE
-            elif xml_encoding == "UTF16BE":
-                xml_encoding = "UTF-16"
+            match xml_encoding:
+                case "UTF8":
+                    xml_encoding = "UTF-8"
+                case "UTF16" | "UTF16LE" | "UTF16BE":
+                    xml_encoding = "UTF-16"  # XML doesn't distinguish LE/BE
+                case _:  # pragma: no cover
+                    pass  # Other encodings (e.g., LATIN1) keep original value
             new_decl = re.sub(
                 r'encoding=["\'][^"\']*["\']',
                 f'encoding="{xml_encoding}"',

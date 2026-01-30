@@ -1285,3 +1285,186 @@ def test_manuscript_list_via_main(capsys: pytest.CaptureFixture[str]) -> None:
     assert result == 0
     captured = capsys.readouterr()
     assert "Available plugins:" in captured.out
+
+
+# =============================================================================
+# Format command tests
+# =============================================================================
+
+
+def test_format_already_formatted(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test format command with already formatted file."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    # Use properly formatted content (formatter expands to multiple lines)
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    result = main(["format", str(plugin)])
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "Already formatted" in captured.out
+
+
+def test_format_reformats_file(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test format command reformats unformatted file."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    # Unformatted: missing newline, bad spacing
+    plugin.write_text('{Run "() { x=1; }"}', encoding="utf-8")
+
+    result = main(["format", str(plugin)])
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "Reformatted" in captured.out
+
+
+def test_format_check_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test format --check reports unformatted files."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    plugin.write_text('{Run "() { x=1; }"}', encoding="utf-8")
+
+    result = main(["format", "--check", str(plugin)])
+    assert result == 1
+    captured = capsys.readouterr()
+    assert "Would reformat" in captured.out
+
+
+def test_format_check_mode_already_formatted(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test format --check passes for formatted file."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    # Use properly formatted content
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    result = main(["format", "--check", str(plugin)])
+    assert result == 0
+
+
+def test_format_diff_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test format --diff shows diff."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    plugin.write_text('{Run "() { x=1; }"}', encoding="utf-8")
+
+    result = main(["format", "--diff", str(plugin)])
+    assert result == 0
+    captured = capsys.readouterr()
+    assert "---" in captured.out or "+++" in captured.out
+
+
+def test_format_file_not_found(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Test format with nonexistent file."""
+    from mahlif.sibelius.cli import main
+
+    main(["format", str(tmp_path / "nonexistent.plg")])
+    captured = capsys.readouterr()
+    assert "not found" in captured.err
+
+
+def test_format_default_files(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Test format with no files uses default directory."""
+    from mahlif.sibelius.cli import main
+
+    # Create a plugin in a temp sibelius dir
+    sibelius_dir = tmp_path / "sibelius"
+    sibelius_dir.mkdir()
+    plugin = sibelius_dir / "Test.plg"
+    # Use properly formatted content
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    # Monkeypatch Path(__file__).parent to return our temp dir
+    import mahlif.sibelius.cli as cli_module
+
+    monkeypatch.setattr(cli_module, "__file__", str(sibelius_dir / "cli.py"))
+
+    result = main(["format"])
+    assert result == 0
+
+
+# =============================================================================
+# Check command --strict and --error tests
+# =============================================================================
+
+
+def test_check_strict_mode(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test check --strict treats warnings as errors."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    # Code with a warning (unused variable)
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    result = main(["check", "--strict", str(plugin)])
+    # Should fail because warning is treated as error
+    assert result >= 1
+    captured = capsys.readouterr()
+    assert "error(s)" in captured.out
+
+
+def test_check_error_flag(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Test check --error promotes specific warnings to errors."""
+    from mahlif.sibelius.cli import main
+
+    plugin = tmp_path / "Test.plg"
+    # Code with MS-W025 (unused variable)
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    result = main(["check", "--error=MS-W025", str(plugin)])
+    # Should fail because MS-W025 is promoted to error
+    assert result >= 1
+    captured = capsys.readouterr()
+    assert "error(s)" in captured.out
+
+
+def test_build_plugins_hardlink_already_exists(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Test build with hardlink when hardlink already exists (same inode)."""
+    from mahlif.sibelius.build import build_plugins
+
+    source_dir = tmp_path / "source"
+    source_dir.mkdir()
+    plugin = source_dir / "Test.plg"
+    plugin.write_text('{\n    Run "() {\n        x = 1;\n    }"\n}\n', encoding="utf-8")
+
+    output_dir = tmp_path / "dist"
+    sibelius_dir = tmp_path / "sibelius_plugins"
+    sibelius_dir.mkdir()
+
+    monkeypatch.setattr(
+        "mahlif.sibelius.build.get_sibelius_plugin_dir", lambda: sibelius_dir
+    )
+
+    # First build creates hardlink
+    error_count, built = build_plugins(
+        source_dir=source_dir, output_dir=output_dir, hardlink=True
+    )
+    assert error_count == 0
+
+    link_path = sibelius_dir / "Test.plg"
+    assert link_path.exists()
+    original_inode = link_path.stat().st_ino
+
+    # Second build - hardlink already exists with same inode
+    error_count, built = build_plugins(
+        source_dir=source_dir, output_dir=output_dir, hardlink=True
+    )
+    assert error_count == 0
+
+    # Should still be same inode (no change needed)
+    assert link_path.stat().st_ino == original_inode

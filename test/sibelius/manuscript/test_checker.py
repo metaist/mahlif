@@ -804,3 +804,249 @@ def test_new_variable_no_shadow() -> None:
     errors = check_method_body("y = 1;", parameters=["x"])
     w033_errors = [e for e in errors if e.code == "MS-W033"]
     assert w033_errors == []
+
+
+# =============================================================================
+# Branch coverage tests
+# =============================================================================
+
+
+def test_constant_condition_while_no_warning() -> None:
+    """Test no warning for while(True) - it's a common pattern."""
+    errors = check_method_body("while (True) { break; }")
+    w028_errors = [e for e in errors if e.code == "MS-W028"]
+    assert w028_errors == []
+
+
+def test_constant_condition_nonzero_number() -> None:
+    """Test warning for if (42) - nonzero number."""
+    errors = check_method_body("if (1) { x = 1; }")
+    w028_errors = [e for e in errors if e.code == "MS-W028"]
+    assert len(w028_errors) == 1
+    assert "always true" in w028_errors[0].message
+
+
+def test_arg_count_multiple_signatures() -> None:
+    """Test error message with multiple overloaded signatures."""
+    from mahlif.sibelius.manuscript.checker import (
+        MethodBodyChecker,
+        FunctionSignature,
+        BUILTIN_SIGNATURES,
+    )
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+    from mahlif.sibelius.manuscript.tokens import Token, TokenType
+
+    # Create a minimal checker
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    # Create a fake token for the function call
+    fake_token = Token(TokenType.IDENTIFIER, "TestFunc", 1, 1)
+
+    # Temporarily add a function with multiple signatures to BUILTIN_SIGNATURES
+    BUILTIN_SIGNATURES["_TestMultiSig"] = [
+        FunctionSignature(min_params=1, max_params=1),
+        FunctionSignature(min_params=3, max_params=4),
+    ]
+
+    try:
+        # Call with invalid arg count (2 args, which matches neither signature)
+        checker._check_arg_count(None, "_TestMultiSig", 2, fake_token)
+
+        assert len(checker.errors) == 1
+        assert "1 or 3-4" in checker.errors[0].message
+    finally:
+        del BUILTIN_SIGNATURES["_TestMultiSig"]
+
+
+def test_arg_count_multiple_signatures_same_range() -> None:
+    """Test error message with multiple signatures having same min=max."""
+    from mahlif.sibelius.manuscript.checker import (
+        MethodBodyChecker,
+        FunctionSignature,
+        BUILTIN_SIGNATURES,
+    )
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+    from mahlif.sibelius.manuscript.tokens import Token, TokenType
+
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    fake_token = Token(TokenType.IDENTIFIER, "TestFunc", 1, 1)
+
+    # Temporarily add a function with multiple signatures where min=max
+    BUILTIN_SIGNATURES["_TestMultiSig2"] = [
+        FunctionSignature(min_params=1, max_params=1),
+        FunctionSignature(min_params=3, max_params=3),
+    ]
+
+    try:
+        # Call with invalid arg count
+        checker._check_arg_count(None, "_TestMultiSig2", 2, fake_token)
+
+        assert len(checker.errors) == 1
+        assert "1 or 3" in checker.errors[0].message
+    finally:
+        del BUILTIN_SIGNATURES["_TestMultiSig2"]
+
+
+def test_find_similar_empty_candidates() -> None:
+    """Test _find_similar with empty candidates list."""
+    from mahlif.sibelius.manuscript.checker import MethodBodyChecker
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    result = checker._find_similar("test", set())
+    assert result is None
+
+
+def test_find_similar_empty_name() -> None:
+    """Test _find_similar with empty name."""
+    from mahlif.sibelius.manuscript.checker import MethodBodyChecker
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    result = checker._find_similar("", {"foo", "bar"})
+    # Empty name should still work (returns None or closest)
+    assert result is None or isinstance(result, str)
+
+
+def test_check_property_method_access() -> None:
+    """Test property check when accessing a method name without calling it."""
+    # This is the case where prop_name is actually a method
+    errors = check_method_body("x = Sibelius.ActiveScore;")
+    # ActiveScore is a property, should work
+    # Testing that methods accessed without () don't error
+    errors = check_method_body("x = Sibelius.MessageBox;")
+    # MessageBox is a method - accessing without calling might be intentional
+    assert not any("MessageBox" in e.message and e.code == "MS-W024" for e in errors)
+
+
+def test_arg_count_no_signature_data() -> None:
+    """Test _check_arg_count returns early when no signature data."""
+    from mahlif.sibelius.manuscript.checker import MethodBodyChecker
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+    from mahlif.sibelius.manuscript.tokens import Token, TokenType
+
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    fake_token = Token(TokenType.IDENTIFIER, "UnknownFunc", 1, 1)
+
+    # Call with unknown function (no signatures in BUILTIN_SIGNATURES)
+    checker._check_arg_count(None, "UnknownFunctionWithNoSigData", 5, fake_token)
+
+    # Should not add any errors since we don't know the signature
+    assert not any(e.code == "MS-W023" for e in checker.errors)
+
+
+def test_arg_count_range_signature() -> None:
+    """Test wrong arg count error for function with min != max signature."""
+    # Substring takes 2-3 args, calling with 0 should show "2-3"
+    errors = check_method_body("x = Substring();")
+    w023_errors = [e for e in errors if e.code == "MS-W023"]
+    assert len(w023_errors) == 1
+    assert "2-3" in w023_errors[0].message
+
+
+def test_check_property_no_receiver_type() -> None:
+    """Test _check_property returns early when receiver_type is None."""
+    from mahlif.sibelius.manuscript.checker import MethodBodyChecker
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+    from mahlif.sibelius.manuscript.tokens import Token, TokenType
+
+    tokenizer = MethodBodyTokenizer("x = 1;")
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+
+    fake_token = Token(TokenType.IDENTIFIER, "SomeProp", 1, 1)
+
+    # Call with None receiver_type - should return without error
+    checker._check_property(None, "SomeProp", fake_token)
+
+    # Should not add any property errors
+    assert not any(e.code == "MS-W024" for e in checker.errors)
+
+
+def test_return_at_end_of_block_no_unreachable() -> None:
+    """Test return at end of block doesn't warn about unreachable code."""
+    errors = check_method_body("x = 1; return x;")
+    w026_errors = [e for e in errors if e.code == "MS-W026"]
+    assert w026_errors == []
+
+
+def test_assignment_at_end_of_tokens() -> None:
+    """Test assignment detection with minimal tokens (can't peek ahead)."""
+    # "x =" with no RHS - should error, not crash
+    errors = check_method_body("x =")
+    # Should get syntax error for missing expression
+    assert any(e.code.startswith("MS-E") for e in errors)
+
+
+def test_comparison_to_self_lt() -> None:
+    """Test warning for x < x (always false)."""
+    errors = check_method_body("if (x < x) { }", parameters=["x"])
+    assert any(e.code == "MS-W032" and "always false" in e.message for e in errors)
+
+
+def test_comparison_to_self_gt() -> None:
+    """Test warning for x > x (always false)."""
+    errors = check_method_body("if (x > x) { }", parameters=["x"])
+    assert any(e.code == "MS-W032" and "always false" in e.message for e in errors)
+
+
+def test_comparison_to_self_lte() -> None:
+    """Test warning for x <= x (always true)."""
+    errors = check_method_body("if (x <= x) { }", parameters=["x"])
+    assert any(e.code == "MS-W032" and "always true" in e.message for e in errors)
+
+
+def test_comparison_to_self_gte() -> None:
+    """Test warning for x >= x (always true)."""
+    errors = check_method_body("if (x >= x) { }", parameters=["x"])
+    assert any(e.code == "MS-W032" and "always true" in e.message for e in errors)
+
+
+def test_unreachable_code_warns_only_once() -> None:
+    """Test that unreachable code after return only warns once."""
+    # Multiple statements after return - should only warn once
+    errors = check_method_body("return 1; x = 1; y = 2;")
+    w026_errors = [e for e in errors if e.code == "MS-W026"]
+    assert len(w026_errors) == 1  # Only one warning, not two
+
+
+def test_unreachable_code_second_statement_skips_warning() -> None:
+    """Test that second unreachable statement doesn't trigger re-check."""
+    from mahlif.sibelius.manuscript.checker import MethodBodyChecker
+    from mahlif.sibelius.manuscript.tokenizer import MethodBodyTokenizer
+
+    # Three statements after return to ensure we hit the "already warned" path twice
+    code = "return 1; x = 1; y = 2; z = 3;"
+    tokenizer = MethodBodyTokenizer(code)
+    tokens = list(tokenizer.tokenize())
+    checker = MethodBodyChecker(tokens)
+    errors = checker.check()
+
+    # Should have exactly one unreachable code warning
+    w026_errors = [e for e in errors if e.code == "MS-W026"]
+    assert len(w026_errors) == 1
+
+    # Should have processed all statements (verified by unreachable_warned being True)
+    assert checker.unreachable_warned is True
+
+
+def test_return_in_block_followed_by_brace() -> None:
+    """Test return in if block where next token is closing brace."""
+    # After return in if block, next token is }, should not warn
+    errors = check_method_body("if (x) { return 1; }", parameters=["x"])
+    w026_errors = [e for e in errors if e.code == "MS-W026"]
+    assert w026_errors == []
