@@ -485,7 +485,13 @@ class MethodBodyChecker:
             self._skip_comments()
 
             # Check for empty right side
-            if self._check(TokenType.SEMICOLON, TokenType.RPAREN, TokenType.EOF):
+            # NOTE: This branch is currently unreachable because _parse_or_expr()
+            # consumes '=' as an equality operator before we get here. ManuScript
+            # uses '=' for both assignment and equality, creating ambiguity.
+            # Keeping this as defensive code in case parser structure changes.
+            if self._check(
+                TokenType.SEMICOLON, TokenType.RPAREN, TokenType.EOF
+            ):  # pragma: no cover
                 self.errors.append(
                     CheckError(
                         self._current().line,

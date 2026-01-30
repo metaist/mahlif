@@ -94,3 +94,126 @@ Property access requires a name after the dot.
 
 **Expected errors:**
 - `MS-E040` - Expected ')' to close function call
+
+## Incomplete Binary Expression
+
+Missing operand after operator.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1 +;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E046` - Expected expression after operator
+
+## Missing Property Name
+
+Dot notation requires a property name.
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        obj = Sibelius;
+        x = obj.;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E047` - Expected property name after '.'
+
+## Unclosed Parenthesis
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = (1 + 2;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')'
+
+## Unclosed Function Call
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = Sibelius.MessageBox('hello';
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ')' or ','
+
+## Unclosed Array Index
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        arr = CreateSparseArray();
+        x = arr[0;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E040` - Expected ']'
+
+## Unexpected Closing Brace
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = 1;
+        }
+        y = 2;
+    }"
+}
+```
+
+**Expected errors:**
+- `MS-E001` - Unexpected '}'
+
+## Valid Chained Method Call
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        x = Sibelius.ActiveScore.NthStaff(1).FullInstrumentName;
+    }"
+}
+```
+
+**Expected errors:**
+(none)
+
+## Valid Complex Expression
+
+```manuscript
+{
+    Initialize "() { AddToPluginsMenu('Test', 'Run'); }"
+    Run "() {
+        a = 1;
+        b = 2;
+        c = 3;
+        x = (a + b) * c;
+    }"
+}
+```
+
+**Expected errors:**
+(none)
