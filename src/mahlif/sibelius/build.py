@@ -207,13 +207,18 @@ def build_plugins(
         errors = lint(plg)
         # Only fail on errors (E*), not warnings (W*)
         error_count = sum(1 for e in errors if e.code.startswith("MS-E"))
+        warning_count = len(errors) - error_count
         if error_count > 0:
             if verbose:
-                print(f"✗ {plg.name}: {error_count} error(s)")
+                print(
+                    f"✗ {plg.name}: {error_count} error(s), {warning_count} warning(s)"
+                )
                 for error in errors:
                     if error.code.startswith("MS-E"):
                         print(f"  {error}")
             lint_failed = True
+        elif verbose:
+            print(f"✓ {plg.name}: {error_count} error(s), {warning_count} warning(s)")
 
     if lint_failed:
         if verbose:
