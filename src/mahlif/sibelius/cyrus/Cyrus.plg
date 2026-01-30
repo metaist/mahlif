@@ -74,12 +74,19 @@ for each staff in score {
 	}
 }
 Sibelius.DestroyProgressDialog();
-header = '=== Cyrus Report (build 13) ===' & Chr(10);
+header = '=== Cyrus Report (build 15) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
 header = header & 'Unresolved: ' & boundariesChecked & Chr(10);
 header = header & 'Changes: ' & changeCount & Chr(10);
+fullReport = header & Chr(10) & report;
+filePath = Sibelius.SelectFileToSave('Save Cyrus Report', 'cyrus_report.txt', '', 'txt', 'TEXT');
+if (filePath != '') {
+	Sibelius.CreateTextFile(filePath);
+	Sibelius.AppendTextFile(filePath, fullReport, True);
+	Sibelius.MessageBox('Report saved to: ' & filePath);
+}
 return header;
 }"
 	ProcessBar "(bar, barNum, staffName) {
