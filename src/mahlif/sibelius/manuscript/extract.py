@@ -14,6 +14,13 @@ The output can be used for:
 - Code completion (LSP)
 - Hover documentation
 - Signature help
+
+TODO: Extract parameter and return types from description text.
+The PDF documents types in prose (e.g., "takes a string", "returns the Bar object").
+Pattern matching or NLP could extract these for better LSP support:
+- Parameter types for type checking
+- Return types for chained method completion
+- Property types for assignment validation
 """
 
 from __future__ import annotations
