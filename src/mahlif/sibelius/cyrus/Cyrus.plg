@@ -119,7 +119,7 @@ if (cancelled) {
 	Sibelius.MessageBox('Processing cancelled.');
 	return header;
 }
-header = '=== Cyrus Report (build 34) ===' & Chr(10);
+header = '=== Cyrus Report (build 35) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
@@ -249,7 +249,7 @@ if (section != '') {
 	loc = loc & ' [' & section & ']';
 }
 loc = loc & ' Bar ' & displayBarNum;
-return 'CHNG ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & Chr(10);
+return 'CHNG ' & loc & ', Beat ' & beat & ', ' & staffName & ': ' & ipaA & '-' & ipaB & ' -> ' & newIpaA & '-' & newIpaB & ' (cyr: ' & cyrA & '-' & cyrB & ')' & Chr(10);
 }"
 	ExtractCyrillicOnset "(text) {
 onset = '';
