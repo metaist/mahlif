@@ -64,8 +64,8 @@ for barNum = startBar to endBar + 1 {
 					staffIdx = staffIdx + 1;
 					staffName = staff.InstrumentName;
 					pct = (barsDone * 100) / totalBars;
-					staffProgress = 'Bar ' & barNum & '/' & endBar & Chr(10) & 'Staff ' & staffIdx & '/' & numStaves & ' (' & staffName & ')';
-					continueProcessing = Sibelius.UpdateProgressDialog(pct, staffProgress);
+					progressMsg = 'Bar ' & barNum & '/' & endBar & Chr(10) & 'Staves: ' & numStaves;
+					continueProcessing = Sibelius.UpdateProgressDialog(pct, progressMsg);
 					if (not(continueProcessing)) {
 						cancelled = True;
 					} else {
@@ -117,7 +117,7 @@ if (cancelled) {
 	Sibelius.MessageBox('Processing cancelled.');
 	return header;
 }
-header = '=== Cyrus Report (build 36) ===' & Chr(10);
+header = '=== Cyrus Report (build 37) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
