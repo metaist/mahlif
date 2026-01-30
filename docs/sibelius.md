@@ -2,10 +2,10 @@
 
 Mahlif provides bidirectional support for Sibelius via ManuScript plugins.
 
-| Direction         | Status         | Method        |
-| ----------------- | -------------- | ------------- |
-| Sibelius → Mahlif | ✅ Working     | Export plugin |
-| Mahlif → Sibelius | 🚧 In Progress | Import plugin |
+| Direction         | Status     | Method                  |
+| ----------------- | ---------- | ----------------------- |
+| Sibelius → Mahlif | ✅ Working | Export plugin           |
+| Mahlif → Sibelius | ✅ Working | Generated import plugin |
 
 ## Quick Start
 
