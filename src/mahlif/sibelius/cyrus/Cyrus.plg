@@ -116,11 +116,11 @@ for barNum = startBar to endBar + 1 {
 	}
 }
 Sibelius.DestroyProgressDialog();
+header = '=== Cyrus Report (build 39) ===' & Chr(10);
 if (cancelled) {
 	Sibelius.MessageBox('Processing cancelled.');
 	return header;
 }
-header = '=== Cyrus Report (build 38) ===' & Chr(10);
 header = header & 'Bars: ' & (endBar - startBar + 1) & Chr(10);
 header = header & 'Staves: ' & numStaves & Chr(10);
 header = header & 'Skipped: ' & skippedCount & Chr(10);
