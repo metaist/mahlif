@@ -86,10 +86,12 @@ Then reload in Sibelius: **File > Plug-ins > Edit Plug-ins** > Unload/Reload
 
 ### EASY: Consonant Mappings
 
-Single Cyrillic consonant to IPA mapping in `MapSingleCyrillicConsonant`:
+Single Cyrillic consonant to pipe-delimited IPA alternatives in `MapSingleCyrillicConsonant`.
+Alternatives account for devoicing, voicing assimilation, and other allophonic variation:
 
 ```manuscript
-if (c = 'щ') { return 'ʃ'; }  // Change this if different IPA is used
+if (c = 'д') { return 'd|t'; }  // d (default) or t (final devoicing)
+if (c = 'г') { return 'g|k|v|x'; }  // devoicing, genitive в, бог→box
 ```
 
 ### EASY: Special Cluster Overrides
@@ -115,7 +117,7 @@ return 'аеёиоуыэюяАЕЁИОУЫЭЮЯ';
 **IPA vowels** in `GetIpaVowels`:
 
 ```manuscript
-return 'ɑʌɐeɛɪiouaæɨ';
+return 'ɑʌɐeɛɪiouaæɨəɔøʊy';
 ```
 
 **Palatalizing vowels** in `GetPalatalizingVowels`:
@@ -170,7 +172,7 @@ These require understanding the full algorithm:
 2. **Affricates with tie bar (`t͡ʃ`, `t͡s`) are atomic** - not split
 3. **Diacritics attach to previous consonant** - moved together
 4. **Palatalizing vowels (я, е, ё, ю) keep their `j`** - when word-initial or after vowel
-5. **г→в sound changes are flagged as UNRE** - legitimate transcription, can't auto-fix
+5. **Non-Cyrillic sections (e.g., French) are skipped** - no Cyrillic→IPA mapping applies
 
 ## Lyric Style IDs
 
